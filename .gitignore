@@ -163,3 +163,8 @@ tsdoc-metadata.json
 
 # swc cache
 .swc
+
+# yarn
+.yarn/cache/
+.yarn/install-state.gz
+.yarnrc.yml
