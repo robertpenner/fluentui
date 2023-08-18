@@ -93,14 +93,14 @@ export const MotionCurves = () => {
         style={{
           display: 'flex',
           flexDirection: 'column',
-          gap: '20px',
+          gap: '15px',
         }}
       >
         {curveNames.map(curveToken => {
           const coordsStr = theme[curveToken].replace(/cubic-bezier\((.*)\)/, '$1');
-          const svgSize = 64;
+          // const svgSize = 64;
           const coords = coordsStr.split(',').map(parseFloat);
-          const [x1, y1, x2, y2] = coords.map(n => n * svgSize);
+          // const [x1, y1, x2, y2] = coords.map(n => n * svgSize);
 
           // const easing = (t: number) => t * t;
           const easing = BezierEasing(coords[0], coords[1], coords[2], coords[3]);
@@ -120,12 +120,12 @@ export const MotionCurves = () => {
                   gap: 5,
                 }}
               >
-                <div key={curveToken} style={{ fontWeight: 'bold' }}>
+                <div key={curveToken} style={{ fontWeight: 'bold', fontSize: '' }}>
                   {curveToken}
                 </div>
 
                 <div>
-                  <svg
+                  {/* <svg
                     key={`${curveToken}-svg`}
                     width={svgSize}
                     height={svgSize}
@@ -138,12 +138,12 @@ export const MotionCurves = () => {
                       strokeWidth="2"
                       fill="transparent"
                     />
-                  </svg>
+                  </svg> */}
                 </div>
                 <div key={`${curveToken}-value`}>{theme[curveToken]}</div>
               </div>
 
-              <div key={`${curveToken}-demo`}>
+              <div key={`${curveToken}-demo`} style={{ zIndex: 5, opacity: animationEnabled ? 0.7 : 0 }}>
                 <div
                   className={classes.curvesAnimation}
                   style={{
@@ -152,7 +152,9 @@ export const MotionCurves = () => {
                   }}
                 />
               </div>
-              <EaseGraph ease={easing} width={300} height={100}></EaseGraph>
+              <div style={{ transform: 'translateX(-35px)' }}>
+                <EaseGraph ease={easing} width={200} height={100} padding={0}></EaseGraph>
+              </div>
             </div>
           );
         })}{' '}
