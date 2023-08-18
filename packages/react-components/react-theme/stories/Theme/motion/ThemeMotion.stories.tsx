@@ -1,8 +1,12 @@
 import * as React from 'react';
 import { makeStyles, shorthands, teamsLightTheme } from '@fluentui/react-components';
 import type { CurveTokens, DurationTokens } from '@fluentui/react-components';
+import EaseGraph from './components/EaseGraph';
+import * as BezierEasing from 'bezier-easing';
 
 const theme = teamsLightTheme;
+
+const curveNames = Object.keys(theme).filter(tokenName => tokenName.startsWith('curve')) as (keyof CurveTokens)[];
 
 const useStyles = makeStyles({
   durationAnimation: {
@@ -87,27 +91,71 @@ export const MotionCurves = () => {
       <label htmlFor="curvesEnableAnimations">Enable animations</label>
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: 'auto auto 1fr',
-          gap: '10px',
-          alignItems: 'center',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '20px',
         }}
       >
-        {(Object.keys(theme).filter(tokenName => tokenName.startsWith('curve')) as (keyof CurveTokens)[]).map(
-          curveToken => [
-            <div key={curveToken}>{curveToken}</div>,
-            <div key={`${curveToken}-value`}>{theme[curveToken]}</div>,
-            <div key={`${curveToken}-demo`}>
+        {curveNames.map(curveToken => {
+          const coordsStr = theme[curveToken].replace(/cubic-bezier\((.*)\)/, '$1');
+          const svgSize = 64;
+          const coords = coordsStr.split(',').map(parseFloat);
+          const [x1, y1, x2, y2] = coords.map(n => n * svgSize);
+
+          // const easing = (t: number) => t * t;
+          const easing = BezierEasing(coords[0], coords[1], coords[2], coords[3]);
+          return (
+            <div
+              key={curveToken}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
               <div
-                className={classes.curvesAnimation}
                 style={{
-                  animationDuration: animationEnabled ? '2s' : '0s',
-                  animationTimingFunction: theme[curveToken],
+                  display: 'flex',
+                  flexDirection: 'column',
+                  width: 200,
+                  gap: 5,
                 }}
-              />
-            </div>,
-          ],
-        )}
+              >
+                <div key={curveToken} style={{ fontWeight: 'bold' }}>
+                  {curveToken}
+                </div>
+
+                <div>
+                  <svg
+                    key={`${curveToken}-svg`}
+                    width={svgSize}
+                    height={svgSize}
+                    viewBox={`-2 -2 ${svgSize + 2} ${svgSize + 2}`}
+                  >
+                    <path
+                      transform={`scale(1, -1) translate(0, -${svgSize})`}
+                      d={`M 0 0 C ${x1} ${y1} ${x2} ${y2} ${svgSize} ${svgSize}`}
+                      stroke="black"
+                      strokeWidth="2"
+                      fill="transparent"
+                    />
+                  </svg>
+                </div>
+                <div key={`${curveToken}-value`}>{theme[curveToken]}</div>
+              </div>
+
+              <div key={`${curveToken}-demo`}>
+                <div
+                  className={classes.curvesAnimation}
+                  style={{
+                    animationDuration: animationEnabled ? '2s' : '0s',
+                    animationTimingFunction: theme[curveToken],
+                  }}
+                />
+              </div>
+              <EaseGraph ease={easing} width={300} height={100}></EaseGraph>
+            </div>
+          );
+        })}{' '}
       </div>
     </div>
   );

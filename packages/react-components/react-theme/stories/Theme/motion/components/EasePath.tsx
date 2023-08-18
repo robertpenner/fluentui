@@ -33,7 +33,7 @@ const EasePath: FC<Props> = ({ width = 100, height = 100, ease = t => t /*, numP
   } catch (e) {
     return null;
   }
-  return <path d={fLine(xData)!} stroke="white" fill="none" />;
+  return <path d={fLine(xData)!} stroke="white" strokeWidth={2} fill="none" />;
 };
 
 export default EasePath;
