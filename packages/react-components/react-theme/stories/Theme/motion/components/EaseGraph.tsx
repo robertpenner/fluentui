@@ -25,7 +25,7 @@ const EaseGraph: FC<Props> = ({ ease, width = 200, height = 200, padding = 20, l
   // console.log('EaseGraph:', ease);
   return (
     <div
-      className="main"
+      className="ease-graph__main"
       onMouseEnter={() => {
         setMouseInside(true);
       }}
@@ -46,7 +46,7 @@ const EaseGraph: FC<Props> = ({ ease, width = 200, height = 200, padding = 20, l
           {mouseInside && <EaseCursor ease={ease} width={width} height={height} />}
         </g>
       </svg>
-      <div className="label" style={{ paddingLeft: padding }}>
+      <div className="ease-graph__label" style={{ paddingLeft: padding }}>
         {label}
       </div>
     </div>
