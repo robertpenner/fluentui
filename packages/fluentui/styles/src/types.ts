@@ -1,4 +1,5 @@
 import * as CSS from 'csstype';
+import { CubicBezierString } from '../../react-northstar/src/themes/teams/animations/timingFunctions';
 
 // ========================================================
 // Debug
@@ -68,7 +69,7 @@ export interface ThemeAnimation<KP = {}> {
   fillMode?: string;
   iterationCount?: string;
   playState?: string;
-  timingFunction?: string;
+  timingFunction?: CSS.DataType.EasingFunction | CubicBezierString;
   keyframeParams?: KP;
 }
 
