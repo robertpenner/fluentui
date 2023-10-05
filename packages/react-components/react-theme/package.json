@@ -27,11 +27,13 @@
   "devDependencies": {
     "@fluentui/eslint-plugin": "*",
     "@fluentui/scripts-api-extractor": "*",
-    "@fluentui/scripts-tasks": "*"
+    "@fluentui/scripts-tasks": "*",
+    "@types/react-transition-group": "^4.2.0"
   },
   "dependencies": {
     "@fluentui/tokens": "1.0.0-alpha.11",
-    "@swc/helpers": "^0.5.1"
+    "@swc/helpers": "^0.5.1",
+    "react-transition-group": "^4.4.5"
   },
   "beachball": {
     "disallowedChangeTypes": [
