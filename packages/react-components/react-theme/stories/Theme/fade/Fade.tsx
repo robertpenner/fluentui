@@ -1,11 +1,12 @@
 import React, { FC, useRef, useCallback } from 'react';
+
+import { Transition as RTGTransition } from 'react-transition-group';
 // import { CSSTransition } from 'react-transition-group';
 
-import { Transition } from 'react-transition-group';
-
 type TransitionState = 'entering' | 'entered' | 'exiting' | 'exited' | 'unmounted';
+type StylesByState = Record<TransitionState, object>;
 
-const transitionStyles: Record<TransitionState, object> = {
+const fadeStyles: StylesByState = {
   entering: { opacity: 1 },
   entered: { opacity: 1 },
   exiting: { opacity: 0 },
@@ -13,9 +14,23 @@ const transitionStyles: Record<TransitionState, object> = {
   unmounted: { opacity: 0 },
 };
 
-type FadeProps = { in: boolean; duration?: number; onStateChange?: (state: TransitionState) => void };
+type TransitionDefinition = {
+  in: object;
+  out: object;
+  transitionProperty: string;
+};
 
-export const Fade: FC<FadeProps> = ({ in: inProp, duration = 300, onStateChange, children }) => {
+const fade: TransitionDefinition = {
+  in: { opacity: 1 },
+  out: { opacity: 0 },
+  transitionProperty: 'opacity',
+};
+
+type TransitionProps = { in: boolean; duration?: number; onState?: (state: TransitionState) => void };
+
+const noop = () => {};
+
+export const Fade: FC<TransitionProps> = ({ in: inProp, duration = 300, onState = noop, children }) => {
   const nodeRef = useRef(null);
 
   const defaultStyle = {
@@ -24,15 +39,15 @@ export const Fade: FC<FadeProps> = ({ in: inProp, duration = 300, onStateChange,
   };
 
   return (
-    <Transition
+    <RTGTransition
       nodeRef={nodeRef}
       in={inProp}
       timeout={duration}
       unmountOnExit
-      onEntering={useCallback(() => onStateChange?.('entering'), [onStateChange])}
-      onEntered={useCallback(() => onStateChange?.('entered'), [onStateChange])}
-      onExiting={useCallback(() => onStateChange?.('exiting'), [onStateChange])}
-      onExited={useCallback(() => onStateChange?.('exited'), [onStateChange])}
+      onEntering={useCallback(() => onState('entering'), [onState])}
+      onEntered={useCallback(() => onState('entered'), [onState])}
+      onExiting={useCallback(() => onState('exiting'), [onState])}
+      onExited={useCallback(() => onState('exited'), [onState])}
     >
       {state => (
         <>
@@ -40,37 +55,15 @@ export const Fade: FC<FadeProps> = ({ in: inProp, duration = 300, onStateChange,
             ref={nodeRef}
             style={{
               ...defaultStyle,
-              ...transitionStyles[state],
+              ...fadeStyles[state],
             }}
           >
             {children}
           </div>
         </>
       )}
-    </Transition>
+    </RTGTransition>
   );
 };
-
-// Copilot
-
-// interface FadeProps {
-//   children: React.ReactNode;
-//   timeout: number;
-// }
-
-// const Fade = ({ children, timeout }: FadeProps) => (
-//   <CSSTransition timeout={timeout} classNames="fade" unmountOnExit>
-//     {state => (
-//       <div
-//         style={{
-//           opacity: state === 'exiting' ? 0 : 1,
-//           transition: `opacity ${timeout}ms ease-in-out`,
-//         }}
-//       >
-//         {children}
-//       </div>
-//     )}
-//   </CSSTransition>
-// );
 
 export default Fade;
