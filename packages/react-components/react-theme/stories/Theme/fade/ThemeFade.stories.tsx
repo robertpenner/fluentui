@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Fade } from './Fade';
+import { Fade, ScaleFade } from './Fade';
 
 export const FadeDemo = () => {
   const [visible, setVisible] = useState(false);
@@ -42,25 +42,17 @@ export const FadeDemoRenderProp = () => {
   );
 };
 
-// export const TransitionDemoRenderProp = () => {
-//   const [visible, setVisible] = useState(false);
-//   const caption = visible ? 'Hide' : 'Show';
-//   return (
-//     <div>
-//       <button onClick={() => setVisible(!visible)}>{caption}</button>
-//       <Fade visible={visible} duration={1000}>
-//         {transitionState => (
-//           <>
-//             <div>STATE: {transitionState}</div>
-
-//             <h2
-//               style={{ backgroundColor: 'lightgrey', borderRadius: '10px', padding: '10px', display: 'inline-block' }}
-//             >
-//               CONTENT
-//             </h2>
-//           </>
-//         )}
-//       </Fade>
-//     </div>
-//   );
-// };
+export const ScaleFadeDemo = () => {
+  const [visible, setVisible] = useState(false);
+  const caption = visible ? 'Hide' : 'Show';
+  return (
+    <div>
+      <button onClick={() => setVisible(!visible)}>{caption}</button>
+      <ScaleFade visible={visible} duration={1000}>
+        <h2 style={{ backgroundColor: 'lightgrey', borderRadius: '10px', padding: '10px', display: 'inline-block' }}>
+          CONTENT
+        </h2>
+      </ScaleFade>
+    </div>
+  );
+};

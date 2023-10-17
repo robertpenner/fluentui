@@ -5,34 +5,31 @@ import { Transition as RTGTransition } from 'react-transition-group';
 
 type TransitionState = 'entering' | 'entered' | 'exiting' | 'exited' | 'unmounted';
 
-// Will we need to make styles for individual states?
-// type StylesByState = Record<TransitionState, CSSProperties>;
-// const fadeStyles: StylesByState = {
-//   entering: { opacity: 1 },
-//   entered: { opacity: 1 },
-//   exiting: { opacity: 0 },
-//   exited: { opacity: 0 },
-//   unmounted: { opacity: 0 },
-// };
-
-type TransitionDefinition = {
-  in: CSSProperties;
+type TransitionConfig = {
+  in?: CSSProperties;
   out: CSSProperties;
   common?: CSSProperties;
   transitionProperty: CSSProperties['transitionProperty'];
 };
 
-const fade: TransitionDefinition = {
-  in: { opacity: 1, transform: 'scale(1.2)' },
+const fade: TransitionConfig = {
+  transitionProperty: 'opacity',
+  // in: { opacity: 1 },
   out: { opacity: 0 },
-  common: { transitionTimingFunction: 'ease-in', transformOrigin: 'top' },
+  common: { transitionTimingFunction: 'ease-in-out' },
+};
+
+const scaleFade: TransitionConfig = {
   transitionProperty: 'opacity, transform',
+  // in: { opacity: 1, transform: 'scale(1)' },
+  out: { opacity: 0, transform: 'scale(.7)' },
+  common: { transitionTimingFunction: 'ease-out', transformOrigin: 'center' },
 };
 
 type TransitionRenderProp = ReactNode | ((state: TransitionState) => ReactNode);
 
 type TransitionProps = {
-  definition: TransitionDefinition;
+  definition: TransitionConfig;
   visible: boolean;
   duration?: number;
   children: TransitionRenderProp;
@@ -40,10 +37,6 @@ type TransitionProps = {
 };
 
 const noop = () => {};
-
-export const Fade: FC<TransitionProps> = ({ visible, duration = 300, onState = noop, children }) => (
-  <Transition definition={fade} {...{ visible, duration, children, onState }} />
-);
 
 const inOrOutByState = {
   entering: 'in',
@@ -56,7 +49,9 @@ const inOrOutByState = {
 const Transition: FC<TransitionProps> = ({ definition, visible, duration = 300, onState = noop, children }) => {
   const nodeRef = useRef(null);
 
-  const defaultStyle = {
+  const baseStyle: CSSProperties = {
+    width: 'fit-content',
+    height: 'fit-content',
     transitionProperty: definition.transitionProperty,
     transitionDuration: `${duration}ms`,
   };
@@ -78,7 +73,7 @@ const Transition: FC<TransitionProps> = ({ definition, visible, duration = 300, 
             <div
               ref={nodeRef}
               style={{
-                ...defaultStyle,
+                ...baseStyle,
                 ...definition.common,
                 ...definition[inOrOutByState[state]],
               }}
@@ -92,4 +87,28 @@ const Transition: FC<TransitionProps> = ({ definition, visible, duration = 300, 
   );
 };
 
+export const Fade: FC<Omit<TransitionProps, 'definition'>> = ({
+  visible,
+  duration = 300,
+  onState = noop,
+  children,
+}) => <Transition definition={fade} {...{ visible, duration, children, onState }} />;
+
+export const ScaleFade: FC<Omit<TransitionProps, 'definition'>> = ({
+  visible,
+  duration = 300,
+  onState = noop,
+  children,
+}) => <Transition definition={scaleFade} {...{ visible, duration, children, onState }} />;
+
 export default Fade;
+
+// Will we need to make styles for individual states?
+// type StylesByState = Record<TransitionState, CSSProperties>;
+// const fadeStyles: StylesByState = {
+//   entering: { opacity: 1 },
+//   entered: { opacity: 1 },
+//   exiting: { opacity: 0 },
+//   exited: { opacity: 0 },
+//   unmounted: { opacity: 0 },
+// };
