@@ -1,12 +1,18 @@
 import { Meta, Canvas } from '@storybook/addon-docs';
-import { FadeDemo } from './ThemeFade.stories';
+import { FadeDemo, FadeDemoRenderProp } from './ThemeFade.stories';
 
 <Meta title="Theme/Fade" />
 
 <h1 class="sbdocs-title">Fade</h1>
 
-### Fade
+### Fade with static children and onState callback
 
 <Canvas withSource="none">
   <FadeDemo />
+</Canvas>
+
+### Fade with render prop children
+
+<Canvas withSource="none">
+  <FadeDemoRenderProp />
 </Canvas>

@@ -10,7 +10,7 @@ export const FadeDemo = () => {
       <div>STATE: {transitionState}</div>
 
       <button onClick={() => setVisible(!visible)}>{caption}</button>
-      <Fade in={visible} duration={1000} onState={setTransitionState}>
+      <Fade visible={visible} duration={1000} onState={setTransitionState}>
         <h2 style={{ backgroundColor: 'lightgrey', borderRadius: '10px', padding: '10px', display: 'inline-block' }}>
           CONTENT
         </h2>
@@ -18,3 +18,49 @@ export const FadeDemo = () => {
     </div>
   );
 };
+
+export const FadeDemoRenderProp = () => {
+  const [visible, setVisible] = useState(false);
+  const caption = visible ? 'Hide' : 'Show';
+  return (
+    <div>
+      <button onClick={() => setVisible(!visible)}>{caption}</button>
+      <Fade visible={visible} duration={1000}>
+        {transitionState => (
+          <>
+            <div>STATE: {transitionState}</div>
+
+            <h2
+              style={{ backgroundColor: 'lightgrey', borderRadius: '10px', padding: '10px', display: 'inline-block' }}
+            >
+              CONTENT
+            </h2>
+          </>
+        )}
+      </Fade>
+    </div>
+  );
+};
+
+// export const TransitionDemoRenderProp = () => {
+//   const [visible, setVisible] = useState(false);
+//   const caption = visible ? 'Hide' : 'Show';
+//   return (
+//     <div>
+//       <button onClick={() => setVisible(!visible)}>{caption}</button>
+//       <Fade visible={visible} duration={1000}>
+//         {transitionState => (
+//           <>
+//             <div>STATE: {transitionState}</div>
+
+//             <h2
+//               style={{ backgroundColor: 'lightgrey', borderRadius: '10px', padding: '10px', display: 'inline-block' }}
+//             >
+//               CONTENT
+//             </h2>
+//           </>
+//         )}
+//       </Fade>
+//     </div>
+//   );
+// };
