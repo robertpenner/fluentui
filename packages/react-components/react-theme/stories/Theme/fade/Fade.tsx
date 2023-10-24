@@ -22,8 +22,8 @@ const fade: TransitionConfig = {
 
 const scaleFade: TransitionConfig = {
   transitionProperty: 'opacity, transform',
-  // in: { opacity: 1, transform: 'scale(1)' },
-  out: { opacity: 0, transform: 'scale(.8)' },
+  in: { opacity: 0.9, transform: 'scale(1)' },
+  out: { opacity: 0.5, transform: 'scale(.8)' },
   common: { transitionDuration: '1s', transitionTimingFunction: 'ease-out', transformOrigin: 'center' },
 };
 
@@ -63,12 +63,14 @@ const Transition: FC<TransitionProps> = ({ config, visible, onState = noop, chil
     height: 'fit-content',
   };
 
+  // mountOnEnter
+  // unmountOnExit
+
   return (
     <RTGTransition
       nodeRef={nodeRef}
       in={visible}
       timeout={durationMs}
-      unmountOnExit
       onEntering={useCallback(() => onState('entering'), [onState])}
       onEntered={useCallback(() => onState('entered'), [onState])}
       onExiting={useCallback(() => onState('exiting'), [onState])}
@@ -85,6 +87,7 @@ const Transition: FC<TransitionProps> = ({ config, visible, onState = noop, chil
                 ...config[inOrOutByState[state]],
               }}
             >
+              ###
               {/* Support static children or render function to respond to state */}
               {typeof children === 'function' ? children(state) : children}
             </div>
