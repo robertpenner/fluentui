@@ -33,8 +33,5 @@ export type DialogSurfaceContextValues = {
  */
 export type DialogSurfaceState = ComponentState<DialogSurfaceSlots> &
   // This is only partial to avoid breaking changes, it should be mandatory and in fact it is always defined internally.
-  Pick<DialogContextValue, 'isNestedDialog'> &
-  Pick<PortalProps, 'mountNode'> & {
-    // This is only optional to avoid breaking changes, it should be mandatory and in fact it is always defined internally.
-    transitionStatus?: 'entering' | 'entered' | 'idle' | 'exiting' | 'exited' | 'unmounted';
-  };
+  Partial<Pick<DialogContextValue, 'isNestedDialog'>> &
+  Pick<PortalProps, 'mountNode'>;

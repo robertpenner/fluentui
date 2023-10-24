@@ -13,7 +13,7 @@ export const dialogSurfaceClassNames: SlotClassNames<DialogSurfaceSlots> = {
 /**
  * Styles for the root slot
  */
-const useRootBaseStyle = makeResetStyles({
+const useRootResetStyles = makeResetStyles({
   ...createFocusOutlineStyle(),
   ...shorthands.inset(0),
   ...shorthands.padding(0),
@@ -33,96 +33,46 @@ const useRootBaseStyle = makeResetStyles({
   maxWidth: '600px',
   maxHeight: '100vh',
   boxSizing: 'border-box',
+  boxShadow: tokens.shadow64,
   backgroundColor: tokens.colorNeutralBackground1,
   color: tokens.colorNeutralForeground1,
 
   [MEDIA_QUERY_BREAKPOINT_SELECTOR]: {
     maxWidth: '100vw',
   },
-
-  // initial style before animation:
-  opacity: 0,
-  transitionDuration: tokens.durationGentle,
-  transitionProperty: 'opacity, transform, box-shadow',
-  // // FIXME: https://github.com/microsoft/fluentui/issues/29473
-  transitionTimingFunction: tokens.curveDecelerateMid,
-  boxShadow: '0px 0px 0px 0px rgba(0, 0, 0, 0.1)',
-  transform: 'scale(0.85) translateZ(0)',
-});
-
-const useRootStyles = makeStyles({
-  unmounted: {},
-  entering: {},
-  entered: {
-    boxShadow: tokens.shadow64,
-    transform: 'scale(1) translateZ(0)',
-    opacity: 1,
-  },
-  idle: {},
-  exiting: {
-    transitionTimingFunction: tokens.curveAccelerateMin,
-  },
-  exited: {},
-});
-
-/**
- * Styles for the backdrop slot
- */
-const useBackdropBaseStyle = makeResetStyles({
-  ...shorthands.inset('0px'),
-  backgroundColor: 'rgba(0, 0, 0, 0.4)',
-  position: 'fixed',
-
-  // initial style before animation:
-  transitionDuration: tokens.durationGentle,
-  transitionTimingFunction: tokens.curveLinear,
-  transitionProperty: 'opacity',
-  willChange: 'opacity',
-  opacity: 0,
 });
 
 const useBackdropStyles = makeStyles({
   nestedDialogBackdrop: {
     backgroundColor: tokens.colorTransparentBackground,
   },
-  unmounted: {},
-  entering: {},
-  entered: {
-    opacity: 1,
-  },
-  idle: {},
-  exiting: {
-    transitionTimingFunction: tokens.curveAccelerateMin,
-  },
-  exited: {},
+});
+
+/**
+ * Styles for the backdrop slot
+ */
+const useBackdropResetStyles = makeResetStyles({
+  ...shorthands.inset('0px'),
+  backgroundColor: 'rgba(0, 0, 0, 0.4)',
+  position: 'fixed',
 });
 
 /**
  * Apply styling to the DialogSurface slots based on the state
  */
 export const useDialogSurfaceStyles_unstable = (state: DialogSurfaceState): DialogSurfaceState => {
-  const { isNestedDialog, root, backdrop, transitionStatus = 'unmounted' } = state;
+  const surfaceResetStyles = useRootResetStyles();
+  const styles = useBackdropStyles();
+  const backdropResetStyles = useBackdropResetStyles();
 
-  const rootBaseStyle = useRootBaseStyle();
-  const rootStyles = useRootStyles();
+  state.root.className = mergeClasses(dialogSurfaceClassNames.root, surfaceResetStyles, state.root.className);
 
-  const backdropBaseStyle = useBackdropBaseStyle();
-  const backdropStyles = useBackdropStyles();
-
-  root.className = mergeClasses(
-    dialogSurfaceClassNames.root,
-    rootBaseStyle,
-    rootStyles[transitionStatus],
-    root.className,
-  );
-
-  if (backdrop) {
-    backdrop.className = mergeClasses(
+  if (state.backdrop) {
+    state.backdrop.className = mergeClasses(
       dialogSurfaceClassNames.backdrop,
-      backdropBaseStyle,
-      isNestedDialog && backdropStyles.nestedDialogBackdrop,
-      backdropStyles[transitionStatus],
-      backdrop.className,
+      backdropResetStyles,
+      state.isNestedDialog && styles.nestedDialogBackdrop,
+      state.backdrop.className,
     );
   }
 
