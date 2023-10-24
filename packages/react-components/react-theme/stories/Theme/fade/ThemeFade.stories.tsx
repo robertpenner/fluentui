@@ -31,7 +31,7 @@ export const FadeDemo = () => {
       <div>STATE: {transitionState}</div>
 
       <button onClick={() => setVisible(!visible)}>{caption}</button>
-      <Fade visible={visible} duration={1000} onState={setTransitionState}>
+      <Fade visible={visible} onState={setTransitionState}>
         {content}
       </Fade>
     </div>
@@ -44,7 +44,7 @@ export const FadeDemoRenderProp = () => {
   return (
     <div>
       <button onClick={() => setVisible(!visible)}>{caption}</button>
-      <Fade visible={visible} duration={1000}>
+      <Fade visible={visible}>
         {transitionState => (
           <>
             <div>STATE: {transitionState}</div>
@@ -65,9 +65,7 @@ export const ScaleFadeDemo = () => {
     <div>
       <button onClick={() => setVisible(!visible)}>{caption}</button>
 
-      <ScaleFade visible={visible} duration={1000}>
-        {content}
-      </ScaleFade>
+      <ScaleFade visible={visible}>{content}</ScaleFade>
     </div>
   );
 };
