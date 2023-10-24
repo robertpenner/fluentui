@@ -1,5 +1,26 @@
 import React, { useState } from 'react';
+import { CardPreview } from '@fluentui/react-components';
+
 import { Fade, ScaleFade } from './Fade';
+
+// const textContent = (
+//   <h2 style={{ backgroundColor: 'lightgrey', borderRadius: '10px', padding: '10px', display: 'inline-block' }}>
+//     CONTENT
+//   </h2>
+// );
+
+const resolveAsset = (asset: string) => {
+  const ASSET_URL =
+    'https://raw.githubusercontent.com/microsoft/fluentui/master/packages/react-components/react-card/stories/assets/';
+
+  return `${ASSET_URL}${asset}`;
+};
+
+const content = (
+  <CardPreview logo={<img src={resolveAsset('docx.png')} alt="Microsoft Word logo" />}>
+    <img src={resolveAsset('doc_template.png')} alt="Preview of a Word document " />
+  </CardPreview>
+);
 
 export const FadeDemo = () => {
   const [visible, setVisible] = useState(false);
@@ -11,9 +32,7 @@ export const FadeDemo = () => {
 
       <button onClick={() => setVisible(!visible)}>{caption}</button>
       <Fade visible={visible} duration={1000} onState={setTransitionState}>
-        <h2 style={{ backgroundColor: 'lightgrey', borderRadius: '10px', padding: '10px', display: 'inline-block' }}>
-          CONTENT
-        </h2>
+        {content}
       </Fade>
     </div>
   );
@@ -30,11 +49,7 @@ export const FadeDemoRenderProp = () => {
           <>
             <div>STATE: {transitionState}</div>
 
-            <h2
-              style={{ backgroundColor: 'lightgrey', borderRadius: '10px', padding: '10px', display: 'inline-block' }}
-            >
-              CONTENT
-            </h2>
+            {content}
           </>
         )}
       </Fade>
@@ -45,13 +60,13 @@ export const FadeDemoRenderProp = () => {
 export const ScaleFadeDemo = () => {
   const [visible, setVisible] = useState(false);
   const caption = visible ? 'Hide' : 'Show';
+
   return (
     <div>
       <button onClick={() => setVisible(!visible)}>{caption}</button>
+
       <ScaleFade visible={visible} duration={1000}>
-        <h2 style={{ backgroundColor: 'lightgrey', borderRadius: '10px', padding: '10px', display: 'inline-block' }}>
-          CONTENT
-        </h2>
+        {content}
       </ScaleFade>
     </div>
   );
