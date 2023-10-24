@@ -3,6 +3,7 @@
 
 import { DialogProvider, DialogSurfaceProvider } from '../../contexts';
 import type { DialogState, DialogContextValues } from './Dialog.types';
+import { ScaleFade } from '../../../../react-theme/stories/Theme/fade/Fade';
 
 /**
  * Render the final JSX of Dialog
@@ -14,7 +15,7 @@ export const renderDialog_unstable = (state: DialogState, contextValues: DialogC
     <DialogProvider value={contextValues.dialog}>
       <DialogSurfaceProvider value={contextValues.dialogSurface}>
         {trigger}
-        {content}
+        <ScaleFade visible={state.open}>{content}</ScaleFade>
       </DialogSurfaceProvider>
     </DialogProvider>
   );
