@@ -5,7 +5,7 @@ import type { TreeContextValues, TreeSlots, TreeState } from '../Tree/Tree.types
 import { TreeProvider } from '../TreeProvider';
 
 import { Transition } from 'react-transition-group';
-import { useRef, CSSProperties, useEffect } from 'react';
+import { useRef, CSSProperties, useEffect, FC, ReactNode } from 'react';
 
 type TransitionState = 'entering' | 'entered' | 'exiting' | 'exited' | 'unmounted';
 const inOrOutByState: Record<TransitionState, 'in' | 'out'> = {
@@ -26,9 +26,13 @@ const expandTransitionConfig = {
   common: { transitionDuration: `${duration}ms`, transitionTimingFunction: 'ease-out' },
 };
 
-export const renderTree_unstable = (state: TreeState, contextValues: TreeContextValues) => {
-  assertSlots<TreeSlots>(state);
-  const nodeRef = useRef<HTMLElement>(null);
+type CollapseProps = {
+  visible: boolean;
+  children: ReactNode;
+};
+
+const Collapse: FC<CollapseProps> = ({ visible, children }) => {
+  const nodeRef = useRef<HTMLDivElement>(null);
   const baseStyle: CSSProperties = {
     width: 'fit-content',
     height: 'fit-content',
@@ -40,31 +44,39 @@ export const renderTree_unstable = (state: TreeState, contextValues: TreeContext
     if (!element) {
       return;
     }
-    if (state.open) {
-      element.style.maxHeight = element.scrollHeight + 'px';
-    } else {
-      element.style.maxHeight = '0px';
-    }
-  }, [state.open]);
+    const maxHeightPx = visible ? element.scrollHeight : 0;
+    element.style.maxHeight = `${maxHeightPx}px`;
+  }, [visible]);
+
+  return (
+    <Transition in={visible} timeout={duration}>
+      {transitionState => (
+        <div
+          ref={nodeRef}
+          style={{
+            ...baseStyle,
+            transitionProperty: config.transitionProperty,
+            ...config.common,
+            ...config[inOrOutByState[transitionState]],
+          }}
+        >
+          {children}
+        </div>
+      )}
+    </Transition>
+  );
+};
+
+export const renderTree_unstable = (state: TreeState, contextValues: TreeContextValues) => {
+  assertSlots<TreeSlots>(state);
+
   return (
     <TreeProvider value={contextValues.tree}>
       {/* original show/hide without transition */}
       {/* {state.open && <state.root>{state.root.children}</state.root>} */}
-      <Transition nodeRef={nodeRef} in={state.open} timeout={duration}>
-        {transitionState => (
-          <div
-            ref={nodeRef}
-            style={{
-              ...baseStyle,
-              transitionProperty: config.transitionProperty,
-              ...config.common,
-              ...config[inOrOutByState[transitionState]],
-            }}
-          >
-            <state.root>{state.root.children}</state.root>
-          </div>
-        )}
-      </Transition>
+      <Collapse visible={state.open}>
+        <state.root>{state.root.children}</state.root>
+      </Collapse>
     </TreeProvider>
   );
 };
