@@ -1,6 +1,6 @@
 /** @jsxRuntime automatic */
 /** @jsxImportSource @fluentui/react-jsx-runtime */
-import { useRef, CSSProperties, useEffect, FC, ReactNode, useCallback } from 'react';
+import { useRef, useEffect, useCallback, CSSProperties, FC, ReactNode } from 'react';
 import { Transition } from 'react-transition-group';
 
 import { assertSlots } from '@fluentui/react-utilities';
@@ -20,6 +20,7 @@ const duration = 200;
 
 const expandTransitionConfig = {
   transitionProperty: 'opacity, max-height',
+  // transitionProperty: 'opacity',
   in: { opacity: 1 },
   out: { opacity: 0 },
   common: { transitionDuration: `${duration}ms`, transitionTimingFunction: 'ease-out' },
@@ -30,8 +31,19 @@ type CollapseProps = {
   children: ReactNode;
 };
 
+function usePreviousValue<T>(value: T): T {
+  const ref = useRef<T>();
+  useEffect(() => {
+    ref.current = value;
+  });
+  return ref.current!;
+}
+
 const Collapse: FC<CollapseProps> = ({ visible, children }) => {
   const nodeRef = useRef<HTMLDivElement>(null);
+  // const [previousVisible, setPreviousVisible] = useState<boolean | undefined>(undefined);
+  // const previousVisible = useRef<boolean>(visible);
+  const previousVisible = usePreviousValue(visible);
   const baseStyle: CSSProperties = {
     width: 'fit-content',
     height: 'fit-content',
@@ -44,10 +56,15 @@ const Collapse: FC<CollapseProps> = ({ visible, children }) => {
       return;
     }
 
-    if (visible) {
-      const maxHeightPx = element.scrollHeight;
-      element.style.maxHeight = `${maxHeightPx}px`;
-    } else {
+    // On the first render, we don't want to animate the exit transition.
+    const isFirstRender = previousVisible === undefined && !visible;
+    const isOpening = previousVisible === false && visible;
+    const isClosing = previousVisible === true && !visible;
+    if (isFirstRender) {
+      element.style.maxHeight = '0px';
+    } else if (isOpening) {
+      element.style.maxHeight = `${element.scrollHeight}px`;
+    } else if (isClosing) {
       // On the exit transition, we want to animate the height from the current height to 0.
       // But if we set maxHeight to 0, the browser will immediately set the height to 0 and the
       // transition won't work, because maxHeight is empty and the transition only works
@@ -61,9 +78,10 @@ const Collapse: FC<CollapseProps> = ({ visible, children }) => {
         element.style.maxHeight = '0px';
       });
     }
-  }, [visible]);
+  }, [visible, previousVisible]);
 
   // TODO: try to remove this callback and make it a declarative style
+  // Clear maxHeight after the enter transition so the element can grow with its content.
   const onEntered = useCallback(() => {
     const element = nodeRef.current;
     if (!element) {
@@ -71,6 +89,8 @@ const Collapse: FC<CollapseProps> = ({ visible, children }) => {
     }
     element.style.maxHeight = '';
   }, []);
+
+  // setPreviousVisible(visible);
 
   return (
     <Transition in={visible} timeout={duration} onEntered={onEntered}>
@@ -98,6 +118,8 @@ export const renderTree_unstable = (state: TreeState, contextValues: TreeContext
     <TreeProvider value={contextValues.tree}>
       {/* original show/hide without transition */}
       {/* {state.open && <state.root>{state.root.children}</state.root>} */}
+
+      {/* Wrap the children in a Collapse transition which manages show/hide */}
       <Collapse visible={state.open}>
         <state.root>{state.root.children}</state.root>
       </Collapse>
