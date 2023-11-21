@@ -1,11 +1,11 @@
 /** @jsxRuntime automatic */
 /** @jsxImportSource @fluentui/react-jsx-runtime */
+import { useRef, CSSProperties, useEffect, FC, ReactNode, useCallback } from 'react';
+import { Transition } from 'react-transition-group';
+
 import { assertSlots } from '@fluentui/react-utilities';
 import type { TreeContextValues, TreeSlots, TreeState } from '../Tree/Tree.types';
 import { TreeProvider } from '../TreeProvider';
-
-import { Transition } from 'react-transition-group';
-import { useRef, CSSProperties, useEffect, FC, ReactNode } from 'react';
 
 type TransitionState = 'entering' | 'entered' | 'exiting' | 'exited' | 'unmounted';
 const inOrOutByState: Record<TransitionState, 'in' | 'out'> = {
@@ -20,7 +20,6 @@ const duration = 200;
 
 const expandTransitionConfig = {
   transitionProperty: 'opacity, max-height',
-  // in: { opacity: 1, maxHeight: '200px' },
   in: { opacity: 1 },
   out: { opacity: 0 },
   common: { transitionDuration: `${duration}ms`, transitionTimingFunction: 'ease-out' },
@@ -44,12 +43,37 @@ const Collapse: FC<CollapseProps> = ({ visible, children }) => {
     if (!element) {
       return;
     }
-    const maxHeightPx = visible ? element.scrollHeight : 0;
-    element.style.maxHeight = `${maxHeightPx}px`;
+
+    if (visible) {
+      const maxHeightPx = element.scrollHeight;
+      element.style.maxHeight = `${maxHeightPx}px`;
+    } else {
+      // On the exit transition, we want to animate the height from the current height to 0.
+      // But if we set maxHeight to 0, the browser will immediately set the height to 0 and the
+      // transition won't work, because maxHeight is empty and the transition only works
+      // between numerical values.
+      // So first set maxHeight back to a number,
+      // and on the next frame, set it to 0 to start the transition.
+      // We can't leave maxHeight as a number because children might change their height inside,
+      // and the parent's maxHeight would not be updated.
+      element.style.maxHeight = `${element.scrollHeight}px`;
+      requestAnimationFrame(() => {
+        element.style.maxHeight = '0px';
+      });
+    }
   }, [visible]);
 
+  // TODO: try to remove this callback and make it a declarative style
+  const onEntered = useCallback(() => {
+    const element = nodeRef.current;
+    if (!element) {
+      return;
+    }
+    element.style.maxHeight = '';
+  }, []);
+
   return (
-    <Transition in={visible} timeout={duration}>
+    <Transition in={visible} timeout={duration} onEntered={onEntered}>
       {transitionState => (
         <div
           ref={nodeRef}
