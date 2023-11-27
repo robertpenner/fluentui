@@ -39,32 +39,52 @@ function usePreviousValue<T>(value: T): T {
   return ref.current!;
 }
 
+type CollapseRenderState = 'initiallyClosed' | 'initiallyOpen' | 'closing' | 'opening';
+// | 'closed'
+// | 'open'
+// | 'closingOneFrameLater'
+// | 'openingOneFrameLater';
+
+const getCollapseRenderState = ({
+  visible,
+  previousVisible,
+}: {
+  visible: boolean;
+  previousVisible: boolean | undefined;
+}): CollapseRenderState => {
+  if (previousVisible === undefined && !visible) {
+    return 'initiallyClosed';
+  } else if (previousVisible === undefined && visible) {
+    return 'initiallyOpen';
+  } else if (previousVisible === false && visible) {
+    return 'opening';
+  } else if (previousVisible === true && !visible) {
+    return 'closing';
+  } else {
+    return 'initiallyClosed';
+    // return 'closed';
+  }
+};
+
 const Collapse: FC<CollapseProps> = ({ visible, children }) => {
   const nodeRef = useRef<HTMLDivElement>(null);
-  // const [previousVisible, setPreviousVisible] = useState<boolean | undefined>(undefined);
-  // const previousVisible = useRef<boolean>(visible);
   const previousVisible = usePreviousValue(visible);
-  const baseStyle: CSSProperties = {
-    width: 'fit-content',
-    height: 'fit-content',
-  };
-  const config = expandTransitionConfig;
 
+  //
   useEffect(() => {
     const element = nodeRef.current;
     if (!element) {
       return;
     }
 
+    const renderState = getCollapseRenderState({ visible, previousVisible });
+
     // On the first render, we don't want to animate the exit transition.
-    const isFirstRender = previousVisible === undefined && !visible;
-    const isOpening = previousVisible === false && visible;
-    const isClosing = previousVisible === true && !visible;
-    if (isFirstRender) {
+    if (renderState === 'initiallyClosed') {
       element.style.maxHeight = '0px';
-    } else if (isOpening) {
-      element.style.maxHeight = `${element.scrollHeight}px`;
-    } else if (isClosing) {
+    } else if (renderState === 'opening') {
+      element.style.maxHeight === `${element.scrollHeight}px`;
+    } else if (renderState === 'closing') {
       // On the exit transition, we want to animate the height from the current height to 0.
       // But if we set maxHeight to 0, the browser will immediately set the height to 0 and the
       // transition won't work, because maxHeight is empty and the transition only works
@@ -90,7 +110,11 @@ const Collapse: FC<CollapseProps> = ({ visible, children }) => {
     element.style.maxHeight = '';
   }, []);
 
-  // setPreviousVisible(visible);
+  const baseStyle: CSSProperties = {
+    width: 'fit-content',
+    height: 'fit-content',
+  };
+  const config = expandTransitionConfig;
 
   return (
     <Transition in={visible} timeout={duration} onEntered={onEntered}>
