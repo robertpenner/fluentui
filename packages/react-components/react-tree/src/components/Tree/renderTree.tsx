@@ -110,14 +110,32 @@ const Collapse: FC<CollapseProps> = ({ visible, children }) => {
     element.style.maxHeight = '';
   }, []);
 
+  const onTransitionState = (state: TransitionState) => {
+    console.log('$$$ onTransitionState', state);
+    if (state === 'entered') {
+      onEntered();
+    }
+  };
+
   const baseStyle: CSSProperties = {
     width: 'fit-content',
     height: 'fit-content',
   };
   const config = expandTransitionConfig;
 
+  // TODO: test unmountOnExit
+  // unmountOnExit={true}
+
   return (
-    <Transition in={visible} timeout={duration} onEntered={onEntered}>
+    <Transition
+      in={visible}
+      timeout={duration}
+      onEntering={() => onTransitionState('entering')}
+      onEntered={() => onTransitionState('entered')}
+      onExiting={() => onTransitionState('exiting')}
+      onExited={() => onTransitionState('exited')}
+    >
+      {/* TODO: how to detect unmounted and call onTransitionState with it? */}
       {transitionState => (
         <div
           ref={nodeRef}
