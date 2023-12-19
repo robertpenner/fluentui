@@ -1,6 +1,6 @@
 /** @jsxRuntime automatic */
 /** @jsxImportSource @fluentui/react-jsx-runtime */
-import { useRef, useEffect, useCallback, CSSProperties, FC, ReactNode } from 'react';
+import { useRef, useState, useEffect, useCallback, CSSProperties, FC, ReactNode } from 'react';
 import { Transition } from 'react-transition-group';
 
 import { assertSlots } from '@fluentui/react-utilities';
@@ -41,6 +41,9 @@ function usePreviousValue<T>(value: T): T {
 
 const Collapse: FC<CollapseProps> = ({ visible, children }) => {
   const nodeRef = useRef<HTMLDivElement>(null);
+  // const [maxHeight, setMaxHeight] = useState('0px');
+  const [maxHeight, setMaxHeight] = useState('');
+
   // const [previousVisible, setPreviousVisible] = useState<boolean | undefined>(undefined);
   // const previousVisible = useRef<boolean>(visible);
   const previousVisible = usePreviousValue(visible);
@@ -62,8 +65,10 @@ const Collapse: FC<CollapseProps> = ({ visible, children }) => {
     const isClosing = previousVisible === true && !visible;
     if (isFirstRender) {
       element.style.maxHeight = '0px';
+      // setMaxHeight('0px');
     } else if (isOpening) {
-      element.style.maxHeight = `${element.scrollHeight}px`;
+      // element.style.maxHeight = `${element.scrollHeight}px`;
+      setMaxHeight(`${element.scrollHeight}px`);
     } else if (isClosing) {
       // On the exit transition, we want to animate the height from the current height to 0.
       // But if we set maxHeight to 0, the browser will immediately set the height to 0 and the
@@ -74,8 +79,10 @@ const Collapse: FC<CollapseProps> = ({ visible, children }) => {
       // We can't leave maxHeight as a number because children might change their height inside,
       // and the parent's maxHeight would not be updated.
       element.style.maxHeight = `${element.scrollHeight}px`;
+      // setMaxHeight(`${element.scrollHeight}px`);
       requestAnimationFrame(() => {
         element.style.maxHeight = '0px';
+        // setMaxHeight('0px');
       });
     }
   }, [visible, previousVisible]);
@@ -87,7 +94,8 @@ const Collapse: FC<CollapseProps> = ({ visible, children }) => {
     if (!element) {
       return;
     }
-    element.style.maxHeight = '';
+    // element.style.maxHeight = '';
+    setMaxHeight('');
   }, []);
 
   // setPreviousVisible(visible);
@@ -102,6 +110,7 @@ const Collapse: FC<CollapseProps> = ({ visible, children }) => {
             transitionProperty: config.transitionProperty,
             ...config.common,
             ...config[inOrOutByState[transitionState]],
+            maxHeight: maxHeight || undefined,
           }}
         >
           {children}
