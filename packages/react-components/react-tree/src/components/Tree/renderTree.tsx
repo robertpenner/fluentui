@@ -64,8 +64,8 @@ const Collapse: FC<CollapseProps> = ({ visible, children }) => {
     const isOpening = previousVisible === false && visible;
     const isClosing = previousVisible === true && !visible;
     if (isFirstRender) {
-      element.style.maxHeight = '0px';
-      // setMaxHeight('0px');
+      // element.style.maxHeight = '0px';
+      setMaxHeight('0px');
     } else if (isOpening) {
       // element.style.maxHeight = `${element.scrollHeight}px`;
       setMaxHeight(`${element.scrollHeight}px`);
@@ -81,8 +81,8 @@ const Collapse: FC<CollapseProps> = ({ visible, children }) => {
       element.style.maxHeight = `${element.scrollHeight}px`;
       // setMaxHeight(`${element.scrollHeight}px`);
       requestAnimationFrame(() => {
-        element.style.maxHeight = '0px';
-        // setMaxHeight('0px');
+        // element.style.maxHeight = '0px';
+        setMaxHeight('0px');
       });
     }
   }, [visible, previousVisible]);
