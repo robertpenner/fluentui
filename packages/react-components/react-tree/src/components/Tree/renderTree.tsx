@@ -64,7 +64,6 @@ const Collapse: FC<CollapseProps> = ({ visible, children }) => {
     const isOpening = previousVisible === false && visible;
     const isClosing = previousVisible === true && !visible;
     if (isFirstRender) {
-      // element.style.maxHeight = '0px';
       setMaxHeight('0px');
     } else if (isOpening) {
       // element.style.maxHeight = `${element.scrollHeight}px`;
@@ -78,10 +77,8 @@ const Collapse: FC<CollapseProps> = ({ visible, children }) => {
       // and on the next frame, set it to 0 to start the transition.
       // We can't leave maxHeight as a number because children might change their height inside,
       // and the parent's maxHeight would not be updated.
-      // element.style.maxHeight = `${element.scrollHeight}px`;
       setMaxHeight(`${element.scrollHeight}px`);
       requestAnimationFrame(() => {
-        // element.style.maxHeight = '0px';
         setMaxHeight('0px');
       });
     }
@@ -90,22 +87,13 @@ const Collapse: FC<CollapseProps> = ({ visible, children }) => {
   // TODO: try to remove this callback and make it a declarative style
   // Clear maxHeight after the enter transition so the element can grow with its content.
   const onEntered = useCallback(() => {
-    const element = nodeRef.current;
-    if (!element) {
-      return;
-    }
-    // element.style.maxHeight = '';
     setMaxHeight('');
   }, []);
 
   // setPreviousVisible(visible);
 
   const setMaxHeightToScrollHeight = useCallback(() => {
-    const element = nodeRef.current;
-    if (!element) {
-      return;
-    }
-    setMaxHeight(`${nodeRef.current.scrollHeight}px`);
+    nodeRef.current && setMaxHeight(`${nodeRef.current.scrollHeight}px`);
   }, []);
 
   return (
