@@ -68,7 +68,7 @@ const Collapse: FC<CollapseProps> = ({ visible, children }) => {
       setMaxHeight('0px');
     } else if (isOpening) {
       // element.style.maxHeight = `${element.scrollHeight}px`;
-      setMaxHeight(`${element.scrollHeight}px`);
+      // setMaxHeight(`${element.scrollHeight}px`);
     } else if (isClosing) {
       // On the exit transition, we want to animate the height from the current height to 0.
       // But if we set maxHeight to 0, the browser will immediately set the height to 0 and the
@@ -100,8 +100,16 @@ const Collapse: FC<CollapseProps> = ({ visible, children }) => {
 
   // setPreviousVisible(visible);
 
+  const setMaxHeightToScrollHeight = useCallback(() => {
+    const element = nodeRef.current;
+    if (!element) {
+      return;
+    }
+    setMaxHeight(`${nodeRef.current.scrollHeight}px`);
+  }, []);
+
   return (
-    <Transition in={visible} timeout={duration} onEntered={onEntered}>
+    <Transition in={visible} timeout={duration} onEntered={onEntered} onEntering={setMaxHeightToScrollHeight}>
       {transitionState => (
         <div
           ref={nodeRef}
@@ -110,7 +118,7 @@ const Collapse: FC<CollapseProps> = ({ visible, children }) => {
             transitionProperty: config.transitionProperty,
             ...config.common,
             ...config[inOrOutByState[transitionState]],
-            maxHeight: maxHeight || undefined,
+            maxHeight,
           }}
         >
           {children}
