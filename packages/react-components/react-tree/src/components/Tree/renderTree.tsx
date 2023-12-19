@@ -1,6 +1,6 @@
 /** @jsxRuntime automatic */
 /** @jsxImportSource @fluentui/react-jsx-runtime */
-import { useRef, useState, useEffect, useCallback, CSSProperties, FC, ReactNode } from 'react';
+import { useRef, useState, useCallback, CSSProperties, FC, ReactNode } from 'react';
 import { Transition } from 'react-transition-group';
 
 import { assertSlots } from '@fluentui/react-utilities';
@@ -18,12 +18,18 @@ const inOrOutByState: Record<TransitionState, 'in' | 'out'> = {
 
 const duration = 200;
 
-const expandTransitionConfig = {
+type TransitionConfig = {
+  transitionProperty: string;
+  common: CSSProperties;
+  in: CSSProperties;
+  out: CSSProperties;
+};
+
+const expandTransitionConfig: TransitionConfig = {
   transitionProperty: 'opacity, max-height',
-  // transitionProperty: 'opacity',
+  common: { transitionDuration: `${duration}ms`, transitionTimingFunction: 'ease-out' },
   in: { opacity: 1 },
   out: { opacity: 0 },
-  common: { transitionDuration: `${duration}ms`, transitionTimingFunction: 'ease-out' },
 };
 
 type CollapseProps = {
@@ -31,73 +37,46 @@ type CollapseProps = {
   children: ReactNode;
 };
 
-function usePreviousValue<T>(value: T): T {
-  const ref = useRef<T>();
-  useEffect(() => {
-    ref.current = value;
-  });
-  return ref.current!;
-}
-
 const Collapse: FC<CollapseProps> = ({ visible, children }) => {
   const nodeRef = useRef<HTMLDivElement>(null);
-  // const [maxHeight, setMaxHeight] = useState('0px');
-  const [maxHeight, setMaxHeight] = useState('');
+  const [height, setHeight] = useState(visible ? '' : '0px');
 
-  // const [previousVisible, setPreviousVisible] = useState<boolean | undefined>(undefined);
-  // const previousVisible = useRef<boolean>(visible);
-  const previousVisible = usePreviousValue(visible);
   const baseStyle: CSSProperties = {
     width: 'fit-content',
     height: 'fit-content',
   };
-  const config = expandTransitionConfig;
 
-  useEffect(() => {
-    const element = nodeRef.current;
-    if (!element) {
-      return;
-    }
+  const expandToCalculatedHeight = useCallback(() => {
+    nodeRef.current && setHeight(`${nodeRef.current.scrollHeight}px`);
+  }, []);
 
-    // On the first render, we don't want to animate the exit transition.
-    const isFirstRender = previousVisible === undefined && !visible;
-    const isOpening = previousVisible === false && visible;
-    const isClosing = previousVisible === true && !visible;
-    if (isFirstRender) {
-      setMaxHeight('0px');
-    } else if (isOpening) {
-      // element.style.maxHeight = `${element.scrollHeight}px`;
-      // setMaxHeight(`${element.scrollHeight}px`);
-    } else if (isClosing) {
-      // On the exit transition, we want to animate the height from the current height to 0.
-      // But if we set maxHeight to 0, the browser will immediately set the height to 0 and the
-      // transition won't work, because maxHeight is empty and the transition only works
-      // between numerical values.
-      // So first set maxHeight back to a number,
-      // and on the next frame, set it to 0 to start the transition.
-      // We can't leave maxHeight as a number because children might change their height inside,
-      // and the parent's maxHeight would not be updated.
-      setMaxHeight(`${element.scrollHeight}px`);
-      requestAnimationFrame(() => {
-        setMaxHeight('0px');
-      });
-    }
-  }, [visible, previousVisible]);
-
-  // TODO: try to remove this callback and make it a declarative style
   // Clear maxHeight after the enter transition so the element can grow with its content.
-  const onEntered = useCallback(() => {
-    setMaxHeight('');
+  const clearHeight = useCallback(() => {
+    setHeight('');
   }, []);
 
-  // setPreviousVisible(visible);
+  const collapseHeight = useCallback(() => {
+    // On the exit transition, we want to animate the height from the current height to 0.
+    // But if we set the height to 0, the browser will immediately set the height to 0 and the
+    // transition won't work, because the height is empty and the transition only works
+    // between numerical values.
+    // So first set it back to the calculated height...
+    expandToCalculatedHeight();
+    // ...and on the next frame, set it to 0 to start the transition.
+    // We can't just leave the height as a number, because children might change their height inside,
+    // and the parent's height would not be updated.
+    requestAnimationFrame(() => setHeight('0px'));
+  }, [expandToCalculatedHeight]);
 
-  const setMaxHeightToScrollHeight = useCallback(() => {
-    nodeRef.current && setMaxHeight(`${nodeRef.current.scrollHeight}px`);
-  }, []);
-
+  const config = expandTransitionConfig;
   return (
-    <Transition in={visible} timeout={duration} onEntered={onEntered} onEntering={setMaxHeightToScrollHeight}>
+    <Transition
+      in={visible}
+      timeout={duration}
+      onEntering={expandToCalculatedHeight}
+      onEntered={clearHeight}
+      onExiting={collapseHeight}
+    >
       {transitionState => (
         <div
           ref={nodeRef}
@@ -106,7 +85,7 @@ const Collapse: FC<CollapseProps> = ({ visible, children }) => {
             transitionProperty: config.transitionProperty,
             ...config.common,
             ...config[inOrOutByState[transitionState]],
-            maxHeight,
+            maxHeight: height,
           }}
         >
           {children}
