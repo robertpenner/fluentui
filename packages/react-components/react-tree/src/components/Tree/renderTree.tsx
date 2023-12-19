@@ -78,8 +78,8 @@ const Collapse: FC<CollapseProps> = ({ visible, children }) => {
       // and on the next frame, set it to 0 to start the transition.
       // We can't leave maxHeight as a number because children might change their height inside,
       // and the parent's maxHeight would not be updated.
-      element.style.maxHeight = `${element.scrollHeight}px`;
-      // setMaxHeight(`${element.scrollHeight}px`);
+      // element.style.maxHeight = `${element.scrollHeight}px`;
+      setMaxHeight(`${element.scrollHeight}px`);
       requestAnimationFrame(() => {
         // element.style.maxHeight = '0px';
         setMaxHeight('0px');
