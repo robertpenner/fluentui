@@ -25,20 +25,28 @@ type CollapseProps = {
 
 export const Collapse: FC<CollapseProps> = ({ visible, children, duration = 200 }) => {
   const nodeRef = useRef<HTMLDivElement>(null);
-  const [height, setHeight] = useState(visible ? '' : '0px');
 
+  // If initially expanded (visible true), set empty height so the element can grow with its content.
+  // Otherwise hide the content instantly with 0 height, and avoid triggering a collapse animation.
+  const initialHeight = visible ? '' : '0px';
+  // The height of the content is carefully managed per transition states.
+  // Currently implemented with maxHeight.
+  const [height, setHeight] = useState(initialHeight);
+
+  // Using inline styles on a wrapper div for this prototype.
   const baseStyle: CSSProperties = {
     width: 'fit-content',
     height: 'fit-content',
   };
 
+  // Styles for the transition states
   const config: TransitionConfig = useMemo(
     () => ({
       transitionProperty: 'opacity, max-height',
       common: { transitionDuration: `${duration}ms`, transitionTimingFunction: 'ease-out' },
       in: { opacity: 1 },
       out: { opacity: 0 },
-      // max-height will be calculated dynamically based on the content height
+      // maxHeight will be calculated dynamically based on the content height
     }),
     [duration],
   );
