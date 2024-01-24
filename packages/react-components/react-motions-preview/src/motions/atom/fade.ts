@@ -9,34 +9,56 @@ import {
   easingLinear,
 } from './tokens';
 
-import type { AtomMotion } from '../../types';
+import type { AtomMotion, PresenceMotion } from '../../types';
 
 export type FadeParams = {
   fromValue?: number;
 };
 
+type DurationMS = number;
+
+type PresenceDirection = keyof PresenceMotion;
+
+type GetFadeParams = FadeParams & {
+  direction: PresenceDirection;
+  duration?: DurationMS;
+  easing?: string;
+};
+
+const fadeKeyframes = (direction: PresenceDirection, fromValue = 0) => {
+  const keyframes = [{ opacity: fromValue }, { opacity: 1 }];
+  if (direction === 'exit') {
+    keyframes.reverse();
+  }
+  return keyframes;
+};
+
+type FadeAtomFactory = (params?: FadeParams) => AtomMotion;
+
+export const defineFade =
+  ({ direction, duration = 200, easing = easingLinear }: GetFadeParams): FadeAtomFactory =>
+  ({ fromValue = 0 } = {}) => ({
+    keyframes: fadeKeyframes(direction, fromValue),
+    duration,
+    easing,
+  });
+
 // Fade Ins
 // --------------------------------------------------
 
-export const enterUltraFast = ({ fromValue = 0 }: FadeParams = {}): AtomMotion => ({
-  keyframes: [{ opacity: fromValue }, { opacity: 1 }],
-
+export const enterUltraFast: FadeAtomFactory = defineFade({
+  direction: 'enter',
   duration: durationUltraFast,
-  easing: easingLinear,
 });
 
-export const enterFaster = ({ fromValue = 0 }: FadeParams = {}): AtomMotion => ({
-  keyframes: [{ opacity: fromValue }, { opacity: 1 }],
-
+export const enterFaster: FadeAtomFactory = defineFade({
+  direction: 'enter',
   duration: durationFaster,
-  easing: easingLinear,
 });
 
-export const enterFast = ({ fromValue = 0 }: FadeParams = {}): AtomMotion => ({
-  keyframes: [{ opacity: fromValue }, { opacity: 1 }],
-
+export const enterFast: FadeAtomFactory = defineFade({
+  direction: 'enter',
   duration: durationFast,
-  easing: easingLinear,
 });
 
 export const enterNormal = ({ fromValue = 0 }: FadeParams = {}): AtomMotion => ({
