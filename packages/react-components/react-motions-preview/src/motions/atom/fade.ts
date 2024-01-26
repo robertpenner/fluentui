@@ -19,7 +19,7 @@ type DurationMS = number;
 
 type PresenceDirection = keyof PresenceMotion;
 
-type GetFadeParams = FadeParams & {
+type DefineFadeParams = FadeParams & {
   direction: PresenceDirection;
   duration?: DurationMS;
   easing?: string;
@@ -36,7 +36,7 @@ const fadeKeyframes = (direction: PresenceDirection, fromValue = 0) => {
 type FadeAtomFactory = (params?: FadeParams) => AtomMotion;
 
 export const defineFade =
-  ({ direction, duration = 200, easing = easingLinear }: GetFadeParams): FadeAtomFactory =>
+  ({ direction, duration = 200, easing = easingLinear }: DefineFadeParams): FadeAtomFactory =>
   ({ fromValue = 0 } = {}) => ({
     keyframes: fadeKeyframes(direction, fromValue),
     duration,
