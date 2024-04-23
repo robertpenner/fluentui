@@ -15,12 +15,14 @@ import { AddRegular, DeleteRegular } from '@fluentui/react-icons';
 // import { createPresenceComponent, motionTokens, PresenceGroup, Collapse } from '@fluentui/react-motions-preview';
 import { PresenceGroup, Collapse, Scale, Fade } from '@fluentui/react-motions-preview';
 import * as React from 'react';
+import { users as allUsers } from './users';
 
 const motionOptions = {
   Collapse,
   ['Collapse.Pushy']: Collapse.Pushy,
   ['Collapse.Gentle']: Collapse.Gentle,
   ['Collapse.Snappy']: Collapse.Snappy,
+  ['Collapse.Linear']: Collapse.Linear,
   ['Scale']: Scale,
   ['Fade']: Fade,
 };
@@ -36,7 +38,7 @@ const useClasses = makeStyles({
     display: 'flex',
     flexDirection: 'column',
 
-    ...shorthands.gap('10px'),
+    // ...shorthands.gap('10px'),
 
     // ...shorthands.border(tokens.strokeWidthThicker, 'solid', tokens.colorNeutralForeground3),
     // ...shorthands.borderRadius(tokens.borderRadiusMedium),
@@ -82,9 +84,41 @@ const useClasses = makeStyles({
 export const PresenceGroupDefault = () => {
   const comboId = useId('combo-variant');
   const classes = useClasses();
-  const [limit, setLimit] = React.useState(3);
+  const [availableUsers, setAvailableUsers] = React.useState([...allUsers]);
+  const [users, setUsers] = React.useState(availableUsers.slice(0, 3));
+  // const [limit, setLimit] = React.useState(3);
   const [motionName, setMotionName] = React.useState<MotionName>(Object.keys(motionOptions)[0] as MotionName);
   const ItemMotion = motionOptions[motionName];
+
+  console.log('### users:', users);
+
+  const addUser = React.useCallback(() => {
+    console.log('### addUser - availableUsers, users:', availableUsers, users);
+    // Find the next user index
+    // const nextUserIndex = allUsers.length - users.length;
+    // Grab the next available user
+    const newUser = availableUsers[availableUsers.length - 1];
+    // Insert at a random position
+    setUsers(_users => {
+      const insertionIndex = Math.floor(Math.random() * (_users.length + 1));
+      return [..._users.slice(0, insertionIndex), newUser, ..._users.slice(insertionIndex)];
+    });
+    // Remove the user from the end of the available list
+    setAvailableUsers(_availableUsers => _availableUsers.slice(0, -1));
+  }, [setUsers, availableUsers, setAvailableUsers]);
+
+  const removeUser = React.useCallback(() => {
+    setUsers(_users => {
+      // TODO: add a removal button on each item
+      // Choose a random user
+      const removalIndex = Math.floor(Math.random() * _users.length);
+      const userToRemove = _users[removalIndex];
+      // Add the user back to the available list
+      setAvailableUsers(_availableUsers => [..._availableUsers, userToRemove]);
+      // Remove the user from the list
+      return [..._users.slice(0, removalIndex), ..._users.slice(removalIndex + 1)];
+    });
+  }, [setUsers]);
 
   return (
     <>
@@ -92,14 +126,14 @@ export const PresenceGroupDefault = () => {
         <div className={classes.controls}>
           <Button
             appearance="primary"
-            disabled={limit + 1 === users.length}
+            // disabled={limit + 1 === users.length}
             icon={<AddRegular />}
-            onClick={() => setLimit(l => l + 1)}
+            onClick={addUser}
             size="small"
           >
             Add user
           </Button>
-          <Button disabled={limit === 0} icon={<DeleteRegular />} onClick={() => setLimit(l => l - 1)} size="small">
+          <Button disabled={users.length === 0} icon={<DeleteRegular />} onClick={removeUser} size="small">
             Remove user
           </Button>
 
@@ -127,7 +161,7 @@ export const PresenceGroupDefault = () => {
         </div>
 
         <div className={classes.card}>
-          <ItemMotion visible={limit === 0} unmountOnExit>
+          <ItemMotion visible={users.length === 0} unmountOnExit>
             <MessageBar>
               <MessageBarBody>
                 <MessageBarTitle>No users</MessageBarTitle>
@@ -137,20 +171,25 @@ export const PresenceGroupDefault = () => {
           </ItemMotion>
 
           <PresenceGroup>
-            {users.slice(0, limit).map(item => (
+            {users.map(item => (
               // HACK: use the motion name in the key to force re-render of all items,
               // otherwise the motions don't reliably update when the selected motion name changes
               <ItemMotion key={item.name + '_' + motionName}>
-                <Persona
-                  avatar={{
-                    image: { src: item.image },
-                  }}
-                  textPosition="after"
-                  name={item.name}
-                  presence={{ status: 'available' }}
-                  secondaryText="Available"
-                  size="extra-large"
-                />
+                {/* Programmatic height cannot reduce padding, so outermost div must have 0 padding for full collapse */}
+                <div>
+                  <div style={{ padding: '5px 0' }}>
+                    <Persona
+                      avatar={{
+                        image: { src: item.image },
+                      }}
+                      textPosition="after"
+                      name={item.name}
+                      presence={{ status: 'available' }}
+                      secondaryText="Available"
+                      size="extra-large"
+                    />
+                  </div>
+                </div>
               </ItemMotion>
             ))}
           </PresenceGroup>
