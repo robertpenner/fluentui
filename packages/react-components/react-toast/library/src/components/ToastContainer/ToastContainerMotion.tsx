@@ -31,3 +31,8 @@ export const ToastContainerMotion = createPresenceComponent(({ element }) => ({
     },
   ],
 }));
+
+// export const ToastContainerMotion2 = createPresenceComponentVariant(Collapse, {
+//   enter: { duration: motionTokens.durationSlow, easing: motionTokens.curveEasyEaseMax },
+//   exit: { duration: motionTokens.durationNormal, easing: motionTokens.curveEasyEaseMax },
+// });
