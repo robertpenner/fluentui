@@ -5,7 +5,7 @@ export const ToastContainerMotion = createPresenceComponent(({ element }) => ({
     {
       keyframes: [
         { marginTop: 0, minHeight: 0, maxHeight: 0, opacity: 0 },
-        { marginTop: '16px', minHeight: 44, maxHeight: `${element.scrollHeight}px`, opacity: 0 },
+        { /*marginTop: '16px', minHeight: 44,*/ maxHeight: `${element.scrollHeight}px`, opacity: 0 },
       ],
       duration: 200,
     },
@@ -19,7 +19,7 @@ export const ToastContainerMotion = createPresenceComponent(({ element }) => ({
   exit: [
     {
       keyframes: [
-        { marginTop: '16px', minHeight: 44, maxHeight: `${element.scrollHeight}px` },
+        { /* marginTop: '16px', minHeight: 44,*/ maxHeight: `${element.scrollHeight}px` },
         { marginTop: 0, minHeight: 0, maxHeight: 0 },
       ],
       delay: 400,

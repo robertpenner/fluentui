@@ -1,5 +1,9 @@
 import { Field, makeStyles, tokens, Switch } from '@fluentui/react-components';
-import { CollapseExaggerated } from '@fluentui/react-motion-components-preview';
+import {
+  CollapseExaggerated,
+  ToastCollapse,
+  ToastCollapseExaggerated,
+} from '@fluentui/react-motion-components-preview';
 import * as React from 'react';
 
 import description from './CollapseExaggerated.stories.md';
@@ -49,11 +53,11 @@ export const Exaggerated = () => {
         </Field>
       </div>
 
-      <CollapseExaggerated visible={visible}>
+      <ToastCollapse visible={visible}>
         <div className={classes.card}>
           <LoremIpsum />
         </div>
-      </CollapseExaggerated>
+      </ToastCollapse>
     </div>
   );
 };

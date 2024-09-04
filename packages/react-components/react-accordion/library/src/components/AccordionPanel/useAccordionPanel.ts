@@ -2,7 +2,7 @@ import * as React from 'react';
 import { getIntrinsicElementProps, slot } from '@fluentui/react-utilities';
 import { useTabsterAttributes } from '@fluentui/react-tabster';
 import { presenceMotionSlot, type PresenceMotionSlotProps } from '@fluentui/react-motion';
-import { Collapse } from '@fluentui/react-motion-components-preview';
+import { DelayedCollapse as Collapse } from '@fluentui/react-motion-components-preview';
 import { useAccordionContext_unstable } from '../../contexts/accordion';
 import type { AccordionPanelProps, AccordionPanelState } from './AccordionPanel.types';
 import { useAccordionItemContext_unstable } from '../../contexts/accordionItem';

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { TreeProps, TreeState } from '../Tree';
 import { SubtreeContextValue, useSubtreeContext_unstable, useTreeItemContext_unstable } from '../contexts/index';
 import { getIntrinsicElementProps, useMergedRefs, slot } from '@fluentui/react-utilities';
-import { Collapse } from '@fluentui/react-motion-components-preview';
+import { DelayedCollapse as Collapse } from '@fluentui/react-motion-components-preview';
 import { presenceMotionSlot, PresenceMotionSlotProps } from '@fluentui/react-motion';
 
 /**
