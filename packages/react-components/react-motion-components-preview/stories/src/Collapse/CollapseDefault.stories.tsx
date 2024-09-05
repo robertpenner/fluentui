@@ -1,20 +1,25 @@
-import { Field, makeStyles, tokens, Switch } from '@fluentui/react-components';
-import { Collapse } from '@fluentui/react-motion-components-preview';
+import { Field, makeStyles, tokens, Switch, Radio, RadioGroup } from '@fluentui/react-components';
+import { DelayedCollapse as Collapse } from '@fluentui/react-motion-components-preview';
 import * as React from 'react';
 
 const useClasses = makeStyles({
   container: {
-    display: 'grid',
-    gridTemplate: `"controls ." "card card" / 1fr 1fr`,
-    gap: '20px 10px',
+    // display: 'grid',
+    // gridTemplate: `"controls ." "card card" / 1fr 1fr`,
+    // gap: '20px 10px',
   },
   card: {
     gridArea: 'card',
     padding: '10px',
+    // overflow: 'hidden',
+    width: '300px',
+    background: tokens.colorNeutralForegroundDisabled,
   },
   controls: {
-    display: 'flex',
-    flexDirection: 'column',
+    display: 'grid',
+    gridTemplateColumns: '1fr 3fr',
+    // flexDirection: 'row',
+    justifyContent: 'start',
     gridArea: 'controls',
 
     border: `${tokens.strokeWidthThicker} solid ${tokens.colorNeutralForeground3}`,
@@ -45,13 +50,25 @@ export const Default = () => {
         <Field className={classes.field}>
           <Switch label="Visible" checked={visible} onChange={() => setVisible(v => !v)} />
         </Field>
+
+        <Field className={classes.field}>
+          <RadioGroup layout="horizontal">
+            <Radio value="vertical" label="vertical" />
+            <Radio value="horizontal" label="horizontal" />
+          </RadioGroup>
+        </Field>
       </div>
 
-      <Collapse visible={visible}>
-        <div className={classes.card}>
-          <LoremIpsum />
-        </div>
-      </Collapse>
+      <div style={{ display: 'flex' }}>
+        <Collapse visible={visible}>
+          <div>
+            <div className={classes.card}>
+              <LoremIpsum />
+            </div>
+          </div>
+        </Collapse>
+        <div style={{ background: 'lightblue', width: '100px', border: 'solid 2px black', borderRadius: '20px' }}></div>
+      </div>
     </div>
   );
 };
