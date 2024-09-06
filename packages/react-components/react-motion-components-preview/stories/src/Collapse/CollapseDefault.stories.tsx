@@ -1,5 +1,6 @@
 import { Field, makeStyles, tokens, Switch, Radio, RadioGroup } from '@fluentui/react-components';
 import { DelayedCollapse as Collapse } from '@fluentui/react-motion-components-preview';
+import { Orientation } from '../../../library/src/components/Collapse/DelayedCollapse';
 import * as React from 'react';
 
 const useClasses = makeStyles({
@@ -43,6 +44,8 @@ const LoremIpsum = () => (
 export const Default = () => {
   const classes = useClasses();
   const [visible, setVisible] = React.useState<boolean>(false);
+  const [orientation, setOrientation] = React.useState<Orientation>('vertical');
+  // const [orientation, setOrientation] = React.useState<Orientation>('horizontal');
 
   return (
     <div className={classes.container}>
@@ -52,7 +55,11 @@ export const Default = () => {
         </Field>
 
         <Field className={classes.field}>
-          <RadioGroup layout="horizontal">
+          <RadioGroup
+            layout="horizontal"
+            value={orientation}
+            onChange={(_, data) => setOrientation(data.value as Orientation)}
+          >
             <Radio value="vertical" label="vertical" />
             <Radio value="horizontal" label="horizontal" />
           </RadioGroup>
@@ -60,7 +67,7 @@ export const Default = () => {
       </div>
 
       <div style={{ display: 'flex' }}>
-        <Collapse visible={visible}>
+        <Collapse visible={visible} orientation={orientation}>
           <div>
             <div className={classes.card}>
               <LoremIpsum />

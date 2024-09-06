@@ -2,14 +2,14 @@ import { motionTokens, type PresenceMotionFnCreator, createPresenceComponent } f
 
 const { durationNormal, durationSlower, durationUltraSlow, curveEasyEase } = motionTokens;
 
-type Orientation = 'horizontal' | 'vertical';
+export type Orientation = 'horizontal' | 'vertical';
 
 /**
  * Creates a motion function for a collapse presence,
  * which defines enter and exit transitions for an element,
  * governing size (width or height) and opacity.
  *
- * @param params - Motion parameters for customizing the generated motion function:
+ * @param params - An object with parameters for customizing the generated motion function:
  *
  * - `enterSizeDuration` (optional): The duration of the size animation when entering. Defaults to `durationNormal`.
  * - `enterOpacityDuration` (optional): The duration of the opacity animation when entering. Defaults to `durationSlower`.
@@ -20,14 +20,12 @@ type Orientation = 'horizontal' | 'vertical';
  * - `enterEasing` (optional): The easing function for the enter animation. Defaults to `curveEasyEase`.
  * - `exitEasing` (optional): The easing function for the exit animation. Defaults to `curveEasyEase`.
  *
- * The motion function returned by `createDelayedCollapseMotionFn` accepts an options object with the following properties:
+ * @returns A motion function which accepts an options object with the following properties:
  * - `element`: The element to animate.
- * - `orientation` (optional): The orientation of the animation. Defaults to `'vertical'`.
+ * - `orientation` (optional): The orientation of the size animation. Defaults to `'vertical'`.
  * - `animateOpacity` (optional): Whether to animate the opacity. Defaults to `true`.
  * - `collapseMargin` (optional): Whether to collapse the margin. Defaults to `true`.
  * - `collapsePadding` (optional): Whether to collapse the padding. Defaults to `true`.
- *
- * @returns The motion function.
  */
 const createDelayedCollapseMotionFn: PresenceMotionFnCreator<
   {
@@ -57,8 +55,8 @@ const createDelayedCollapseMotionFn: PresenceMotionFnCreator<
     exitSizeDuration = enterSizeDuration,
     exitOpacityDuration = enterOpacityDuration,
     // delay
-    enterDelay = 0 * enterSizeDuration,
-    exitDelay = 0 * exitOpacityDuration,
+    enterDelay = 1 * enterSizeDuration,
+    exitDelay = 1 * exitOpacityDuration,
     // easing
     enterEasing = curveEasyEase,
     exitEasing = curveEasyEase,
@@ -72,7 +70,7 @@ const createDelayedCollapseMotionFn: PresenceMotionFnCreator<
     const toSize = `${measuredSize}px`;
     const sizeName = orientation === 'horizontal' ? 'maxWidth' : 'maxHeight';
     const overflowName = orientation === 'horizontal' ? 'overflowX' : 'overflowY';
-    const overflow = 'hidden';
+    // const overflow = 'hidden';
 
     // Setting height to zero does not eliminate margin or padding, so allow collapsing those as well.
     // TODO: rename to be agnostic to orientation
@@ -91,11 +89,11 @@ const createDelayedCollapseMotionFn: PresenceMotionFnCreator<
             {
               [sizeName]: fromSize,
               // opacity: fromOpacity,
-              overflow,
+              [overflowName]: 'hidden',
               ...collapsedWhiteSpace,
             },
-            { [sizeName]: toSize, offset: 0.9999, overflow },
-            { [sizeName]: 'unset', overflow: 'unset' },
+            { [sizeName]: toSize, offset: 0.9999, [overflowName]: 'hidden' },
+            { [sizeName]: 'unset', [overflowName]: 'unset' },
           ],
           duration: enterSizeDuration,
           easing: enterEasing,
@@ -114,8 +112,8 @@ const createDelayedCollapseMotionFn: PresenceMotionFnCreator<
         // Fade out first
         {
           keyframes: [
-            { opacity: toOpacity, overflow },
-            { opacity: fromOpacity, overflow },
+            { opacity: toOpacity /*, [overflowName]: 'hidden'*/ },
+            { opacity: fromOpacity /*, [overflowName]: 'hidden'*/ },
           ],
           duration: exitOpacityDuration,
           easing: exitEasing,
@@ -124,8 +122,8 @@ const createDelayedCollapseMotionFn: PresenceMotionFnCreator<
         {
           delay: exitDelay,
           keyframes: [
-            { [sizeName]: toSize, overflow },
-            { [sizeName]: fromSize, overflow, ...collapsedWhiteSpace },
+            { [sizeName]: toSize /*, [overflowName]: 'hidden'*/ },
+            { [sizeName]: fromSize /*, [overflowName]: 'hidden'*/, ...collapsedWhiteSpace },
           ],
           duration: exitSizeDuration,
           easing: exitEasing,
