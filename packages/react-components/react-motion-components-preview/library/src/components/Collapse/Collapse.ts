@@ -1,54 +1,173 @@
-import {
-  motionTokens,
-  type PresenceMotionFnCreator,
-  createPresenceComponent,
-  PresenceParams,
-} from '@fluentui/react-motion';
+import { motionTokens, type PresenceMotionFnCreator, createPresenceComponent } from '@fluentui/react-motion';
 
-const { durationNormal, durationUltraFast, durationSlow, curveEasyEaseMax } = motionTokens;
+const { durationNormal, durationSlower, durationUltraFast, curveEasyEase, curveEasyEaseMax } = motionTokens;
 
-/** Define a presence motion for collapse/expand */
-const createCollapseMotionFn: PresenceMotionFnCreator<PresenceParams, { animateOpacity?: boolean }> =
+export type CollapseOrientation = 'horizontal' | 'vertical';
+
+/**
+ * Creates a motion function for a collapse presence transition.
+ * The motion function defines enter and exit transitions which can be applied to a DOM element,
+ * governing size expansion along one dimension (width or height) and a fade.
+ *
+ * By default, the size and fade transitions start and end in sync,
+ * but they can be given separate durations and/or have a delay between them.
+ *
+ * @param params - An object with parameters for up-front customization of the generated motion function:
+ *
+ * - `enterSizeDuration` (optional): The duration of the size animation when entering. Defaults to `durationNormal`.
+ * - `enterOpacityDuration` (optional): The duration of the opacity animation when entering. Defaults to `durationSlower`.
+ * - `exitSizeDuration` (optional): The duration of the size animation when exiting. Defaults to `enterSizeDuration`.
+ * - `exitOpacityDuration` (optional): The duration of the opacity animation when exiting. Defaults to `enterOpacityDuration`.
+ * - `enterDelay` (optional): The delay before the enter animation starts. Defaults to `0`.
+ * - `exitDelay` (optional): The delay before the exit animation starts. Defaults to `0`.
+ * - `enterEasing` (optional): The easing function for the enter animation. Defaults to `curveEasyEase`.
+ * - `exitEasing` (optional): The easing function for the exit animation. Defaults to `curveEasyEase`.
+ *
+ * @returns A motion function which will accept an options object at runtime, with the following properties:
+ * - `element`: The element to animate.
+ * - `orientation` (optional): The orientation of the size animation. Defaults to `'vertical'`.
+ * - `animateOpacity` (optional): Whether to animate the opacity. Defaults to `true`.
+ * - `collapseMargin` (optional): Whether to collapse the margin. Defaults to `true`.
+ * - `collapsePadding` (optional): Whether to collapse the padding. Defaults to `true`.
+ */
+const createCollapseMotion: PresenceMotionFnCreator<
+  {
+    /** Time (ms) for the size expand. Defaults to the durationNormal value (200 ms). */
+    enterSizeDuration?: number;
+
+    /** Time (ms) for the fade-in. Defaults to the enterSizeDuration param, to sync fade-in with expand. */
+    enterOpacityDuration?: number;
+
+    /** Time (ms) for the size collapse. Defaults to the enterSizeDuration param, for temporal symmetry.. */
+    exitSizeDuration?: number;
+
+    /** Defaults to the exitSizeDuration param, to sync the fade-out with the collapse. */
+    exitOpacityDuration?: number;
+
+    /** Time (ms) between the size expand start and the fade-in start. Defaults to `0`.  */
+    enterDelay?: number;
+
+    /** Time (ms) between the fade-out start and the size collapse start. Defaults to `0`.  */
+    exitDelay?: number;
+
+    /** Easing curve for the enter transition, shared by size and opacity. Defaults to the easeEaseMax value.  */
+    enterEasing?: string;
+
+    /** Easing curve for the exit transition, shared by size and opacity. Defaults to the enterEasing param. */
+    exitEasing?: string;
+  },
+  { orientation?: CollapseOrientation; animateOpacity?: boolean; collapseMargin?: boolean; collapsePadding?: boolean }
+> =
   ({
-    enterDuration = durationNormal,
-    exitDuration = durationNormal,
+    // duration
+    enterSizeDuration = durationNormal,
+    enterOpacityDuration = enterSizeDuration,
+    exitSizeDuration = enterSizeDuration,
+    exitOpacityDuration = exitSizeDuration,
+    // delay
+    enterDelay = 0,
+    exitDelay = 0,
+    // easing
     enterEasing = curveEasyEaseMax,
-    exitEasing = curveEasyEaseMax,
+    exitEasing = enterEasing,
   } = {}) =>
-  ({ element, animateOpacity = true }) => {
-    const fromOpacity = animateOpacity ? 0 : 1;
+  ({ element, orientation = 'vertical', animateOpacity = true, collapseMargin = !true, collapsePadding = !true }) => {
+    const fromOpacity = animateOpacity ? 0 : 1; // Possible future custom param, for fading in from a different opacity.
     const toOpacity = 1;
-    const fromHeight = '0'; // Could be a custom param in the future, for collapsing to a specific height.
-    const toHeight = `${element.scrollHeight}px`;
-    const overflow = 'hidden';
 
-    const enterKeyframes = [
-      { opacity: fromOpacity, maxHeight: fromHeight, overflow },
-      // Transition to the height of the content, at 99.99% of the duration.
-      { opacity: toOpacity, maxHeight: toHeight, offset: 0.9999, overflow },
-      // On completion, remove the maxHeight because the content might need to expand later.
-      // This extra keyframe is simpler than firing a callback on completion.
-      { opacity: toOpacity, maxHeight: 'unset', overflow },
-    ];
+    // "size" is the width or height of the element, depending on the orientation.
+    const fromSize = '0'; // Possible future custom param, for collapsing to a width or height.
+    const measuredSize = orientation === 'horizontal' ? element.scrollWidth : element.scrollHeight;
+    const toSize = `${measuredSize}px`;
+    const sizeName = orientation === 'horizontal' ? 'maxWidth' : 'maxHeight';
+    const overflowName = orientation === 'horizontal' ? 'overflowX' : 'overflowY';
+    // const overflow = 'hidden';
 
-    const exitKeyframes = [
-      { opacity: toOpacity, maxHeight: toHeight, overflow },
-      { opacity: fromOpacity, maxHeight: fromHeight, overflow },
-    ];
+    // Setting height to zero does not eliminate margin or padding, so allow collapsing those as well.
+    // TODO: rename to be agnostic to orientation
+    const collapsedWhiteSpace = {
+      marginTop: collapseMargin ? 0 : undefined,
+      marginBottom: collapseMargin ? 0 : undefined,
+      paddingTop: collapsePadding ? 0 : undefined,
+      paddingBottom: collapsePadding ? 0 : undefined,
+    };
 
     return {
-      enter: { duration: enterDuration, easing: enterEasing, keyframes: enterKeyframes },
-      exit: { duration: exitDuration, easing: exitEasing, keyframes: exitKeyframes },
+      // The enter transition is an array of 2 motion atoms: for size and for opacity.
+      enter: [
+        // Expand size (width or height).
+        {
+          keyframes: [
+            {
+              [sizeName]: fromSize,
+              // opacity: fromOpacity,
+              [overflowName]: 'hidden',
+              ...collapsedWhiteSpace,
+            },
+            { [sizeName]: toSize, offset: 0.9999, [overflowName]: 'hidden' },
+            { [sizeName]: 'unset', [overflowName]: 'unset' },
+          ],
+          duration: enterSizeDuration,
+          easing: enterEasing,
+        },
+        // Fade in. If enterDelay > 0, this is after the size expand.
+        {
+          delay: enterDelay,
+          keyframes: [{ opacity: fromOpacity }, { opacity: toOpacity }],
+          duration: enterOpacityDuration,
+          easing: enterEasing,
+          fill: 'both',
+        },
+      ],
+
+      // The enter transition is an array of 2 motion atoms: for size and for opacity.
+      exit: [
+        // Fade out first (if delay > 0)
+        {
+          keyframes: [
+            { opacity: toOpacity /*, [overflowName]: 'hidden'*/ },
+            { opacity: fromOpacity /*, [overflowName]: 'hidden'*/ },
+          ],
+          duration: exitOpacityDuration,
+          easing: exitEasing,
+        },
+        // Collapse size (width or height). If exitDelay > 0, this is after the fade-out.
+        {
+          delay: exitDelay,
+          keyframes: [
+            { [sizeName]: toSize /*, [overflowName]: 'hidden'*/ },
+            { [sizeName]: fromSize /*, [overflowName]: 'hidden'*/, ...collapsedWhiteSpace },
+          ],
+          duration: exitSizeDuration,
+          easing: exitEasing,
+          fill: 'both',
+        },
+      ],
     };
   };
 
-/** A React component that applies collapse/expand transitions to its children. */
-export const Collapse = createPresenceComponent(createCollapseMotionFn());
+/** A React component that applies collapse/expand transitions to its child content. */
+export const Collapse = createPresenceComponent(createCollapseMotion());
 
 export const CollapseSnappy = createPresenceComponent(
-  createCollapseMotionFn({ enterDuration: durationUltraFast, exitDuration: durationUltraFast }),
+  createCollapseMotion({
+    enterSizeDuration: durationUltraFast,
+  }),
 );
 
 export const CollapseExaggerated = createPresenceComponent(
-  createCollapseMotionFn({ enterDuration: durationSlow, exitDuration: durationNormal }),
+  createCollapseMotion({
+    enterSizeDuration: durationSlower,
+    enterOpacityDuration: durationNormal,
+  }),
+);
+
+export const CollapseDelayed = createPresenceComponent(
+  createCollapseMotion({
+    enterSizeDuration: durationNormal,
+    enterOpacityDuration: durationSlower,
+    enterDelay: durationNormal,
+    exitDelay: durationSlower,
+    enterEasing: curveEasyEase,
+  }),
 );

@@ -1,6 +1,6 @@
 import { Field, makeStyles, tokens, Switch, Radio, RadioGroup } from '@fluentui/react-components';
-import { DelayedCollapse as Collapse } from '@fluentui/react-motion-components-preview';
-import { Orientation } from '../../../library/src/components/Collapse/DelayedCollapse';
+import { Collapse } from '@fluentui/react-motion-components-preview';
+import { CollapseOrientation } from '../../../library/src/components/Collapse/Collapse';
 import * as React from 'react';
 
 const useClasses = makeStyles({
@@ -44,7 +44,7 @@ const LoremIpsum = () => (
 export const Default = () => {
   const classes = useClasses();
   const [visible, setVisible] = React.useState<boolean>(false);
-  const [orientation, setOrientation] = React.useState<Orientation>('vertical');
+  const [orientation, setOrientation] = React.useState<CollapseOrientation>('vertical');
   // const [orientation, setOrientation] = React.useState<Orientation>('horizontal');
 
   return (
@@ -58,7 +58,7 @@ export const Default = () => {
           <RadioGroup
             layout="horizontal"
             value={orientation}
-            onChange={(_, data) => setOrientation(data.value as Orientation)}
+            onChange={(_, data) => setOrientation(data.value as CollapseOrientation)}
           >
             <Radio value="vertical" label="vertical" />
             <Radio value="horizontal" label="horizontal" />
@@ -74,7 +74,19 @@ export const Default = () => {
             </div>
           </div>
         </Collapse>
-        <div style={{ background: 'lightblue', width: '100px', border: 'solid 2px black', borderRadius: '20px' }}></div>
+        <div
+          style={{
+            background: 'lightblue',
+            width: '100px',
+            height: '100px',
+            border: 'solid 2px black',
+            borderRadius: '20px',
+            padding: '50px',
+            textAlign: 'center',
+          }}
+        >
+          Other Content
+        </div>
       </div>
     </div>
   );

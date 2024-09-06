@@ -1,7 +1,7 @@
 import { getIntrinsicElementProps, useEventCallback, slot } from '@fluentui/react-utilities';
 import type { TreeCheckedChangeData, TreeProps, TreeState } from '../Tree';
 import * as React from 'react';
-import { DelayedCollapse as Collapse } from '@fluentui/react-motion-components-preview';
+import { Collapse } from '@fluentui/react-motion-components-preview';
 import { PresenceMotionSlotProps } from '@fluentui/react-motion';
 import { TreeContextValue, TreeItemRequest } from '../contexts/treeContext';
 import { createCheckedItems } from '../utils/createCheckedItems';

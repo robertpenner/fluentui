@@ -1,8 +1,5 @@
 import { Field, makeStyles, tokens, Switch } from '@fluentui/react-components';
-import {
-  // CollapseExaggerated,
-  DelayedCollapseExaggerated as CollapseExaggerated,
-} from '@fluentui/react-motion-components-preview';
+import { CollapseExaggerated } from '@fluentui/react-motion-components-preview';
 import * as React from 'react';
 
 import description from './CollapseExaggerated.stories.md';
