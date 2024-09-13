@@ -4,6 +4,32 @@ const { durationNormal, durationSlower, durationUltraFast, curveEasyEase, curveE
 
 export type CollapseOrientation = 'horizontal' | 'vertical';
 
+type CollapseVariantOptions = {
+  /** Time (ms) for the size expand. Defaults to the durationNormal value (200 ms). */
+  enterSizeDuration?: number;
+
+  /** Time (ms) for the fade-in. Defaults to the enterSizeDuration param, to sync fade-in with expand. */
+  enterOpacityDuration?: number;
+
+  /** Time (ms) for the size collapse. Defaults to the enterSizeDuration param, for temporal symmetry.. */
+  exitSizeDuration?: number;
+
+  /** Defaults to the exitSizeDuration param, to sync the fade-out with the collapse. */
+  exitOpacityDuration?: number;
+
+  /** Time (ms) between the size expand start and the fade-in start. Defaults to `0`.  */
+  enterDelay?: number;
+
+  /** Time (ms) between the fade-out start and the size collapse start. Defaults to `0`.  */
+  exitDelay?: number;
+
+  /** Easing curve for the enter transition, shared by size and opacity. Defaults to the easeEaseMax value.  */
+  enterEasing?: string;
+
+  /** Easing curve for the exit transition, shared by size and opacity. Defaults to the enterEasing param. */
+  exitEasing?: string;
+};
+
 /**
  * Creates a motion function for a collapse presence transition.
  * The motion function defines enter and exit transitions which can be applied to a DOM element,
@@ -12,7 +38,8 @@ export type CollapseOrientation = 'horizontal' | 'vertical';
  * By default, the size and fade transitions start and end in sync,
  * but they can be given separate durations and/or have a delay between them.
  *
- * @param params - An object with parameters for up-front customization of the generated motion function:
+ * @param {variantOptions} - An object with options for variant customizing via the generated motion function.
+ * @see type CollapseVariantOptions.
  *
  * - `enterSizeDuration` (optional): The duration of the size animation when entering. Defaults to `durationNormal`.
  * - `enterOpacityDuration` (optional): The duration of the opacity animation when entering. Defaults to `durationSlower`.
@@ -30,32 +57,9 @@ export type CollapseOrientation = 'horizontal' | 'vertical';
  * - `collapseMargin` (optional): Whether to collapse the margin. Defaults to `true`.
  * - `collapsePadding` (optional): Whether to collapse the padding. Defaults to `true`.
  */
+
 const createCollapseMotion: PresenceMotionFnCreator<
-  {
-    /** Time (ms) for the size expand. Defaults to the durationNormal value (200 ms). */
-    enterSizeDuration?: number;
-
-    /** Time (ms) for the fade-in. Defaults to the enterSizeDuration param, to sync fade-in with expand. */
-    enterOpacityDuration?: number;
-
-    /** Time (ms) for the size collapse. Defaults to the enterSizeDuration param, for temporal symmetry.. */
-    exitSizeDuration?: number;
-
-    /** Defaults to the exitSizeDuration param, to sync the fade-out with the collapse. */
-    exitOpacityDuration?: number;
-
-    /** Time (ms) between the size expand start and the fade-in start. Defaults to `0`.  */
-    enterDelay?: number;
-
-    /** Time (ms) between the fade-out start and the size collapse start. Defaults to `0`.  */
-    exitDelay?: number;
-
-    /** Easing curve for the enter transition, shared by size and opacity. Defaults to the easeEaseMax value.  */
-    enterEasing?: string;
-
-    /** Easing curve for the exit transition, shared by size and opacity. Defaults to the enterEasing param. */
-    exitEasing?: string;
-  },
+  CollapseVariantOptions,
   { orientation?: CollapseOrientation; animateOpacity?: boolean; collapseMargin?: boolean; collapsePadding?: boolean }
 > =
   ({
