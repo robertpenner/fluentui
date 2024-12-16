@@ -124,6 +124,8 @@ export function createPositionManager(options: PositionManagerOptions): Position
           return;
         }
 
+        console.log('### computedPlacement', computedPlacement);
+
         writeArrowUpdates({ arrow, middlewareData });
         writeContainerUpdates({
           container,

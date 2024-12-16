@@ -8,6 +8,8 @@ import { DATA_POSITIONING_PLACEMENT } from './constants';
  * @returns Griffel styles to spread to a slot
  */
 export function createSlideStyles(mainAxis: number): GriffelStyle {
+  return {};
+
   const slideDistanceVarX = '--fui-positioning-slide-distance-x';
   const slideDistanceVarY = '--fui-positioning-slide-distance-y';
 
@@ -34,12 +36,12 @@ export function createSlideStyles(mainAxis: number): GriffelStyle {
     },
 
     animationName: [
-      {
-        from: {
-          transform: `translate(var(${slideDistanceVarX}), var(${slideDistanceVarY}))`,
-        },
-        to: {},
-      },
+      // {
+      //   from: {
+      //     transform: `translate(var(${slideDistanceVarX}), var(${slideDistanceVarY}))`,
+      //   },
+      //   to: {},
+      // },
     ],
 
     // Note: at-rules have more specificity in Griffel
