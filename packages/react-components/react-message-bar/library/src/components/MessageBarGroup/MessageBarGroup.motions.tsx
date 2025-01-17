@@ -1,6 +1,8 @@
 import { motionTokens, createPresenceComponent, PresenceDirection, AtomMotion } from '@fluentui/react-motion';
 import { MessageBarGroupProps } from './MessageBarGroup.types';
 
+type CollapseOrientation = 'horizontal' | 'vertical';
+
 // TODO: import these atoms from react-motion-components-preview once they're available there
 
 interface FadeAtomParams {
@@ -67,6 +69,70 @@ const slideAtom = ({
   };
 };
 
+// ----- SIZE -----
+
+const sizeValuesForOrientation = (orientation: CollapseOrientation, element: Element) => {
+  const sizeName = orientation === 'horizontal' ? 'maxWidth' : 'maxHeight';
+  const overflowName = orientation === 'horizontal' ? 'overflowX' : 'overflowY';
+  const measuredSize = orientation === 'horizontal' ? element.scrollWidth : element.scrollHeight;
+  const toSize = `${measuredSize}px`;
+  return { sizeName, overflowName, toSize };
+};
+
+interface SizeEnterAtomParams {
+  orientation: CollapseOrientation;
+  duration: number;
+  easing: string;
+  element: HTMLElement;
+  fromSize?: string;
+}
+
+export const sizeEnterAtom = ({
+  orientation,
+  duration,
+  easing,
+  element,
+  fromSize = '0',
+}: SizeEnterAtomParams): AtomMotion => {
+  const { sizeName, overflowName, toSize } = sizeValuesForOrientation(orientation, element);
+
+  return {
+    keyframes: [
+      { [sizeName]: fromSize, [overflowName]: 'hidden' },
+      { [sizeName]: toSize, offset: 0.9999, [overflowName]: 'hidden' },
+      { [sizeName]: 'unset', [overflowName]: 'unset' },
+    ],
+    duration,
+    easing,
+  };
+};
+
+interface SizeExitAtomParams extends SizeEnterAtomParams {
+  delay?: number;
+}
+
+export const sizeExitAtom = ({
+  orientation,
+  duration,
+  easing,
+  element,
+  delay = 0,
+  fromSize = '0',
+}: SizeExitAtomParams): AtomMotion => {
+  const { sizeName, overflowName, toSize } = sizeValuesForOrientation(orientation, element);
+
+  return {
+    keyframes: [
+      { [sizeName]: toSize, [overflowName]: 'hidden' },
+      { [sizeName]: fromSize, [overflowName]: 'hidden' },
+    ],
+    duration,
+    easing,
+    fill: 'both',
+    delay,
+  };
+};
+
 /**
  * A presence component for a MessageBar to enter and exit from a MessageBarGroup.
  * It has an optional enter transition of a slide-in and fade-in,
@@ -74,21 +140,31 @@ const slideAtom = ({
  * It always has an exit transition of a fade-out.
  */
 export const MessageBarMotion = createPresenceComponent<{ animate?: MessageBarGroupProps['animate'] }>(
-  ({ animate }) => {
+  ({ element, animate }) => {
     const duration = motionTokens.durationGentle;
+    const enterSizeDuration = motionTokens.durationGentle;
+    const enterEasing = motionTokens.curveEasyEase;
+    const exitDelay = duration;
+    const exitSizeDuration = motionTokens.durationGentle;
+    const exitEasing = motionTokens.curveEasyEase;
+    const orientation = 'vertical';
 
     return {
       enter:
         animate === 'both'
           ? // enter with slide and fade
             [
-              fadeAtom({ direction: 'enter', duration }),
-              slideAtom({ direction: 'enter', axis: 'Y', fromValue: '-100%', duration }),
+              sizeEnterAtom({ orientation, duration: enterSizeDuration, easing: enterEasing, element }),
+              { ...fadeAtom({ direction: 'enter', duration }), delay: duration, fill: 'both' },
+              { ...slideAtom({ direction: 'enter', axis: 'Y', fromValue: '-100%', duration }), delay: duration },
             ]
           : [], // no enter motion
 
       // Always exit with a fade
-      exit: fadeAtom({ direction: 'exit', duration }),
+      exit: [
+        fadeAtom({ direction: 'exit', duration }),
+        sizeExitAtom({ orientation, duration: exitSizeDuration, easing: exitEasing, element, delay: exitDelay }),
+      ],
     };
   },
 );
