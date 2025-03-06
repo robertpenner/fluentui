@@ -5,9 +5,8 @@ import { motionTokens } from '@fluentui/react-components';
 
 const CustomFadeVariant = createPresenceComponent(
   createFadePresence({
-    enterDuration: motionTokens.durationSlow,
-    enterEasing: motionTokens.curveEasyEaseMax,
-    exitDuration: motionTokens.durationNormal,
+    duration: [motionTokens.durationSlow, motionTokens.durationNormal],
+    easing: motionTokens.curveEasyEaseMax,
   }),
 );
 

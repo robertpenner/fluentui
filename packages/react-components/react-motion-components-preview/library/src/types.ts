@@ -1,5 +1,7 @@
 import type { MotionParam, PresenceMotion, PresenceMotionFn } from '@fluentui/react-motion';
 
+export type OneOrTwo<T> = T | [T, T];
+
 /**
  * This is a factory function that generates a motion object from variant params, e.g. duration, easing, etc.
  * The generated object defines a presence motion with `enter` and `exit` transitions.
@@ -8,9 +10,9 @@ import type { MotionParam, PresenceMotion, PresenceMotionFn } from '@fluentui/re
  * It can be turned into a React component using `createPresenceComponent`.
  */
 // TODO: move to @fluentui/react-motion when stable
-export type PresenceMotionCreator<MotionVariantParams extends Record<string, MotionParam> = {}> = (
-  variantParams?: MotionVariantParams,
-) => PresenceMotion;
+export type PresenceMotionCreator<
+  MotionVariantParams extends Record<string, MotionParam | OneOrTwo<MotionParam>> = {},
+> = (variantParams?: MotionVariantParams) => PresenceMotion;
 
 /**
  * This is a factory function that generates a motion function, which has variant params bound into it.
