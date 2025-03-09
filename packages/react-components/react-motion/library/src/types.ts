@@ -25,7 +25,9 @@ export type AtomMotionFn<MotionParams extends Record<string, MotionParam> = {}> 
   params: { element: HTMLElement } & MotionParams,
 ) => AtomMotion | AtomMotion[];
 
-export type PresenceMotionFn<MotionParams extends Record<string, MotionParam> = {}> = (
+export type OneOrTwo<T> = T | [enter: T, exit: T];
+
+export type PresenceMotionFn<MotionParams extends Record<string, OneOrTwo<MotionParam>> = {}> = (
   params: { element: HTMLElement } & MotionParams,
 ) => PresenceMotion;
 
