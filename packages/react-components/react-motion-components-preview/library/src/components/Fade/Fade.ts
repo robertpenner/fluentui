@@ -1,5 +1,10 @@
-import { motionTokens, createPresenceComponent } from '@fluentui/react-motion';
-import type { EnterExit, PresenceMotionCreator } from '../../types';
+import {
+  motionTokens,
+  createPresenceComponent,
+  PresenceMotionFn,
+  createPresenceComponentVariant,
+  EnterExit,
+} from '@fluentui/react-motion';
 import { fadeAtom } from '../../atoms/fade-atom';
 import { enterValue, exitValue } from '../../utils/presence-utils';
 
@@ -14,10 +19,10 @@ type FadeVariantParams = {
 };
 
 /** Define a presence motion for fade in/out  */
-export const createFadePresence: PresenceMotionCreator<FadeVariantParams> = ({
+export const fadePresenceFn: PresenceMotionFn<FadeVariantParams> = ({
   duration = motionTokens.durationNormal,
   easing = motionTokens.curveEasyEase,
-} = {}) => {
+}) => {
   return {
     enter: fadeAtom({ direction: 'enter', duration: enterValue(duration), easing: enterValue(easing) }),
     exit: fadeAtom({ direction: 'exit', duration: exitValue(duration), easing: exitValue(easing) }),
@@ -25,8 +30,8 @@ export const createFadePresence: PresenceMotionCreator<FadeVariantParams> = ({
 };
 
 /** A React component that applies fade in/out transitions to its children. */
-export const Fade = createPresenceComponent(createFadePresence());
+export const Fade = createPresenceComponent(fadePresenceFn);
 
-export const FadeSnappy = createPresenceComponent(createFadePresence({ duration: motionTokens.durationFast }));
+export const FadeSnappy = createPresenceComponentVariant(Fade, { duration: motionTokens.durationFast });
 
-export const FadeRelaxed = createPresenceComponent(createFadePresence({ duration: motionTokens.durationGentle }));
+export const FadeRelaxed = createPresenceComponentVariant(Fade, { duration: motionTokens.durationGentle });
