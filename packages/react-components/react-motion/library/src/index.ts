@@ -20,6 +20,7 @@ export type {
   PresenceDirection,
   MotionImperativeRef,
   MotionParam,
+  EnterExit,
 } from './types';
 
 export { MotionBehaviourProvider } from './contexts/MotionBehaviourContext';

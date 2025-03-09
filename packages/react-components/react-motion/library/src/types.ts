@@ -25,10 +25,17 @@ export type AtomMotionFn<MotionParams extends Record<string, MotionParam> = {}> 
   params: { element: HTMLElement } & MotionParams,
 ) => AtomMotion | AtomMotion[];
 
-export type OneOrTwo<T> = T | [enter: T, exit: T];
+/**
+ * If a motion param is a 2-item array, it means that
+ * the first value is for the enter transition and the second value is for the exit transition.
+ * If a motion param is not an array, it means that
+ * the same value is used for both enter and exit transitions.
+ */
+// export type EnterExit<T extends MotionParam> = T | [enter: T, exit: T];
+export type EnterExit<T> = T | [enter: T, exit: T];
 
-export type PresenceMotionFn<MotionParams extends Record<string, OneOrTwo<MotionParam>> = {}> = (
-  params: { element: HTMLElement } & MotionParams,
+export type PresenceMotionFn<PresenceParams extends Record<string, EnterExit<MotionParam>> = {}> = (
+  params: { element: HTMLElement } & PresenceParams,
 ) => PresenceMotion;
 
 // ---

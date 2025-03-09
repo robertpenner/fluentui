@@ -1,14 +1,6 @@
 import type { MotionParam, PresenceMotion, PresenceMotionFn } from '@fluentui/react-motion';
 
 /**
- * If a motion param is a 2-item array, it means that
- * the first value is for the enter transition and the second value is for the exit transition.
- * If a motion param is not an array, it means that
- * the same value is used for both enter and exit transitions.
- */
-export type EnterExit<T extends MotionParam> = T | [enter: T, exit: T];
-
-/**
  * This is a factory function that generates a motion object from variant params, e.g. duration, easing, etc.
  * The generated object defines a presence motion with `enter` and `exit` transitions.
  * This motion object is declarative, i.e. data without side effects,
