@@ -11,15 +11,16 @@ import { enterValue, exitValue } from '../../utils/presence-utils';
 const scalePresenceFn: PresenceMotionFn<{
   duration?: EnterExit<number>;
   easing?: EnterExit<string>;
+  fromScale?: number;
   animateOpacity?: boolean;
 }> = ({
   duration = motionTokens.durationNormal,
   easing = [motionTokens.curveDecelerateMid, motionTokens.curveAccelerateMid],
+  fromScale = 0.9,
   animateOpacity = true,
 }) => {
   const fromOpacity = animateOpacity ? 0 : 1;
   const toOpacity = 1;
-  const fromScale = 0.9; // Could be a custom param in the future
   const toScale = 1;
 
   // TODO: use fadeAtom
