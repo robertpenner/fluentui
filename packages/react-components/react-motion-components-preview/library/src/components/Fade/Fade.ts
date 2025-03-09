@@ -1,20 +1,20 @@
-import { motionTokens, createPresenceComponent } from '@fluentui/react-motion';
-import type { OneOrTwo, PresenceMotionCreator } from '../../types';
+import { motionTokens, createPresenceComponent, MotionParam } from '@fluentui/react-motion';
+import type { EnterExit, PresenceMotionCreator } from '../../types';
 import { fadeAtom } from '../../atoms/fade-atom';
 
 type FadeVariantParams = {
   /** Time (ms) for the transition. Can be a number or an array of 2 numbers for enter/exit.
    * Defaults to the `durationNormal` value (200 ms). */
-  duration?: OneOrTwo<number>;
+  duration?: EnterExit<number>;
 
   /** Easing curve for the enter transition (fade-in). Can be a string or an array of 2 strings for enter/exit.
    * Defaults to the `easeEase` value.  */
-  easing?: OneOrTwo<string>;
+  easing?: EnterExit<string>;
 };
 
-const get1st = <T>(value: OneOrTwo<T>): T => (Array.isArray(value) ? value[0] : value);
+const get1st = <T extends MotionParam>(value: EnterExit<T>): T => (Array.isArray(value) ? value[0] : value);
 
-const get2nd = <T>(value: OneOrTwo<T>): T => (Array.isArray(value) ? value[1] : value);
+const get2nd = <T extends MotionParam>(value: EnterExit<T>): T => (Array.isArray(value) ? value[1] : value);
 
 /** Define a presence motion for fade in/out  */
 export const createFadePresence: PresenceMotionCreator<FadeVariantParams> = ({
