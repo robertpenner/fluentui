@@ -9,8 +9,8 @@ import { enterValue, exitValue } from '../../utils/presence-utils';
 
 /** Define a presence motion for scale in/out */
 const scalePresenceFn: PresenceMotionFn<{
-  duration: EnterExit<number>;
-  easing: EnterExit<string>;
+  duration?: EnterExit<number>;
+  easing?: EnterExit<string>;
   animateOpacity?: boolean;
 }> = ({
   duration = motionTokens.durationNormal,
