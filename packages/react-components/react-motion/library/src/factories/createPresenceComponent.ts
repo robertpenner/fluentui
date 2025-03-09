@@ -9,6 +9,8 @@ import { useIsReducedMotion } from '../hooks/useIsReducedMotion';
 import { getChildElement } from '../utils/getChildElement';
 import type { MotionParam, PresenceMotion, MotionImperativeRef, PresenceMotionFn, PresenceDirection } from '../types';
 import { useMotionBehaviourContext } from '../contexts/MotionBehaviourContext';
+// TODO: move type to @fluentui/react-motion when stable
+import { EnterExit } from '../../../../react-motion-components-preview/library/src/types';
 
 /**
  * @internal A private symbol to store the motion definition on the component for variants.
@@ -67,16 +69,16 @@ export type PresenceComponentProps = {
   unmountOnExit?: boolean;
 };
 
-export type PresenceComponent<MotionParams extends Record<string, MotionParam> = {}> = {
-  (props: PresenceComponentProps & MotionParams): React.ReactElement | null;
-  [MOTION_DEFINITION]: PresenceMotionFn<MotionParams>;
+export type PresenceComponent<PresenceParams extends Record<string, EnterExit<MotionParam>> = {}> = {
+  (props: PresenceComponentProps & PresenceParams): React.ReactElement | null;
+  [MOTION_DEFINITION]: PresenceMotionFn<PresenceParams>;
 };
 
-export function createPresenceComponent<MotionParams extends Record<string, MotionParam> = {}>(
-  value: PresenceMotion | PresenceMotionFn<MotionParams>,
-): PresenceComponent<MotionParams> {
+export function createPresenceComponent<PresenceParams extends Record<string, EnterExit<MotionParam>> = {}>(
+  value: PresenceMotion | PresenceMotionFn<PresenceParams>,
+): PresenceComponent<PresenceParams> {
   return Object.assign(
-    (props: PresenceComponentProps & MotionParams) => {
+    (props: PresenceComponentProps & PresenceParams) => {
       'use no memo';
 
       const itemContext = React.useContext(PresenceGroupChildContext);
@@ -103,7 +105,7 @@ export function createPresenceComponent<MotionParams extends Record<string, Moti
       const handleRef = useMotionImperativeRef(imperativeRef);
       const elementRef = React.useRef<HTMLElement>();
       const ref = useMergedRefs(elementRef, child.ref);
-      const optionsRef = React.useRef<{ appear?: boolean; params: MotionParams; skipMotions: boolean }>({
+      const optionsRef = React.useRef<{ appear?: boolean; params: PresenceParams; skipMotions: boolean }>({
         appear,
         params,
         skipMotions,
