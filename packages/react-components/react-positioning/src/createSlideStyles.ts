@@ -21,8 +21,7 @@ export function createSlideStyles(mainAxis: number): GriffelStyle {
   const slideDistanceVarY = '--fui-positioning-slide-distance-y';
 
   return {
-    // The fade has absolute values, whereas the slide amount is relative.
-    animationComposition: 'replace, accumulate',
+    animationComposition: 'accumulate',
     animationDuration: tokens.durationSlower,
     animationTimingFunction: tokens.curveDecelerateMid,
     [slideDistanceVarX]: `0px`,
@@ -55,7 +54,6 @@ export function createSlideStyles(mainAxis: number): GriffelStyle {
     // Note: at-rules have more specificity in Griffel
     '@media(prefers-reduced-motion)': {
       [`&[${DATA_POSITIONING_PLACEMENT}]`]: {
-        animationComposition: 'replace',
         animationDuration: '1ms',
         animationName: fadeIn,
       },
@@ -64,7 +62,6 @@ export function createSlideStyles(mainAxis: number): GriffelStyle {
     // Tested in Firefox 79
     '@supports not (animation-composition: accumulate)': {
       [`&[${DATA_POSITIONING_PLACEMENT}]`]: {
-        animationComposition: 'replace',
         animationName: fadeIn,
       },
     },
