@@ -30,3 +30,13 @@ ReactDOM.render(
 ### Docs
 
 Docs are hosted at https://react.fluentui.dev/.
+
+### Contributing
+
+If you're interested in contributing to this project, here are some helpful resources:
+
+- [Development Environment Setup](/docs/react-v9/contributing/dev-env.md) - How to set up your development environment
+- [Development Workflow](/docs/react-v9/contributing/dev-workflow.md) - How to contribute changes to the project
+- [Component Implementation Guide](/docs/react-v9/contributing/component-implementation-guide.md) - Guide for implementing components
+- [Command Cheat Sheet](/docs/react-v9/contributing/command-cheat-sheet.md) - Quick reference for common commands
+- [Common Development Snags](/docs/react-v9/contributing/common-dev-snags.md) - Solutions for common issues
