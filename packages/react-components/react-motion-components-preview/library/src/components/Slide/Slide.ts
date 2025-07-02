@@ -20,11 +20,11 @@ type SlideVariantParams = {
   /** Easing curve for the exit transition (slide-out). Defaults to the `curveAccelerateMax` value.  */
   exitEasing?: string;
 
-  /** The X translate value in pixels to animate from. Defaults to `0`. */
-  fromX?: number;
+  /** The X translate value with units to animate from. Defaults to `'0px'`. */
+  fromX?: string;
 
-  /** The Y translate value in pixels to animate from. Defaults to `-20`. */
-  fromY?: number;
+  /** The Y translate value with units to animate from. Defaults to `'-20px'`. */
+  fromY?: string;
 
   /** Whether to animate the opacity. Defaults to `true`. */
   animateOpacity?: boolean;
@@ -36,8 +36,8 @@ const slidePresenceFn: PresenceMotionFn<SlideVariantParams> = ({
   easing = motionTokens.curveDecelerateMax,
   exitDuration = motionTokens.durationNormal,
   exitEasing = motionTokens.curveAccelerateMax,
-  fromX = 0,
-  fromY = -20,
+  fromX = '0px',
+  fromY = '-20px',
   animateOpacity = true,
 }) => {
   const enterAtoms = [slideAtom({ direction: 'enter', duration, easing, fromX, fromY })];

@@ -45,12 +45,12 @@ const useClasses = makeStyles({
 });
 
 const cardData = [
-  { id: 1, title: 'Welcome', content: 'Getting started with Slide', color: tokens.colorPaletteBlueBorderActive, fromX: -50, fromY: 0 },
-  { id: 2, title: 'Features', content: 'Explore animations', color: tokens.colorPaletteGreenBorderActive, fromX: 0, fromY: -50 },
-  { id: 3, title: 'Customize', content: 'Make it your own', color: tokens.colorPalettePurpleBorderActive, fromX: 50, fromY: 0 },
-  { id: 4, title: 'Advanced', content: 'Pro techniques', color: tokens.colorPaletteRedBorderActive, fromX: -30, fromY: 30 },
-  { id: 5, title: 'Examples', content: 'Real-world usage', color: tokens.colorPaletteYellowBorderActive, fromX: 30, fromY: 30 },
-  { id: 6, title: 'Resources', content: 'Documentation & help', color: tokens.colorPaletteOrangeBorderActive, fromX: 0, fromY: 50 },
+  { id: 1, title: 'Welcome', content: 'Getting started with Slide', color: tokens.colorPaletteBlueBorderActive, fromX: '-50px', fromY: '0px' },
+  { id: 2, title: 'Features', content: 'Explore animations', color: tokens.colorPaletteGreenBorderActive, fromX: '0px', fromY: '-50px' },
+  { id: 3, title: 'Customize', content: 'Make it your own', color: tokens.colorPalettePurpleBorderActive, fromX: '50px', fromY: '0px' },
+  { id: 4, title: 'Advanced', content: 'Pro techniques', color: tokens.colorPaletteRedBorderActive, fromX: '-30px', fromY: '30px' },
+  { id: 5, title: 'Examples', content: 'Real-world usage', color: tokens.colorPaletteYellowBorderActive, fromX: '30px', fromY: '30px' },
+  { id: 6, title: 'Resources', content: 'Documentation & help', color: tokens.colorPaletteOrangeBorderActive, fromX: '0px', fromY: '50px' },
 ];
 
 export const SequentialAnimation = () => {

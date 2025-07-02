@@ -46,20 +46,26 @@ const useClasses = makeStyles({
 });
 
 const slideDirections = {
-  'Slide from Top': { fromX: 0, fromY: -40 },
-  'Slide from Bottom': { fromX: 0, fromY: 40 },
-  'Slide from Left': { fromX: -40, fromY: 0 },
-  'Slide from Right': { fromX: 40, fromY: 0 },
-  'Slide from Top-Left': { fromX: -30, fromY: -30 },
-  'Slide from Top-Right': { fromX: 30, fromY: -30 },
-  'Slide from Bottom-Left': { fromX: -30, fromY: 30 },
-  'Slide from Bottom-Right': { fromX: 30, fromY: 30 },
+  'Slide from Top (px)': { fromX: '0px', fromY: '-40px' },
+  'Slide from Bottom (px)': { fromX: '0px', fromY: '40px' },
+  'Slide from Left (px)': { fromX: '-40px', fromY: '0px' },
+  'Slide from Right (px)': { fromX: '40px', fromY: '0px' },
+  'Slide from Top-Left (px)': { fromX: '-30px', fromY: '-30px' },
+  'Slide from Top-Right (px)': { fromX: '30px', fromY: '-30px' },
+  'Slide from Bottom-Left (px)': { fromX: '-30px', fromY: '30px' },
+  'Slide from Bottom-Right (px)': { fromX: '30px', fromY: '30px' },
+  'Slide from Top (100%)': { fromX: '0%', fromY: '-100%' },
+  'Slide from Bottom (100%)': { fromX: '0%', fromY: '100%' },
+  'Slide from Left (100%)': { fromX: '-100%', fromY: '0%' },
+  'Slide from Right (100%)': { fromX: '100%', fromY: '0%' },
+  'Slide from Top (50%)': { fromX: '0%', fromY: '-50%' },
+  'Slide from Left (50%)': { fromX: '-50%', fromY: '0%' },
 };
 
 export const Customization = () => {
   const classes = useClasses();
   const [visible, setVisible] = React.useState<boolean>(true);
-  const [selectedDirection, setSelectedDirection] = React.useState<string>('Slide from Top');
+  const [selectedDirection, setSelectedDirection] = React.useState<string>('Slide from Top (px)');
   const [animateOpacity, setAnimateOpacity] = React.useState<boolean>(true);
 
   const slideParams = slideDirections[selectedDirection as keyof typeof slideDirections];
@@ -107,8 +113,8 @@ export const Customization = () => {
           <div className={classes.card}>
             <h3>Slide Animation</h3>
             <p>Direction: {selectedDirection}</p>
-            <p>fromX: {slideParams.fromX}px</p>
-            <p>fromY: {slideParams.fromY}px</p>
+            <p>fromX: {slideParams.fromX}</p>
+            <p>fromY: {slideParams.fromY}</p>
             <p>Opacity: {animateOpacity ? 'Animated' : 'Static'}</p>
           </div>
         </Slide>

@@ -88,15 +88,15 @@ const useClasses = makeStyles({
 });
 
 const slideConfigs = [
-  { name: 'Center', className: 'cardCenter', fromX: 0, fromY: -20, label: 'From Top' },
-  { name: 'Top', className: 'cardTop', fromX: 0, fromY: -80, label: 'From Above' },
-  { name: 'Bottom', className: 'cardBottom', fromX: 0, fromY: 80, label: 'From Below' },
-  { name: 'Left', className: 'cardLeft', fromX: -80, fromY: 0, label: 'From Left' },
-  { name: 'Right', className: 'cardRight', fromX: 80, fromY: 0, label: 'From Right' },
-  { name: 'TopLeft', className: 'cardTopLeft', fromX: -60, fromY: -60, label: 'Top-Left' },
-  { name: 'TopRight', className: 'cardTopRight', fromX: 60, fromY: -60, label: 'Top-Right' },
-  { name: 'BottomLeft', className: 'cardBottomLeft', fromX: -60, fromY: 60, label: 'Bottom-Left' },
-  { name: 'BottomRight', className: 'cardBottomRight', fromX: 60, fromY: 60, label: 'Bottom-Right' },
+  { name: 'Center', className: 'cardCenter', fromX: '0px', fromY: '-20px', label: 'From Top' },
+  { name: 'Top', className: 'cardTop', fromX: '0px', fromY: '-80px', label: 'From Above' },
+  { name: 'Bottom', className: 'cardBottom', fromX: '0px', fromY: '80px', label: 'From Below' },
+  { name: 'Left', className: 'cardLeft', fromX: '-80px', fromY: '0px', label: 'From Left' },
+  { name: 'Right', className: 'cardRight', fromX: '80px', fromY: '0px', label: 'From Right' },
+  { name: 'TopLeft', className: 'cardTopLeft', fromX: '-60px', fromY: '-60px', label: 'Top-Left' },
+  { name: 'TopRight', className: 'cardTopRight', fromX: '60px', fromY: '-60px', label: 'Top-Right' },
+  { name: 'BottomLeft', className: 'cardBottomLeft', fromX: '-60px', fromY: '60px', label: 'Bottom-Left' },
+  { name: 'BottomRight', className: 'cardBottomRight', fromX: '60px', fromY: '60px', label: 'Bottom-Right' },
 ];
 
 export const Showcase = () => {
