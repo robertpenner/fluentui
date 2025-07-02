@@ -5,6 +5,8 @@ export { Default } from './SlideDefault.stories';
 export { Snappy } from './SlideSnappy.stories';
 export { Relaxed } from './SlideRelaxed.stories';
 export { Customization } from './SlideCustomization.stories';
+export { Showcase } from './SlideShowcase.stories';
+export { SequentialAnimation } from './SlideSequential.stories';
 
 export default {
   title: 'Motion/Components (preview)/Slide',
