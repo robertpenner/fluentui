@@ -30,3 +30,7 @@ ReactDOM.render(
 ### Docs
 
 Docs are hosted at https://react.fluentui.dev/.
+
+### Contributing
+
+For Fluent UI development guidelines, see the [contributing docs](/docs/react-v9/contributing/README.md).
