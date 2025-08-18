@@ -516,10 +516,7 @@ describe('stagger-utils', () => {
 
       testScenarios.forEach(({ mode, direction, expectedInitial }) => {
         // Simulate the useState logic from useStaggerItemsVisibility
-        let initialState: boolean;
-
-        // Both modes now follow the same pattern: start in final state
-        initialState = direction === 'enter';
+        const initialState = direction === 'enter';
 
         expect(initialState).toBe(expectedInitial);
       });
