@@ -510,21 +510,16 @@ describe('stagger-utils', () => {
       const testScenarios = [
         { mode: 'presence', direction: 'enter', expectedInitial: true }, // Final state
         { mode: 'presence', direction: 'exit', expectedInitial: false }, // Final state
-        { mode: 'mount', direction: 'enter', expectedInitial: false }, // Start state
-        { mode: 'mount', direction: 'exit', expectedInitial: true }, // Start state
+        { mode: 'mount', direction: 'enter', expectedInitial: true }, // Final state
+        { mode: 'mount', direction: 'exit', expectedInitial: false }, // Final state
       ];
 
       testScenarios.forEach(({ mode, direction, expectedInitial }) => {
         // Simulate the useState logic from useStaggerItemsVisibility
         let initialState: boolean;
 
-        if (mode === 'presence') {
-          // For presence components: start in final state (they handle their own animation)
-          initialState = direction === 'enter';
-        } else {
-          // For regular DOM elements: start in start state (we control mount/unmount)
-          initialState = direction === 'exit';
-        }
+        // Both modes now follow the same pattern: start in final state
+        initialState = direction === 'enter';
 
         expect(initialState).toBe(expectedInitial);
       });
@@ -546,6 +541,88 @@ describe('stagger-utils', () => {
 
       expect(presenceInitialState).not.toBe(mountInitialState);
       expect(problemBehavior.keyInsight).toBe('Different component types need different initial states');
+    });
+  });
+
+  // Add this test to demonstrate the bug and fix it
+  describe('First mount behavior with visible=false', () => {
+    it('should not animate stagger-out on first mount when visible=false in mount mode', () => {
+      const mockOnMotionFinish = jest.fn();
+
+      const TestComponent = () => {
+        const { itemsVisibility } = useStaggerItemsVisibility({
+          itemCount: 3,
+          itemDelay: 100,
+          direction: 'exit', // visible=false maps to direction='exit'
+          mode: 'mount',
+          onMotionFinish: mockOnMotionFinish,
+        });
+        return <div data-testid="visibility">{JSON.stringify(itemsVisibility)}</div>;
+      };
+
+      const { getByTestId } = render(<TestComponent />);
+
+      // On first render with visible=false, items should be hidden and NOT animate
+      expect(JSON.parse(getByTestId('visibility').textContent!)).toEqual([false, false, false]);
+
+      // Should call onMotionFinish immediately since no animation needed
+      expect(mockOnMotionFinish).toHaveBeenCalledTimes(1);
+
+      // Should NOT request animation frame on first render for exit direction
+      expect(mockRequestAnimationFrame).not.toHaveBeenCalled();
+    });
+
+    it('should animate stagger-out only on subsequent renders when direction changes', () => {
+      const mockOnMotionFinish = jest.fn();
+
+      const TestComponent = ({ direction }: { direction: 'enter' | 'exit' }) => {
+        const { itemsVisibility } = useStaggerItemsVisibility({
+          itemCount: 3,
+          itemDelay: 100,
+          direction,
+          mode: 'mount',
+          onMotionFinish: mockOnMotionFinish,
+        });
+        return <div data-testid="visibility">{JSON.stringify(itemsVisibility)}</div>;
+      };
+
+      const { getByTestId, rerender } = render(<TestComponent direction="exit" />);
+
+      // First render - items should be hidden, no animation
+      expect(JSON.parse(getByTestId('visibility').textContent!)).toEqual([false, false, false]);
+      expect(mockRequestAnimationFrame).not.toHaveBeenCalled();
+
+      // Change to enter direction - should animate in
+      mockRequestAnimationFrame.mockClear();
+      act(() => {
+        rerender(<TestComponent direction="enter" />);
+      });
+
+      // Now animation should start
+      expect(mockRequestAnimationFrame).toHaveBeenCalled();
+    });
+
+    it('should make mount mode follow presence mode - no animation on first render for enter direction', () => {
+      const mockOnMotionFinish = jest.fn();
+
+      // Test mount mode directly (not rerendering from presence mode)
+      const TestComponent = () => {
+        const { itemsVisibility } = useStaggerItemsVisibility({
+          itemCount: 3,
+          itemDelay: 100,
+          direction: 'enter',
+          mode: 'mount',
+          onMotionFinish: mockOnMotionFinish,
+        });
+        return <div data-testid="visibility">{JSON.stringify(itemsVisibility)}</div>;
+      };
+
+      const { getByTestId } = render(<TestComponent />);
+
+      // Mount mode should behave like presence mode: start in final state, no animation
+      expect(JSON.parse(getByTestId('visibility').textContent!)).toEqual([true, true, true]);
+      expect(mockOnMotionFinish).toHaveBeenCalledTimes(1);
+      expect(mockRequestAnimationFrame).not.toHaveBeenCalled();
     });
   });
 });
