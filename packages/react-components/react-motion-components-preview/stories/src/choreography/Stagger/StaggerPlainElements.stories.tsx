@@ -1,4 +1,5 @@
 import * as React from 'react';
+import StaggerPlainElementsDescription from './StaggerPlainElements.stories.md';
 import { Field, makeStyles, tokens, Button } from '@fluentui/react-components';
 import { Stagger, Slide } from '@fluentui/react-motion-components-preview';
 
@@ -66,4 +67,12 @@ export const PlainElements = () => {
       </div>
     </div>
   );
+};
+
+PlainElements.parameters = {
+  docs: {
+    description: {
+      story: StaggerPlainElementsDescription,
+    },
+  },
 };
