@@ -6,13 +6,6 @@ export const DEFAULT_ITEM_DELAY = 100;
 export const DEFAULT_ITEM_DURATION = 200;
 
 /**
- * Defines how Stagger manages its children's visibility.
- * - 'mount': Children are mounted/unmounted from DOM based on visibility
- * - 'presence': Children are presence components with visible prop (always present in DOM, but shown/hidden by the presence itself)
- */
-export type StaggerMode = 'mount' | 'presence';
-
-/**
  * Flattens ReactNode (including Fragments) to an array of valid ReactElements,
  * filtering out strings, numbers, null, etc.
  */

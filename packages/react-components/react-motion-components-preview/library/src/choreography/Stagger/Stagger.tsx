@@ -5,9 +5,8 @@ import {
   DEFAULT_ITEM_DURATION,
   DEFAULT_ITEM_DELAY,
   acceptsVisibleProp,
-  type StaggerMode,
 } from './stagger-utils';
-import { StaggerOneWayProps, StaggerProps } from './stagger-types';
+import { StaggerOneWayProps, StaggerProps, type StaggerMode } from './stagger-types';
 
 const StaggerOneWay: React.FC<StaggerOneWayProps> = ({
   children,

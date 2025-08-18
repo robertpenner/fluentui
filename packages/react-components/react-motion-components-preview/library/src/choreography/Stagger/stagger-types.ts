@@ -1,6 +1,12 @@
-import { PresenceComponentProps, PresenceDirection } from '@fluentui/react-motion/src/index';
+import { PresenceComponentProps, PresenceDirection } from '@fluentui/react-motion';
 import * as React from 'react';
-import type { StaggerMode } from './stagger-utils';
+
+/**
+ * Defines how Stagger manages its children's visibility.
+ * - 'mount': Children are mounted/unmounted from DOM based on visibility
+ * - 'presence': Children are presence components with visible prop (always present in DOM, but shown/hidden by the presence itself)
+ */
+export type StaggerMode = 'mount' | 'presence';
 
 /**
  * Props for the Stagger component that manages staggered entrance and exit animations.
