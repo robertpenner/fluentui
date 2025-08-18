@@ -28,15 +28,17 @@ export interface StaggerProps {
   mode?: StaggerMode;
 }
 
-// Internal props that include the required mode
-interface StaggerBaseProps extends StaggerProps {
+// Internal props that include the required mode and use direction instead of visible
+interface StaggerBaseProps extends Omit<StaggerProps, 'visible'> {
   mode: StaggerMode;
+  /** Animation direction: 'enter' or 'exit'. */
+  direction: 'enter' | 'exit';
 }
 
 // TODO: support a render prop for custom rendering of children
 const StaggerBase: React.FC<StaggerBaseProps> = ({
   children,
-  visible = false,
+  direction,
   itemDelay = DEFAULT_ITEM_DELAY,
   itemDuration = DEFAULT_ITEM_DURATION,
   reversed = false,
@@ -49,7 +51,7 @@ const StaggerBase: React.FC<StaggerBaseProps> = ({
     itemCount: elements.length,
     itemDelay,
     itemDuration,
-    direction: visible ? 'enter' : 'exit',
+    direction,
     reversed,
     onMotionFinish,
     mode,
@@ -73,16 +75,16 @@ const StaggerBase: React.FC<StaggerBaseProps> = ({
 };
 
 const StaggerIn: React.FC<Omit<StaggerProps, 'visible'>> = props => (
-  <StaggerBase {...props} visible={true} mode="mount" />
+  <StaggerBase {...props} direction="enter" mode="mount" />
 );
 
 const StaggerOut: React.FC<Omit<StaggerProps, 'visible'>> = props => (
-  <StaggerBase {...props} visible={false} mode="mount" />
+  <StaggerBase {...props} direction="exit" mode="mount" />
 );
 
 // Main Stagger component with auto-detection or explicit mode
 const StaggerMain: React.FC<StaggerProps> = props => {
-  const { mode, children, ...rest } = props;
+  const { mode, children, visible = false, ...rest } = props;
 
   // Determine mode: explicit prop takes precedence, otherwise auto-detect
   let resolvedMode: StaggerMode;
@@ -95,7 +97,7 @@ const StaggerMain: React.FC<StaggerProps> = props => {
     resolvedMode = hasNonPresenceItems ? 'mount' : 'presence';
   }
 
-  return <StaggerBase {...rest} children={children} mode={resolvedMode} />;
+  return <StaggerBase {...rest} children={children} mode={resolvedMode} direction={visible ? 'enter' : 'exit'} />;
 };
 
 /**
