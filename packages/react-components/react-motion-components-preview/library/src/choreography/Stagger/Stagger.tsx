@@ -46,11 +46,11 @@ const StaggerOneWay: React.FC<StaggerOneWayProps> = ({
   );
 };
 
-const StaggerIn: React.FC<Omit<StaggerProps, 'visible'>> = props => (
+const StaggerIn: React.FC<Omit<StaggerProps, 'visible' | 'mode'>> = props => (
   <StaggerOneWay {...props} direction="enter" mode="mount" />
 );
 
-const StaggerOut: React.FC<Omit<StaggerProps, 'visible'>> = props => (
+const StaggerOut: React.FC<Omit<StaggerProps, 'visible' | 'mode'>> = props => (
   <StaggerOneWay {...props} direction="exit" mode="mount" />
 );
 
@@ -68,8 +68,9 @@ const StaggerMain: React.FC<StaggerProps> = props => {
     const hasNonPresenceItems = elements.some(child => !acceptsVisibleProp(child));
     resolvedMode = hasNonPresenceItems ? 'mount' : 'presence';
   }
+  const direction = visible ? 'enter' : 'exit';
 
-  return <StaggerOneWay {...rest} children={children} mode={resolvedMode} direction={visible ? 'enter' : 'exit'} />;
+  return <StaggerOneWay {...rest} children={children} mode={resolvedMode} direction={direction} />;
 };
 
 /**

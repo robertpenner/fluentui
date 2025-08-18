@@ -67,8 +67,8 @@ export const SlideSnappy: PresenceComponent<SlideParams>;
 
 // @public
 export const Stagger: React_2.FC<StaggerProps> & {
-    In: React_2.FC<Omit<StaggerProps, "visible">>;
-    Out: React_2.FC<Omit<StaggerProps, "visible">>;
+    In: React_2.FC<Omit<StaggerProps, "visible" | "mode">>;
+    Out: React_2.FC<Omit<StaggerProps, "visible" | "mode">>;
 };
 
 // @public
