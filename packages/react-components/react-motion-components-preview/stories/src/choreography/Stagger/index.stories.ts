@@ -4,7 +4,7 @@ import StaggerDescription from './StaggerDescription.md';
 export { Default } from './StaggerDefault.stories';
 export { Reversed } from './StaggerReversed.stories';
 export { PlainElements } from './StaggerPlainElements.stories';
-export { TransitionIn } from './StaggerTransitionIn.stories';
+export { OneWayIn } from './StaggerOneWayIn.stories';
 
 export default {
   title: 'Motion/Choreography (preview)/Stagger',

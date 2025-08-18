@@ -1,7 +1,7 @@
 import * as React from 'react';
 import StaggerPlainElementsDescription from './StaggerPlainElements.stories.md';
 import { Field, makeStyles, tokens, Button } from '@fluentui/react-components';
-import { Stagger, Slide } from '@fluentui/react-motion-components-preview';
+import { Stagger } from '@fluentui/react-motion-components-preview';
 
 const useClasses = makeStyles({
   container: {

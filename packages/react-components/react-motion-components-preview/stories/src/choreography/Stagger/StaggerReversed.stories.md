@@ -1,3 +1,5 @@
+The `reversed` prop animates the stagger from the last item to the first.
+
 ```tsx
 import { Stagger, Slide } from '@fluentui/react-motion-components-preview';
 

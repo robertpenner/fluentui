@@ -1,5 +1,5 @@
 import * as React from 'react';
-import StaggerTransitionInDescription from './StaggerTransitionIn.stories.md';
+import StaggerOneWayInDescription from './StaggerOneWayIn.stories.md';
 import {
   Avatar,
   Button,
@@ -78,7 +78,7 @@ const users = [
   },
 ];
 
-export const TransitionIn = () => {
+export const OneWayIn = () => {
   const classes = useClasses();
   const [animationKey, setAnimationKey] = React.useState<number>(0);
 
@@ -132,10 +132,10 @@ export const TransitionIn = () => {
   );
 };
 
-TransitionIn.parameters = {
+OneWayIn.parameters = {
   docs: {
     description: {
-      story: StaggerTransitionInDescription,
+      story: StaggerOneWayInDescription,
     },
   },
 };
