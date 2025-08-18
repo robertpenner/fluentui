@@ -3,7 +3,7 @@ Stagger
 > **⚠️ Preview components are considered unstable**
 
 ```tsx
-import { Stagger, Fade } from '@fluentui/react-motion-components-preview';
+import { Stagger, Slide } from '@fluentui/react-motion-components-preview';
 
 <Stagger visible={isVisible}>
   <Slide>{/* item 1 */}</Slide>
