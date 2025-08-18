@@ -93,7 +93,7 @@ const StaggerMain: React.FC<StaggerProps> = props => {
   } else {
     // Auto-detect based on children: if any child doesn't accept visible prop, use mount mode
     const elements = toElementArray(children);
-    const hasNonPresenceItems = elements.every(child => !acceptsVisibleProp(child));
+    const hasNonPresenceItems = elements.some(child => !acceptsVisibleProp(child));
     resolvedMode = hasNonPresenceItems ? 'mount' : 'presence';
   }
 
