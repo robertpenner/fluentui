@@ -33,11 +33,10 @@ const useClasses = makeStyles({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: tokens.colorNeutralBackgroundStatic,
-    color: 'white',
-    // border: `${tokens.strokeWidthThicker} solid ${tokens.colorTransparentStroke}`,
+    color: tokens.colorNeutralForegroundInverted,
     width: '40px',
     height: '100px',
-    margin: '2px',
+    margin: tokens.spacingHorizontalXXS,
   },
 });
 
@@ -57,20 +56,7 @@ export const Default = (props: {} /* TODO: Stagger props */) => {
 
       <div className={classes.items}>
         <Stagger visible={visible}>
-          {Array.from({ length: 8 }, (_, i) => (
-            <div className={classes.item}>{i + 1}</div>
-          ))}
-        </Stagger>
-      </div>
-    </div>
-  );
-};
-
-/*
-
-      <div className={classes.items}>
-        <Stagger visible={visible}>
-          {/ * Create a list of items, each wrapped with a presence transition * /}
+          {/* Create a list of items, each wrapped with a presence transition */}
           {Array.from({ length: 8 }, (_, i) => (
             <Slide key={`stagger-item-${i}`}>
               <div className={classes.item}>{i + 1}</div>
@@ -78,5 +64,6 @@ export const Default = (props: {} /* TODO: Stagger props */) => {
           ))}
         </Stagger>
       </div>
-
-*/
+    </div>
+  );
+};
