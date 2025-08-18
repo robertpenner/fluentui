@@ -16,9 +16,9 @@ jest.mock('./stagger-utils', () => ({
 
 // Import after mocking
 import { Stagger } from './Stagger';
-import { Fade } from '../components/Fade';
-import { Scale } from '../components/Scale';
-import { Slide } from '../components/Slide';
+import { Fade } from '../../components/Fade';
+import { Scale } from '../../components/Scale';
+import { Slide } from '../../components/Slide';
 
 // Regular component without visible prop
 const RegularDiv: React.FC<{ children: React.ReactNode }> = ({ children }) => (

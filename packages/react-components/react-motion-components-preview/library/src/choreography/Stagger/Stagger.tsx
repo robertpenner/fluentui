@@ -7,7 +7,7 @@ import {
   acceptsVisibleProp,
   type StaggerMode,
 } from './stagger-utils';
-import { StaggerOneWayProps, StaggerProps } from './Stagger.types';
+import { StaggerOneWayProps, StaggerProps } from './stagger-types';
 
 const StaggerOneWay: React.FC<StaggerOneWayProps> = ({
   children,

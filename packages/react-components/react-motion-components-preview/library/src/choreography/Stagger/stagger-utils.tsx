@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useAnimationFrame } from '@fluentui/react-utilities';
-import type { StaggerProps } from './Stagger.types';
+import type { StaggerProps } from './stagger-types';
 
 export const DEFAULT_ITEM_DELAY = 100;
 export const DEFAULT_ITEM_DURATION = 200;
@@ -47,7 +47,7 @@ export const childrenOrFragmentToArray = (children: React.ReactNode): React.Reac
  * @param params.itemDuration Milliseconds each item’s animation lasts (default 0)
  * @returns                   Total duration in milliseconds (never negative)
  */
-function getStaggerTotalDuration({
+export function getStaggerTotalDuration({
   itemCount,
   itemDelay = DEFAULT_ITEM_DELAY,
   itemDuration = DEFAULT_ITEM_DURATION,
@@ -73,7 +73,7 @@ interface StaggerItemsVisibilityAtTimeParams extends Pick<StaggerProps, 'itemDel
 /**
  * Returns visibility flags plus timing metrics for a stagger sequence.
  */
-function staggerItemsVisibilityAtTime({
+export function staggerItemsVisibilityAtTime({
   itemCount,
   elapsed,
   itemDelay = DEFAULT_ITEM_DELAY,

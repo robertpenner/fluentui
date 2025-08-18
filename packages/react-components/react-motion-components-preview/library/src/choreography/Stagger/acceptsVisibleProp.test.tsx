@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { acceptsVisibleProp } from './stagger-utils';
-import { Fade } from '../components/Fade/Fade';
-import { Scale } from '../components/Scale/Scale';
-import { Slide } from '../components/Slide/Slide';
+import { Fade } from '../../components/Fade/Fade';
+import { Scale } from '../../components/Scale/Scale';
+import { Slide } from '../../components/Slide/Slide';
 
 describe('acceptsVisibleProp', () => {
   it('should return true for components with visible prop set to true', () => {
