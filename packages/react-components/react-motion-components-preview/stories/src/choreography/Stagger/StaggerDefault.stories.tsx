@@ -1,20 +1,14 @@
 import * as React from 'react';
-import {
-  Field,
-  Select,
-  makeStyles,
-  tokens,
-  Switch,
-  motionTokens,
-  createPresenceComponentVariant,
-  useId,
-} from '@fluentui/react-components';
-import { Stagger, Fade, Scale } from '@fluentui/react-motion-components-preview';
+import { Field, makeStyles, tokens, Button } from '@fluentui/react-components';
+import { Stagger, Slide } from '@fluentui/react-motion-components-preview';
 
 const useClasses = makeStyles({
   container: {
     display: 'flex',
+    flexDirection: 'column',
     // flexWrap: 'wrap',
+    alignItems: 'flex-start',
+    gap: tokens.spacingHorizontalXL,
   },
   controls: {
     display: 'flex',
@@ -31,76 +25,58 @@ const useClasses = makeStyles({
   },
   items: {
     display: 'flex',
-    flexDirection: 'column',
-    // flexWrap: 'wrap',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
   },
   item: {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: tokens.colorBrandBackground,
+    backgroundColor: tokens.colorNeutralBackgroundStatic,
     color: 'white',
     // border: `${tokens.strokeWidthThicker} solid ${tokens.colorTransparentStroke}`,
-    width: '400px',
-    height: '20px',
+    width: '40px',
+    height: '100px',
     margin: '2px',
   },
-});
-
-const FadeUltraSlow = createPresenceComponentVariant(Fade, {
-  duration: motionTokens.durationUltraSlow,
-});
-
-const ScaleFull = createPresenceComponentVariant(Scale, {
-  duration: motionTokens.durationSlow,
-  fromScale: 0,
 });
 
 export const Default = (props: {} /* TODO: Stagger props */) => {
   const classes = useClasses();
   const [visible, setVisible] = React.useState<boolean>(false);
-  const [reversed, setReversed] = React.useState<boolean>(false);
-  const [transition, setTransition] = React.useState<'Fade' | 'Scale'>('Fade');
-
-  const transitionSelectId = useId();
-
-  // TODO: clean up this mapping
-  const ItemTransition = transition === 'Fade' ? FadeUltraSlow : ScaleFull;
 
   return (
     <div className={classes.container}>
       <div className={classes.controls}>
         <Field className={classes.field}>
-          <Switch label="Visible" checked={visible} onChange={() => setVisible(v => !v)} />
+          <Button appearance="primary" onClick={() => setVisible(v => !v)}>
+            {visible ? 'Hide' : 'Show'}
+          </Button>
         </Field>
-
-        <Field className={classes.field}>
-          <Switch label="Reversed" checked={reversed} onChange={() => setReversed(v => !v)} />
-        </Field>
-
-        <label htmlFor={transitionSelectId}>transition</label>
-        <Select
-          id={transitionSelectId}
-          onChange={(_, data) => setTransition(data.value as typeof transition)}
-          defaultValue={transition}
-        >
-          <option>Fade</option>
-          <option>Scale</option>
-        </Select>
       </div>
 
-      <div>
-        <div className={classes.items}>
-          <Stagger presence visible={visible} reversed={reversed}>
-            {/* Create a list of items, each wrapped with a presence transition */}
-            {Array.from({ length: 10 }, (_, i) => (
-              <ItemTransition key={i}>
-                <div className={classes.item}>{i}</div>
-              </ItemTransition>
-            ))}
-          </Stagger>
-        </div>
+      <div className={classes.items}>
+        <Stagger visible={visible}>
+          {Array.from({ length: 8 }, (_, i) => (
+            <div className={classes.item}>{i + 1}</div>
+          ))}
+        </Stagger>
       </div>
     </div>
   );
 };
+
+/*
+
+      <div className={classes.items}>
+        <Stagger visible={visible}>
+          {/ * Create a list of items, each wrapped with a presence transition * /}
+          {Array.from({ length: 8 }, (_, i) => (
+            <Slide key={`stagger-item-${i}`}>
+              <div className={classes.item}>{i + 1}</div>
+            </Slide>
+          ))}
+        </Stagger>
+      </div>
+
+*/

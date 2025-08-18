@@ -3,10 +3,10 @@ import StaggerDescription from './StaggerDescription.md';
 
 export { Default } from './StaggerDefault.stories';
 export { TransitionIn } from './StaggerTransitionIn.stories';
-export { DashboardTiles } from './StaggerDashboard.stories';
-export { NotificationCenter } from './StaggerNotifications.stories';
-export { FileExplorer } from './StaggerFileExplorer.stories';
-export { AdvancedConfiguration } from './StaggerAdvancedConfiguration.stories';
+// export { DashboardTiles } from './StaggerDashboard.stories';
+// export { NotificationCenter } from './StaggerNotifications.stories';
+// export { FileExplorer } from './StaggerFileExplorer.stories';
+// export { AdvancedConfiguration } from './StaggerAdvancedConfiguration.stories';
 
 export default {
   title: 'Motion/Choreography (preview)/Stagger',
