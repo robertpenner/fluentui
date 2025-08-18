@@ -40,7 +40,7 @@ const useClasses = makeStyles({
   },
 });
 
-export const Default = () => {
+export const Reversed = () => {
   const classes = useClasses();
   const [visible, setVisible] = React.useState<boolean>(false);
 
@@ -55,7 +55,7 @@ export const Default = () => {
       </div>
 
       <div className={classes.items}>
-        <Stagger visible={visible}>
+        <Stagger visible={visible} reversed>
           {/* Create a list of items, each wrapped with a presence transition */}
           {Array.from({ length: 8 }, (_, i) => (
             <Slide key={`stagger-item-${i}`}>
