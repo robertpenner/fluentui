@@ -5,6 +5,7 @@
 ```ts
 
 import { PresenceComponent } from '@fluentui/react-motion';
+import { PresenceComponentProps } from '@fluentui/react-motion';
 import * as React_2 from 'react';
 
 // @public
@@ -78,7 +79,7 @@ export interface StaggerProps {
     mode?: StaggerMode;
     onMotionFinish?: () => void;
     reversed?: boolean;
-    visible?: boolean;
+    visible?: PresenceComponentProps['visible'];
 }
 
 // (No @packageDocumentation comment for this package)
