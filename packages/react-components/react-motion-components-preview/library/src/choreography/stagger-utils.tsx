@@ -137,13 +137,13 @@ export interface UseStaggerItemsVisibilityParams extends Omit<StaggerItemsVisibi
  * Hook that tracks the visibility of a staggered sequence of items as time progresses.
  *
  * **Behavior:**
- * - For presence mode: Items start in their final state on first render (no animation)
- * - For mount mode: Items start in their start state on first render and animate
+ * - Both modes start in final state: visible for 'enter', hidden for 'exit'
+ * - Both modes: No animation on first render (items already in final state)
  * - On subsequent renders: Items animate from start state to final state over time
  *
  * **States:**
- * - Enter direction: Items start hidden → animate to visible
- * - Exit direction: Items start visible → animate to hidden
+ * - Enter direction: Items start visible (final state)
+ * - Exit direction: Items start hidden (final state)
  *
  * @param itemCount - Total number of items to stagger
  * @param itemDelay - Milliseconds between the start of each item's animation
@@ -168,15 +168,9 @@ export function useStaggerItemsVisibility({
 
   // State: visibility array for all items
   const [itemsVisibility, setItemsVisibility] = React.useState<boolean[]>(() => {
-    // For presence mode: start in final state (they handle their own animation)
-    // For mount mode: start in start state (we control mount/unmount)
-    if (mode === 'presence') {
-      // For presence components: final state is visible for 'enter', hidden for 'exit'
-      return Array(itemCount).fill(direction === 'enter');
-    } else {
-      // For mount mode: start state is hidden for 'enter', visible for 'exit'
-      return Array(itemCount).fill(direction === 'exit');
-    }
+    // Both modes start in final state: visible for 'enter', hidden for 'exit'
+    // The difference is in the animation handling, not the initial state
+    return Array(itemCount).fill(direction === 'enter');
   });
 
   // Refs: animation timing and control
@@ -192,22 +186,17 @@ export function useStaggerItemsVisibility({
     startTimeRef.current = null;
     finishedRef.current = false;
 
-    // For presence mode: on first render, items should already be in their final state
-    // For mount mode: on first render, items should be in their start state and animate
+    // Both modes behave the same: no animation on first render, already in final state
     if (isFirstRender.current) {
       isFirstRender.current = false;
-      if (mode === 'presence') {
-        // Presence components: already in correct final state, no animation needed
-        onMotionFinish?.();
-        return; // No cleanup needed for first render
-      }
-      // For mount mode: we continue to animate from start state (already set in useState)
+      // Items are already in their final state from useState, no animation needed
+      onMotionFinish?.();
+      return; // No cleanup needed for first render
     }
 
     // For animations after first render, we start from the opposite of the final state:
     // - Enter animation: start hidden (false), animate to visible (true)
     // - Exit animation: start visible (true), animate to hidden (false)
-    // Only set start state if we're doing an animation (not first render for presence components)
     const startState = direction === 'exit';
     setItemsVisibility(Array(itemCount).fill(startState));
 
