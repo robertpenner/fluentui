@@ -1,6 +1,15 @@
 import * as React from 'react';
 import StaggerTransitionInDescription from './StaggerTransitionIn.stories.md';
-import { Avatar, Button, Card, CardHeader, Text, makeStyles, tokens } from '@fluentui/react-components';
+import {
+  Avatar,
+  Button,
+  Card,
+  CardHeader,
+  PresenceBadgeStatus,
+  Text,
+  makeStyles,
+  tokens,
+} from '@fluentui/react-components';
 import { Stagger, CollapseRelaxed } from '@fluentui/react-motion-components-preview';
 import { MoreHorizontal20Regular } from '@fluentui/react-icons';
 
@@ -91,7 +100,13 @@ export const TransitionIn = () => {
             <Card className={classes.userCard}>
               <CardHeader
                 className={classes.cardHeader}
-                image={<Avatar name={user.name} image={{ src: user.avatar }} badge={{ status: user.status as any }} />}
+                image={
+                  <Avatar
+                    name={user.name}
+                    image={{ src: user.avatar }}
+                    badge={{ status: user.status as PresenceBadgeStatus }}
+                  />
+                }
                 header={
                   <div>
                     <Text weight="semibold">{user.name}</Text>
