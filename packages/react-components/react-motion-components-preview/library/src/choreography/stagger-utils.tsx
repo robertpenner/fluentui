@@ -1,15 +1,16 @@
 import * as React from 'react';
 import { useAnimationFrame } from '@fluentui/react-utilities';
+import type { StaggerProps } from './Stagger.types';
 
 export const DEFAULT_ITEM_DELAY = 100;
 export const DEFAULT_ITEM_DURATION = 200;
 
 /**
  * Defines how Stagger manages its children's visibility.
- * - 'presence': Children are presence components with visible prop (always rendered, visibility controlled via prop)
  * - 'mount': Children are mounted/unmounted from DOM based on visibility
+ * - 'presence': Children are presence components with visible prop (always present in DOM, but shown/hidden by the presence itself)
  */
-export type StaggerMode = 'presence' | 'mount';
+export type StaggerMode = 'mount' | 'presence';
 
 /**
  * Flattens ReactNode (including Fragments) to an array of valid ReactElements,
@@ -46,15 +47,13 @@ export const childrenOrFragmentToArray = (children: React.ReactNode): React.Reac
  * @param params.itemDuration Milliseconds each item’s animation lasts (default 0)
  * @returns                   Total duration in milliseconds (never negative)
  */
-export function getStaggerTotalDuration({
+function getStaggerTotalDuration({
   itemCount,
-  itemDelay,
+  itemDelay = DEFAULT_ITEM_DELAY,
   itemDuration = DEFAULT_ITEM_DURATION,
 }: {
   itemCount: number;
-  itemDelay: number;
-  itemDuration?: number;
-}): number {
+} & Pick<StaggerProps, 'itemDelay' | 'itemDuration'>): number {
   if (itemCount <= 0) {
     return 0;
   }
@@ -65,19 +64,16 @@ export function getStaggerTotalDuration({
   return Math.max(0, staggerDuration + itemDuration);
 }
 
-export interface StaggerItemsVisibilityAtTimeParams {
+interface StaggerItemsVisibilityAtTimeParams extends Pick<StaggerProps, 'itemDelay' | 'itemDuration' | 'reversed'> {
   itemCount: number;
   elapsed: number;
-  itemDelay?: number;
-  itemDuration?: number;
   direction?: 'enter' | 'exit';
-  reversed?: boolean;
 }
 
 /**
  * Returns visibility flags plus timing metrics for a stagger sequence.
  */
-export function staggerItemsVisibilityAtTime({
+function staggerItemsVisibilityAtTime({
   itemCount,
   elapsed,
   itemDelay = DEFAULT_ITEM_DELAY,
@@ -127,11 +123,9 @@ export function staggerItemsVisibilityAtTime({
   return { itemsVisibility, totalDuration };
 }
 
-export interface UseStaggerItemsVisibilityParams extends Omit<StaggerItemsVisibilityAtTimeParams, 'elapsed'> {
-  onMotionFinish?: () => void;
-  /** Defines how children's visibility is managed. Defaults to 'presence'. */
-  mode?: StaggerMode;
-}
+interface UseStaggerItemsVisibilityParams
+  extends Pick<StaggerProps, 'onMotionFinish' | 'mode'>,
+    Omit<StaggerItemsVisibilityAtTimeParams, 'elapsed'> {}
 
 /**
  * Hook that tracks the visibility of a staggered sequence of items as time progresses.

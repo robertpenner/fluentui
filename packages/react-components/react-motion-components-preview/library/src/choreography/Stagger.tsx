@@ -7,43 +7,16 @@ import {
   acceptsVisibleProp,
   type StaggerMode,
 } from './stagger-utils';
+import { StaggerOneWayProps, StaggerProps } from './Stagger.types';
 
-/**
- * Props for the Stagger component that manages staggered entrance and exit animations.
- */
-export interface StaggerProps {
-  /** React elements to animate. Elements are cloned with animation props. */
-  children: React.ReactNode;
-  /** Controls animation direction: `true` for enter, `false` for exit. Defaults to `false`. */
-  visible?: boolean; // true = enter, false = exit (defaults to false)
-  /** Milliseconds between each item's animation start. Defaults to 100ms. */
-  itemDelay?: number;
-  /** Milliseconds each item's animation lasts. Defaults to 200ms. */
-  itemDuration?: number;
-  /** Whether to reverse the stagger sequence (last item animates first). Defaults to `false`. */
-  reversed?: boolean; // run sequence backward (defaults to false)
-  /** Callback invoked when the staggered animation sequence completes. */
-  onMotionFinish?: () => void;
-  /** How children's visibility is managed. If undefined, auto-detects based on children. */
-  mode?: StaggerMode;
-}
-
-// Internal props that include the required mode and use direction instead of visible
-interface StaggerBaseProps extends Omit<StaggerProps, 'visible'> {
-  mode: StaggerMode;
-  /** Animation direction: 'enter' or 'exit'. */
-  direction: 'enter' | 'exit';
-}
-
-// TODO: support a render prop for custom rendering of children
-const StaggerBase: React.FC<StaggerBaseProps> = ({
+const StaggerOneWay: React.FC<StaggerOneWayProps> = ({
   children,
   direction,
   itemDelay = DEFAULT_ITEM_DELAY,
   itemDuration = DEFAULT_ITEM_DURATION,
   reversed = false,
+  mode = 'mount',
   onMotionFinish,
-  mode,
 }) => {
   const elements = toElementArray(children);
 
@@ -75,11 +48,11 @@ const StaggerBase: React.FC<StaggerBaseProps> = ({
 };
 
 const StaggerIn: React.FC<Omit<StaggerProps, 'visible'>> = props => (
-  <StaggerBase {...props} direction="enter" mode="mount" />
+  <StaggerOneWay {...props} direction="enter" mode="mount" />
 );
 
 const StaggerOut: React.FC<Omit<StaggerProps, 'visible'>> = props => (
-  <StaggerBase {...props} direction="exit" mode="mount" />
+  <StaggerOneWay {...props} direction="exit" mode="mount" />
 );
 
 // Main Stagger component with auto-detection or explicit mode
@@ -97,7 +70,7 @@ const StaggerMain: React.FC<StaggerProps> = props => {
     resolvedMode = hasNonPresenceItems ? 'mount' : 'presence';
   }
 
-  return <StaggerBase {...rest} children={children} mode={resolvedMode} direction={visible ? 'enter' : 'exit'} />;
+  return <StaggerOneWay {...rest} children={children} mode={resolvedMode} direction={visible ? 'enter' : 'exit'} />;
 };
 
 /**
