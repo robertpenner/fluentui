@@ -27,9 +27,8 @@ import { Stagger, Slide } from '@fluentui/react-motion-components-preview';
 
 ## Stagger Modes
 
-|              | **'presence' mode**                                                                                           | **'mount' mode**                                                                                  |
-| ------------ | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| **behavior** | Waits for interactivity                                                                                       | Autoplays immediately                                                                             |
-| **children** | Presence components like `Fade` with a `visible` prop                                                         | DOM elements or self-playing motion components like `Fade.In`                                     |
-| **flow**     | Components occupy space in the DOM while hidden. When triggered, they transition in without affecting layout. | As elements are added to the DOM, they can affect layout. They can autoplay animation internally. |
-| **example**  | A hidden dropdown menu occupying space and ready to animate in on click                                       | Cards that stagger in as soon as a page loads                                                     |
+|              | **'presence' mode**                                                                                                               | **'mount' mode**                                               |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| **children** | Presence components like `Fade` with a `visible` prop                                                                             | DOM elements or self-playing motion components like `Fade.In`  |
+| **flow**     | Components occupy space in the DOM while hidden. When triggered, `Stagger` transitions them without necessarily affecting layout. | As `Stagger` adds elements to the DOM, they can affect layout. |
+| **example**  | A hidden dropdown menu occupying space and ready to animate in on click                                                           | Cards that stagger in as soon as a page loads                  |
