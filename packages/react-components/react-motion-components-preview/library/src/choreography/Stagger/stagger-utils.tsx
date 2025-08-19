@@ -155,9 +155,13 @@ export function useStaggerItemsVisibility({
 
   // State: visibility array for all items
   const [itemsVisibility, setItemsVisibility] = React.useState<boolean[]>(() => {
-    // Both modes start in final state: visible for 'enter', hidden for 'exit'
-    // The difference is in the animation handling, not the initial state
-    return Array(itemCount).fill(direction === 'enter');
+    // For mount mode, items should start hidden and animate to visible
+    // For presence mode, items start in final state: visible for 'enter', hidden for 'exit'
+    if (mode === 'mount') {
+      return Array(itemCount).fill(direction === 'exit');
+    } else {
+      return Array(itemCount).fill(direction === 'enter');
+    }
   });
 
   // Refs: animation timing and control
@@ -173,19 +177,32 @@ export function useStaggerItemsVisibility({
     startTimeRef.current = null;
     finishedRef.current = false;
 
-    // Both modes behave the same: no animation on first render, already in final state
-    if (isFirstRender.current) {
+    // Mount mode should always animate, presence mode only animates after first render
+    // - Stagger.In (enter + mount): DOM elements get added and animate from hidden to visible
+    // - Stagger.Out (exit + mount): DOM elements start visible and animate out before removal
+    if (mode === 'presence' && isFirstRender.current) {
       isFirstRender.current = false;
       // Items are already in their final state from useState, no animation needed
       onMotionFinish?.();
       return; // No cleanup needed for first render
     }
 
-    // For animations after first render, we start from the opposite of the final state:
-    // - Enter animation: start hidden (false), animate to visible (true)
-    // - Exit animation: start visible (true), animate to hidden (false)
-    const startState = direction === 'exit';
-    setItemsVisibility(Array(itemCount).fill(startState));
+    // Mark first render as complete
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+    }
+
+    // For mount mode, we start with the initial state and animate to the final state
+    // For presence mode animations after first render, we start from the opposite state
+    if (mode === 'mount') {
+      // Mount mode: already initialized correctly, start animation
+    } else {
+      // Presence mode: start from the opposite of the final state
+      // - Enter animation: start hidden (false), animate to visible (true)
+      // - Exit animation: start visible (true), animate to hidden (false)
+      const startState = direction === 'exit';
+      setItemsVisibility(Array(itemCount).fill(startState));
+    }
 
     // Animation loop: update visibility on each frame until complete
     const tick = (now: number) => {
@@ -251,7 +268,7 @@ export function acceptsVisibleProp(element: React.ReactElement): boolean {
     return true;
   }
 
-  // Fallback: check if it's a presence motion component by looking for .In and .Out properties
+  // Check if it's a presence motion component by looking for .In and .Out properties
   if (typeof element.type === 'function') {
     const isPresence = 'In' in element.type && 'Out' in element.type;
     return isPresence;

@@ -541,16 +541,16 @@ describe('stagger-utils', () => {
     });
   });
 
-  // Add this test to demonstrate the bug and fix it
-  describe('First mount behavior with visible=false', () => {
-    it('should not animate stagger-out on first mount when visible=false in mount mode', () => {
+  // Add this test to demonstrate mount mode behavior
+  describe('First mount behavior in mount mode', () => {
+    it('should animate stagger-out on first mount when direction=exit in mount mode', () => {
       const mockOnMotionFinish = jest.fn();
 
       const TestComponent = () => {
         const { itemsVisibility } = useStaggerItemsVisibility({
           itemCount: 3,
           itemDelay: 100,
-          direction: 'exit', // visible=false maps to direction='exit'
+          direction: 'exit', // Want items to exit (end up hidden)
           mode: 'mount',
           onMotionFinish: mockOnMotionFinish,
         });
@@ -559,17 +559,17 @@ describe('stagger-utils', () => {
 
       const { getByTestId } = render(<TestComponent />);
 
-      // On first render with visible=false, items should be hidden and NOT animate
-      expect(JSON.parse(getByTestId('visibility').textContent!)).toEqual([false, false, false]);
+      // On first render with exit direction, items should start visible and animate to hidden
+      expect(JSON.parse(getByTestId('visibility').textContent!)).toEqual([true, true, true]);
 
-      // Should call onMotionFinish immediately since no animation needed
-      expect(mockOnMotionFinish).toHaveBeenCalledTimes(1);
+      // Should start animation, not finish immediately
+      expect(mockOnMotionFinish).not.toHaveBeenCalled();
 
-      // Should NOT request animation frame on first render for exit direction
-      expect(mockRequestAnimationFrame).not.toHaveBeenCalled();
+      // Should request animation frame to start animation
+      expect(mockRequestAnimationFrame).toHaveBeenCalled();
     });
 
-    it('should animate stagger-out only on subsequent renders when direction changes', () => {
+    it('should animate on mount and allow direction changes on subsequent renders', () => {
       const mockOnMotionFinish = jest.fn();
 
       const TestComponent = ({ direction }: { direction: 'enter' | 'exit' }) => {
@@ -585,9 +585,9 @@ describe('stagger-utils', () => {
 
       const { getByTestId, rerender } = render(<TestComponent direction="exit" />);
 
-      // First render - items should be hidden, no animation
-      expect(JSON.parse(getByTestId('visibility').textContent!)).toEqual([false, false, false]);
-      expect(mockRequestAnimationFrame).not.toHaveBeenCalled();
+      // First render - items should start visible and animate to hidden
+      expect(JSON.parse(getByTestId('visibility').textContent!)).toEqual([true, true, true]);
+      expect(mockRequestAnimationFrame).toHaveBeenCalled();
 
       // Change to enter direction - should animate in
       mockRequestAnimationFrame.mockClear();
@@ -595,11 +595,11 @@ describe('stagger-utils', () => {
         rerender(<TestComponent direction="enter" />);
       });
 
-      // Now animation should start
+      // Now animation should start for enter direction
       expect(mockRequestAnimationFrame).toHaveBeenCalled();
     });
 
-    it('should make mount mode follow presence mode - no animation on first render for enter direction', () => {
+    it('should make mount mode animate on first render for enter direction', () => {
       const mockOnMotionFinish = jest.fn();
 
       // Test mount mode directly (not rerendering from presence mode)
@@ -616,10 +616,11 @@ describe('stagger-utils', () => {
 
       const { getByTestId } = render(<TestComponent />);
 
-      // Mount mode should behave like presence mode: start in final state, no animation
-      expect(JSON.parse(getByTestId('visibility').textContent!)).toEqual([true, true, true]);
-      expect(mockOnMotionFinish).toHaveBeenCalledTimes(1);
-      expect(mockRequestAnimationFrame).not.toHaveBeenCalled();
+      // Mount mode should start in opposite state and animate to final state
+      // For enter direction, start hidden and animate to visible
+      expect(JSON.parse(getByTestId('visibility').textContent!)).toEqual([false, false, false]);
+      expect(mockOnMotionFinish).not.toHaveBeenCalled(); // Animation should start, not finish immediately
+      expect(mockRequestAnimationFrame).toHaveBeenCalled(); // Should start animation
     });
   });
 });
