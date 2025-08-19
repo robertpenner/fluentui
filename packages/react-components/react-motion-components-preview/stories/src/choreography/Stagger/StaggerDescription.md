@@ -25,16 +25,12 @@ import { Stagger, Slide } from '@fluentui/react-motion-components-preview';
 </Stagger>
 ```
 
-### Stagger 'presence' mode (reactive)
+## Stagger Modes
 
-- Purpose: Components exist in the DOM and wait for external events to trigger animations
-- Initial State: Idle/ready state - items are already in their final state
-- Trigger: User interactions, state changes, or other events toggle the animation
-- Example: A dropdown menu that's hidden but ready to animate in when clicked
-
-### Stagger 'mount' mode (autonomous)
-
-- Purpose: Components animate as soon as they're added to the DOM
-- Initial State: Animation begins immediately upon mount
-- Trigger: The act of mounting/rendering itself starts the animation
-- Example: Cards that stagger in as soon as a page loads
+|                   | **'presence' mode**                                                            | **'mount' mode**                                          |
+| ----------------- | ------------------------------------------------------------------------------ | --------------------------------------------------------- |
+| **Type**          | Reactive                                                                       | Autonomous                                                |
+| **Purpose**       | Components exist in the DOM and wait for external events to trigger animations | Components animate as soon as they're added to the DOM    |
+| **Initial State** | Idle/ready state - items are already in their final state                      | Animation begins immediately upon mount                   |
+| **Trigger**       | User interactions, state changes, or other events toggle the animation         | The act of mounting/rendering itself starts the animation |
+| **Example**       | A dropdown menu that's hidden but ready to animate in when clicked             | Cards that stagger in as soon as a page loads             |
