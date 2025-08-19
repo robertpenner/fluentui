@@ -5,7 +5,7 @@
 - `Stagger` can wrap presence motion components (`Slide`, `Fade`, `Collapse`, etc.) and then animate them by triggering their `visible` props in sequence.
 - Its own `visible` prop gives interactive control over the staggered enter and exit transitions.
 - This allows `Stagger` to be treated like a presence component, and thus be nested within another `Stagger`.
-- `Stagger` can also animate plain HTML elements by adding and removing them from the DOM.
+- `Stagger` can also transition plain HTML elements by adding and removing them from the DOM.
 
 ```tsx
 import { Stagger, Slide } from '@fluentui/react-motion-components-preview';
@@ -27,10 +27,9 @@ import { Stagger, Slide } from '@fluentui/react-motion-components-preview';
 
 ## Stagger Modes
 
-|                   | **'presence' mode**                                                            | **'mount' mode**                                          |
-| ----------------- | ------------------------------------------------------------------------------ | --------------------------------------------------------- |
-| **Type**          | Reactive                                                                       | Autonomous                                                |
-| **Purpose**       | Components exist in the DOM and wait for external events to trigger animations | Components animate as soon as they're added to the DOM    |
-| **Initial State** | Idle/ready state - items are already in their final state                      | Animation begins immediately upon mount                   |
-| **Trigger**       | User interactions, state changes, or other events toggle the animation         | The act of mounting/rendering itself starts the animation |
-| **Example**       | A dropdown menu that's hidden but ready to animate in when clicked             | Cards that stagger in as soon as a page loads             |
+|              | **'presence' mode**                                                                                           | **'mount' mode**                                                                                  |
+| ------------ | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| **behavior** | Waits for interactivity                                                                                       | Autoplays immediately                                                                             |
+| **children** | Presence components like `Fade` with a `visible` prop                                                         | DOM elements or self-playing motion components like `Fade.In`                                     |
+| **flow**     | Components occupy space in the DOM while hidden. When triggered, they transition in without affecting layout. | As elements are added to the DOM, they can affect layout. They can autoplay animation internally. |
+| **example**  | A hidden dropdown menu occupying space and ready to animate in on click                                       | Cards that stagger in as soon as a page loads                                                     |
