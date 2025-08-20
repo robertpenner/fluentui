@@ -1,11 +1,6 @@
 import * as React from 'react';
-import {
-  toElementArray,
-  useStaggerItemsVisibility,
-  DEFAULT_ITEM_DURATION,
-  DEFAULT_ITEM_DELAY,
-  acceptsVisibleProp,
-} from './stagger-utils';
+import { useStaggerItemsVisibility } from './useStaggerItemsVisibility';
+import { toElementArray, DEFAULT_ITEM_DURATION, DEFAULT_ITEM_DELAY, acceptsVisibleProp } from './utils';
 import { StaggerOneWayProps, StaggerProps, type StaggerMode } from './stagger-types';
 
 const StaggerOneWay: React.FC<StaggerOneWayProps> = ({

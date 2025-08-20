@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { acceptsVisibleProp } from './stagger-utils';
-import { Fade } from '../../components/Fade';
+import { acceptsVisibleProp } from './acceptsVisibleProp';
+import { Fade } from '../../../components/Fade';
 
 describe('acceptsVisibleProp', () => {
   describe('custom functional components', () => {

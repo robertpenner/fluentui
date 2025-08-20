@@ -1,122 +1,10 @@
 import * as React from 'react';
 import { useAnimationFrame } from '@fluentui/react-utilities';
 import type { StaggerProps } from './stagger-types';
+import { staggerItemsVisibilityAtTime, type StaggerItemsVisibilityAtTimeParams } from './utils/stagger-calculations';
+import { DEFAULT_ITEM_DURATION } from './utils/constants';
 
-export const DEFAULT_ITEM_DELAY = 100;
-export const DEFAULT_ITEM_DURATION = 200;
-
-/**
- * Flattens ReactNode (including Fragments) to an array of valid ReactElements,
- * filtering out strings, numbers, null, etc.
- */
-export const toElementArray = (children: React.ReactNode): React.ReactElement[] =>
-  React.Children.toArray(children).filter(React.isValidElement) as React.ReactElement[];
-
-/**
- * Returns true if the given child is a React Fragment.
- */
-export const isFragment = (child: React.ReactNode): child is React.ReactElement =>
-  React.isValidElement(child) && child.type === React.Fragment;
-
-/**
- * Convert React children that might be a Fragment or other JSX into a clean array of React elements.
- */
-export const childrenOrFragmentToArray = (children: React.ReactNode): React.ReactElement[] => {
-  if (isFragment(children)) {
-    return toElementArray(children.props.children);
-  }
-  return toElementArray(children);
-};
-
-/**
- * Calculate the total stagger duration—from the moment stagger begins
- * until the final item’s animation completes.
- *
- * Uses the formula:
- *   max(0, delay * (count - 1) + itemDuration)
- *
- * @param params.count        Total number of items to stagger
- * @param params.delay        Milliseconds between the start of each item
- * @param params.itemDuration Milliseconds each item’s animation lasts (default 0)
- * @returns                   Total duration in milliseconds (never negative)
- */
-export function getStaggerTotalDuration({
-  itemCount,
-  itemDelay = DEFAULT_ITEM_DELAY,
-  itemDuration = DEFAULT_ITEM_DURATION,
-}: {
-  itemCount: number;
-} & Pick<StaggerProps, 'itemDelay' | 'itemDuration'>): number {
-  if (itemCount <= 0) {
-    return 0;
-  }
-  if (itemCount <= 1) {
-    return Math.max(0, itemDuration);
-  }
-  const staggerDuration = itemDelay * (itemCount - 1);
-  return Math.max(0, staggerDuration + itemDuration);
-}
-
-interface StaggerItemsVisibilityAtTimeParams extends Pick<StaggerProps, 'itemDelay' | 'itemDuration' | 'reversed'> {
-  itemCount: number;
-  elapsed: number;
-  direction?: 'enter' | 'exit';
-}
-
-/**
- * Returns visibility flags plus timing metrics for a stagger sequence.
- */
-export function staggerItemsVisibilityAtTime({
-  itemCount,
-  elapsed,
-  itemDelay = DEFAULT_ITEM_DELAY,
-  itemDuration = DEFAULT_ITEM_DURATION,
-  direction = 'enter',
-  reversed = false,
-}: StaggerItemsVisibilityAtTimeParams): {
-  itemsVisibility: boolean[];
-  totalDuration: number;
-} {
-  // If no items, return the empty state
-  if (itemCount <= 0) {
-    return { itemsVisibility: [], totalDuration: 0 };
-  }
-
-  const totalDuration = getStaggerTotalDuration({ itemCount, itemDelay, itemDuration });
-
-  // Calculate progression through the stagger sequence
-  let completedSteps: number;
-  if (itemDelay <= 0) {
-    // When itemDelay is 0 or negative, all steps complete immediately
-    completedSteps = itemCount;
-  } else {
-    // For enter: Math.floor(elapsed / itemDelay) gives 0 at t=0, but we want 1 item visible
-    // For exit: Math.floor(elapsed / itemDelay) gives 0 at t=0, which we'll negate to show all items
-    const offset = direction === 'enter' ? 1 : 0;
-    const stepsFromElapsedTime = Math.floor(elapsed / itemDelay) + offset;
-    // Clamp to itemCount to prevent showing more items than we have
-    completedSteps = Math.min(itemCount, stepsFromElapsedTime);
-  }
-
-  const itemsVisibility = Array.from({ length: itemCount }, (_, idx) => {
-    // Calculate based on progression through the sequence (enter pattern)
-    const fromStart = idx < completedSteps;
-    const fromEnd = idx >= itemCount - completedSteps;
-
-    let itemVisible = reversed ? fromEnd : fromStart;
-
-    // For exit, invert the enter pattern
-    if (direction === 'exit') {
-      itemVisible = !itemVisible;
-    }
-
-    return itemVisible;
-  });
-
-  return { itemsVisibility, totalDuration };
-}
-
-interface UseStaggerItemsVisibilityParams
+export interface UseStaggerItemsVisibilityParams
   extends Pick<StaggerProps, 'onMotionFinish' | 'mode'>,
     Omit<StaggerItemsVisibilityAtTimeParams, 'elapsed'> {}
 
@@ -253,26 +141,4 @@ export function useStaggerItemsVisibility({
   ]);
 
   return { itemsVisibility };
-}
-
-/**
- * Checks if a React element accepts a `visible` prop.
- * This first checks if the visible prop is already explicitly provided,
- * or falls back to detecting presence motion components by looking for the .In and .Out properties.
- *
- * @internal - Exported for testing purposes
- */
-export function acceptsVisibleProp(element: React.ReactElement): boolean {
-  // Check if visible prop is already explicitly provided
-  if (element.props && 'visible' in element.props) {
-    return true;
-  }
-
-  // Check if it's a presence motion component by looking for .In and .Out properties
-  if (typeof element.type === 'function') {
-    const isPresence = 'In' in element.type && 'Out' in element.type;
-    return isPresence;
-  }
-
-  return false;
 }

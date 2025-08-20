@@ -1,17 +1,20 @@
 import * as React from 'react';
 import { render, screen } from '@testing-library/react';
 
-// Mock the stagger-utils module with default behavior (all visible)
-jest.mock('./stagger-utils', () => ({
-  toElementArray: (children: React.ReactNode) => {
-    return React.Children.toArray(children).filter(React.isValidElement);
-  },
+// Mock the hook and utilities separately
+jest.mock('./useStaggerItemsVisibility', () => ({
   useStaggerItemsVisibility: () => ({
     itemsVisibility: [true, true, true], // All items visible for testing
   }),
+}));
+
+jest.mock('./utils', () => ({
+  toElementArray: (children: React.ReactNode) => {
+    return React.Children.toArray(children).filter(React.isValidElement);
+  },
   DEFAULT_ITEM_DELAY: 100,
   DEFAULT_ITEM_DURATION: 200,
-  acceptsVisibleProp: jest.requireActual('./stagger-utils').acceptsVisibleProp,
+  acceptsVisibleProp: jest.requireActual('./utils').acceptsVisibleProp,
 }));
 
 // Import after mocking
