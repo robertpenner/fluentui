@@ -3,11 +3,11 @@ import * as React from 'react';
 
 /**
  * Defines how Stagger manages its children's visibility.
- * - 'mount': Children are mounted/unmounted from DOM based on visibility
- * - 'presence': Children are presence components with visible prop (always present in DOM, but shown/hidden by the presence itself)
- * - 'visibilityStyle': Children remain in DOM with inline style visibility: hidden/visible (preserves layout space)
+ * - 'visibleProp': Children are components with a `visible` prop and they show/hide themselves (e.g. Fade motion component)
+ * - 'visibilityStyle': Children remain in DOM with inline style `visibility: hidden | visible` (preserves layout space)
+ * - 'unmount': Children are mounted/unmounted from DOM based on visibility
  */
-export type StaggerMode = 'mount' | 'presence' | 'visibilityStyle';
+export type StaggerHideMode = 'visibleProp' | 'visibilityStyle' | 'unmount';
 
 /**
  * Props for the Stagger component that manages staggered entrance and exit animations.
@@ -30,7 +30,7 @@ export interface StaggerProps {
   itemDuration?: number;
 
   /** How children's visibility is managed. If undefined, auto-detects based on children. */
-  mode?: StaggerMode;
+  mode?: StaggerHideMode;
 
   /** Callback invoked when the staggered animation sequence completes. */
   onMotionFinish?: () => void;

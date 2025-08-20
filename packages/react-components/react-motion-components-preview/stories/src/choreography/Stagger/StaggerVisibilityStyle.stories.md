@@ -1,8 +1,8 @@
 # VisibilityStyle Mode
 
-The `visibilityStyle` mode provides a balance between the `mount` and `presence` modes by:
+The `visibilityStyle` mode provides a balance between the `unmount` and `visibleProp` modes by:
 
-- **Keeping elements in the DOM at all times** (like `presence` mode)
+- **Keeping elements in the DOM at all times** (like `visibleProp` mode)
 - **Using inline CSS `visibility: hidden/visible`** to control visibility
 - **Preserving layout space** when elements are hidden (unlike `display: none`)
 
@@ -35,6 +35,6 @@ No layout jumps or shifts occur during the stagger sequence.
 
 | Mode              | DOM Presence   | Layout Impact                   | Performance               |
 | ----------------- | -------------- | ------------------------------- | ------------------------- |
-| `mount`           | Added/removed  | Layout shifts possible          | DOM mutations             |
-| `presence`        | Always present | Controlled by motion components | Motion component overhead |
+| `unmount`         | Added/removed  | Layout shifts possible          | DOM mutations             |
+| `visibleProp`     | Always present | Controlled by motion components | Motion component overhead |
 | `visibilityStyle` | Always present | Layout preserved                | Simple style changes      |

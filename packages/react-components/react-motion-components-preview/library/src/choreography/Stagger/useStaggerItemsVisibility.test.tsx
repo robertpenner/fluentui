@@ -139,17 +139,17 @@ describe('useStaggerItemsVisibility', () => {
   });
 
   describe('Mode-based initial state logic (from Node test analysis)', () => {
-    it('should understand the critical difference between presence, visibilityStyle, and mount modes', () => {
+    it('should understand the critical difference between presence, visibilityStyle, and unmount modes', () => {
       // This captures the key insight from test-stagger-fix.tsx:
       // The critical fix was in the useState initialization logic
 
       const testScenarios = [
-        { mode: 'presence', direction: 'enter', expectedInitial: true }, // Final state
-        { mode: 'presence', direction: 'exit', expectedInitial: false }, // Final state
-        { mode: 'visibilityStyle', direction: 'enter', expectedInitial: true }, // Final state (same as presence)
-        { mode: 'visibilityStyle', direction: 'exit', expectedInitial: false }, // Final state (same as presence)
-        { mode: 'mount', direction: 'enter', expectedInitial: true }, // Final state
-        { mode: 'mount', direction: 'exit', expectedInitial: false }, // Final state
+        { mode: 'visibleProp', direction: 'enter', expectedInitial: true },
+        { mode: 'visibleProp', direction: 'exit', expectedInitial: false },
+        { mode: 'visibilityStyle', direction: 'enter', expectedInitial: true },
+        { mode: 'visibilityStyle', direction: 'exit', expectedInitial: false },
+        { mode: 'unmount', direction: 'enter', expectedInitial: true },
+        { mode: 'unmount', direction: 'exit', expectedInitial: false },
       ];
 
       testScenarios.forEach(({ mode, direction, expectedInitial }) => {
@@ -181,9 +181,9 @@ describe('useStaggerItemsVisibility', () => {
     });
   });
 
-  // Add this test to demonstrate mount mode behavior
-  describe('First mount behavior in mount mode', () => {
-    it('should animate stagger-out on first mount when direction=exit in mount mode', () => {
+  // Add this test to demonstrate unmount mode behavior
+  describe('First mount behavior in unmount mode', () => {
+    it('should animate stagger-out on first mount when direction=exit in unmount mode', () => {
       const mockOnMotionFinish = jest.fn();
 
       const TestComponent = () => {
@@ -191,7 +191,7 @@ describe('useStaggerItemsVisibility', () => {
           itemCount: 3,
           itemDelay: 100,
           direction: 'exit', // Want items to exit (end up hidden)
-          mode: 'mount',
+          mode: 'unmount',
           onMotionFinish: mockOnMotionFinish,
         });
         return <div data-testid="visibility">{JSON.stringify(itemsVisibility)}</div>;
@@ -217,7 +217,7 @@ describe('useStaggerItemsVisibility', () => {
           itemCount: 3,
           itemDelay: 100,
           direction,
-          mode: 'mount',
+          mode: 'unmount',
           onMotionFinish: mockOnMotionFinish,
         });
         return <div data-testid="visibility">{JSON.stringify(itemsVisibility)}</div>;
@@ -239,16 +239,16 @@ describe('useStaggerItemsVisibility', () => {
       expect(mockRequestAnimationFrame).toHaveBeenCalled();
     });
 
-    it('should make mount mode animate on first render for enter direction', () => {
+    it('should make unmount mode animate on first render for enter direction', () => {
       const mockOnMotionFinish = jest.fn();
 
-      // Test mount mode directly (not rerendering from presence mode)
+      // Test unmount mode directly (not rerendering from presence mode)
       const TestComponent = () => {
         const { itemsVisibility } = useStaggerItemsVisibility({
           itemCount: 3,
           itemDelay: 100,
           direction: 'enter',
-          mode: 'mount',
+          mode: 'unmount',
           onMotionFinish: mockOnMotionFinish,
         });
         return <div data-testid="visibility">{JSON.stringify(itemsVisibility)}</div>;

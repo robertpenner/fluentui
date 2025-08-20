@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useStaggerItemsVisibility } from './useStaggerItemsVisibility';
 import { toElementArray, DEFAULT_ITEM_DURATION, DEFAULT_ITEM_DELAY, acceptsVisibleProp } from './utils';
-import { StaggerOneWayProps, StaggerProps, type StaggerMode } from './stagger-types';
+import { StaggerOneWayProps, StaggerProps, type StaggerHideMode } from './stagger-types';
 
 const StaggerOneWay: React.FC<StaggerOneWayProps> = ({
   children,
@@ -9,7 +9,7 @@ const StaggerOneWay: React.FC<StaggerOneWayProps> = ({
   itemDelay = DEFAULT_ITEM_DELAY,
   itemDuration = DEFAULT_ITEM_DURATION,
   reversed = false,
-  mode = 'mount',
+  mode = 'unmount',
   onMotionFinish,
 }) => {
   const elements = toElementArray(children);
@@ -29,8 +29,8 @@ const StaggerOneWay: React.FC<StaggerOneWayProps> = ({
       {elements.map((child, idx) => {
         const key = child.key ?? idx;
 
-        if (mode === 'presence') {
-          // Always render and control via visible prop (presence mode)
+        if (mode === 'visibleProp') {
+          // Always render and control via visible prop (visibleProp mode)
           return React.cloneElement(child, { key, visible: itemsVisibility[idx] });
         } else if (mode === 'visibilityStyle') {
           // Always render and control via inline visibility style
@@ -40,7 +40,7 @@ const StaggerOneWay: React.FC<StaggerOneWayProps> = ({
           };
           return React.cloneElement(child, { key, style });
         } else {
-          // Mount/unmount based on visibility (mount mode)
+          // Mount/unmount based on visibility (unmount mode)
           return itemsVisibility[idx] ? React.cloneElement(child, { key }) : null;
         }
       })}
@@ -49,11 +49,11 @@ const StaggerOneWay: React.FC<StaggerOneWayProps> = ({
 };
 
 const StaggerIn: React.FC<Omit<StaggerProps, 'visible' | 'mode'>> = props => (
-  <StaggerOneWay {...props} direction="enter" mode="mount" />
+  <StaggerOneWay {...props} direction="enter" mode="unmount" />
 );
 
 const StaggerOut: React.FC<Omit<StaggerProps, 'visible' | 'mode'>> = props => (
-  <StaggerOneWay {...props} direction="exit" mode="mount" />
+  <StaggerOneWay {...props} direction="exit" mode="unmount" />
 );
 
 // Main Stagger component with auto-detection or explicit mode
@@ -61,16 +61,16 @@ const StaggerMain: React.FC<StaggerProps> = props => {
   const { mode, children, visible = false, ...rest } = props;
 
   // Determine mode: explicit prop takes precedence, otherwise auto-detect
-  let resolvedMode: StaggerMode;
+  let resolvedMode: StaggerHideMode;
   if (mode !== undefined) {
     resolvedMode = mode;
   } else {
     // Auto-detect based on children:
-    // - If all children accept visible prop, use presence mode
+    // - If all children accept visible prop, use visibleProp mode
     // - Otherwise, use visibilityStyle mode for regular DOM elements
     const elements = toElementArray(children);
     const hasNonPresenceItems = elements.some(child => !acceptsVisibleProp(child));
-    resolvedMode = hasNonPresenceItems ? 'visibilityStyle' : 'presence';
+    resolvedMode = hasNonPresenceItems ? 'visibilityStyle' : 'visibleProp';
   }
   const direction = visible ? 'enter' : 'exit';
 
@@ -91,13 +91,13 @@ const StaggerMain: React.FC<StaggerProps> = props => {
  * @param mode - How children's visibility is managed. Auto-detects if not specified.
  *
  * **Mode behavior:**
- * - `'presence'`: Children are presence components with `visible` prop (always rendered, visibility controlled via prop)
+ * - `'visibleProp'`: Children are presence components with `visible` prop (always rendered, visibility controlled via prop)
  * - `'visibilityStyle'`: Children remain in DOM with inline style visibility: hidden/visible (preserves layout space)
- * - `'mount'`: Children are mounted/unmounted from DOM based on visibility
+ * - `'unmount'`: Children are mounted/unmounted from DOM based on visibility
  *
  * **Static variants:**
- * - `<Stagger.In>` - One-way stagger for entrance animations only (uses mount mode)
- * - `<Stagger.Out>` - One-way stagger for exit animations only (uses mount mode)
+ * - `<Stagger.In>` - One-way stagger for entrance animations only (uses unmount mode)
+ * - `<Stagger.Out>` - One-way stagger for exit animations only (uses unmount mode)
  *
  * @example
  * ```tsx
@@ -108,14 +108,14 @@ const StaggerMain: React.FC<StaggerProps> = props => {
  *   <div>Item 3</div>
  * </Stagger>
  *
- * // Explicit mount mode for regular DOM elements
+ * // Explicit unmount mode for regular DOM elements
  * <Stagger.In itemDelay={100}>
  *   <div>Item 1</div>
  *   <div>Item 2</div>
  * </Stagger.In>
  *
- * // Presence mode for motion components
- * <Stagger visible={isVisible} mode="presence">
+ * // VisibleProp mode for motion components
+ * <Stagger visible={isVisible} mode="visibleProp">
  *   <Fade><div>Item 1</div></Fade>
  *   <Scale><div>Item 2</div></Scale>
  * </Stagger>
