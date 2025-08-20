@@ -5,8 +5,9 @@ import * as React from 'react';
  * Defines how Stagger manages its children's visibility.
  * - 'mount': Children are mounted/unmounted from DOM based on visibility
  * - 'presence': Children are presence components with visible prop (always present in DOM, but shown/hidden by the presence itself)
+ * - 'visibilityStyle': Children remain in DOM with inline style visibility: hidden/visible (preserves layout space)
  */
-export type StaggerMode = 'mount' | 'presence';
+export type StaggerMode = 'mount' | 'presence' | 'visibilityStyle';
 
 /**
  * Props for the Stagger component that manages staggered entrance and exit animations.

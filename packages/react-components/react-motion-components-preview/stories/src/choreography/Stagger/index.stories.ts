@@ -5,6 +5,7 @@ export { Default } from './StaggerDefault.stories';
 export { Reversed } from './StaggerReversed.stories';
 export { ItemDelay } from './StaggerItemDelay.stories';
 export { PlainElements } from './StaggerPlainElements.stories';
+export { VisibilityStyle } from './StaggerVisibilityStyle.stories';
 export { OneWayIn } from './StaggerOneWayIn.stories';
 
 export default {

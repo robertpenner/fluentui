@@ -32,6 +32,13 @@ const StaggerOneWay: React.FC<StaggerOneWayProps> = ({
         if (mode === 'presence') {
           // Always render and control via visible prop (presence mode)
           return React.cloneElement(child, { key, visible: itemsVisibility[idx] });
+        } else if (mode === 'visibilityStyle') {
+          // Always render and control via inline visibility style
+          const style = {
+            ...child.props.style,
+            visibility: itemsVisibility[idx] ? 'visible' : 'hidden',
+          };
+          return React.cloneElement(child, { key, style });
         } else {
           // Mount/unmount based on visibility (mount mode)
           return itemsVisibility[idx] ? React.cloneElement(child, { key }) : null;
@@ -58,10 +65,12 @@ const StaggerMain: React.FC<StaggerProps> = props => {
   if (mode !== undefined) {
     resolvedMode = mode;
   } else {
-    // Auto-detect based on children: if any child doesn't accept visible prop, use mount mode
+    // Auto-detect based on children:
+    // - If all children accept visible prop, use presence mode
+    // - Otherwise, use visibilityStyle mode for regular DOM elements
     const elements = toElementArray(children);
     const hasNonPresenceItems = elements.some(child => !acceptsVisibleProp(child));
-    resolvedMode = hasNonPresenceItems ? 'mount' : 'presence';
+    resolvedMode = hasNonPresenceItems ? 'visibilityStyle' : 'presence';
   }
   const direction = visible ? 'enter' : 'exit';
 
@@ -83,6 +92,7 @@ const StaggerMain: React.FC<StaggerProps> = props => {
  *
  * **Mode behavior:**
  * - `'presence'`: Children are presence components with `visible` prop (always rendered, visibility controlled via prop)
+ * - `'visibilityStyle'`: Children remain in DOM with inline style visibility: hidden/visible (preserves layout space)
  * - `'mount'`: Children are mounted/unmounted from DOM based on visibility
  *
  * **Static variants:**
@@ -91,7 +101,7 @@ const StaggerMain: React.FC<StaggerProps> = props => {
  *
  * @example
  * ```tsx
- * // Auto-detects mode based on children
+ * // Auto-detects mode based on children (visibilityStyle for DOM elements)
  * <Stagger visible={isVisible} itemDelay={150} onMotionFinish={handleComplete}>
  *   <div>Item 1</div>
  *   <div>Item 2</div>
@@ -108,6 +118,12 @@ const StaggerMain: React.FC<StaggerProps> = props => {
  * <Stagger visible={isVisible} mode="presence">
  *   <Fade><div>Item 1</div></Fade>
  *   <Scale><div>Item 2</div></Scale>
+ * </Stagger>
+ *
+ * // VisibilityStyle mode preserves layout during stagger
+ * <Stagger visible={isVisible} mode="visibilityStyle">
+ *   <div>Card 1</div>
+ *   <div>Card 2</div>
  * </Stagger>
  * ```
  */

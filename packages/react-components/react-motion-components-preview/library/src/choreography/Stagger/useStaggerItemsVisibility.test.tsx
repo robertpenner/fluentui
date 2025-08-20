@@ -139,13 +139,15 @@ describe('useStaggerItemsVisibility', () => {
   });
 
   describe('Mode-based initial state logic (from Node test analysis)', () => {
-    it('should understand the critical difference between presence and mount modes', () => {
+    it('should understand the critical difference between presence, visibilityStyle, and mount modes', () => {
       // This captures the key insight from test-stagger-fix.tsx:
       // The critical fix was in the useState initialization logic
 
       const testScenarios = [
         { mode: 'presence', direction: 'enter', expectedInitial: true }, // Final state
         { mode: 'presence', direction: 'exit', expectedInitial: false }, // Final state
+        { mode: 'visibilityStyle', direction: 'enter', expectedInitial: true }, // Final state (same as presence)
+        { mode: 'visibilityStyle', direction: 'exit', expectedInitial: false }, // Final state (same as presence)
         { mode: 'mount', direction: 'enter', expectedInitial: true }, // Final state
         { mode: 'mount', direction: 'exit', expectedInitial: false }, // Final state
       ];
@@ -164,14 +166,16 @@ describe('useStaggerItemsVisibility', () => {
 
       const problemBehavior = {
         beforeFix: 'All items initialized in final state',
-        afterFix: 'Presence items in final state, mount items in start state',
+        afterFix: 'Presence and visibilityStyle items in final state, mount items in start state',
         keyInsight: 'Different component types need different initial states',
       };
 
       // Test the core behavioral difference
       const presenceInitialState = true; // Final state for enter direction
+      const visibilityStyleInitialState = true; // Final state for enter direction (same as presence)
       const mountInitialState = false; // Start state for enter direction
 
+      expect(presenceInitialState).toBe(visibilityStyleInitialState);
       expect(presenceInitialState).not.toBe(mountInitialState);
       expect(problemBehavior.keyInsight).toBe('Different component types need different initial states');
     });
@@ -257,6 +261,30 @@ describe('useStaggerItemsVisibility', () => {
       expect(JSON.parse(getByTestId('visibility').textContent!)).toEqual([false, false, false]);
       expect(mockOnMotionFinish).not.toHaveBeenCalled(); // Animation should start, not finish immediately
       expect(mockRequestAnimationFrame).toHaveBeenCalled(); // Should start animation
+    });
+
+    it('should handle visibilityStyle mode like presence mode on first render', () => {
+      const mockOnMotionFinish = jest.fn();
+
+      // Test visibilityStyle mode behavior
+      const TestComponent = () => {
+        const { itemsVisibility } = useStaggerItemsVisibility({
+          itemCount: 3,
+          itemDelay: 100,
+          direction: 'enter',
+          mode: 'visibilityStyle',
+          onMotionFinish: mockOnMotionFinish,
+        });
+        return <div data-testid="visibility">{JSON.stringify(itemsVisibility)}</div>;
+      };
+
+      const { getByTestId } = render(<TestComponent />);
+
+      // VisibilityStyle mode should behave like presence mode:
+      // Start in final state on first render
+      expect(JSON.parse(getByTestId('visibility').textContent!)).toEqual([true, true, true]);
+      expect(mockOnMotionFinish).toHaveBeenCalledTimes(1); // Should finish immediately on first render
+      expect(mockRequestAnimationFrame).not.toHaveBeenCalled(); // No animation on first render
     });
   });
 });

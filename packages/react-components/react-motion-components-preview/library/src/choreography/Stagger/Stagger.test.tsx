@@ -3,9 +3,9 @@ import { render, screen } from '@testing-library/react';
 
 // Mock the hook and utilities separately
 jest.mock('./useStaggerItemsVisibility', () => ({
-  useStaggerItemsVisibility: () => ({
-    itemsVisibility: [true, true, true], // All items visible for testing
-  }),
+  useStaggerItemsVisibility: jest.fn(() => ({
+    itemsVisibility: [true, true, true], // All items visible for testing by default
+  })),
 }));
 
 jest.mock('./utils', () => ({
@@ -22,10 +22,18 @@ import { Stagger } from './Stagger';
 import { Fade } from '../../components/Fade';
 import { Scale } from '../../components/Scale';
 import { Slide } from '../../components/Slide';
+import { useStaggerItemsVisibility } from './useStaggerItemsVisibility';
+
+// Get the mocked function
+const mockUseStaggerItemsVisibility = useStaggerItemsVisibility as jest.MockedFunction<
+  typeof useStaggerItemsVisibility
+>;
 
 // Regular component without visible prop
-const RegularDiv: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div data-testid="regular-div">{children}</div>
+const SimpleWrapper: React.FC<{ children: React.ReactNode; style?: React.CSSProperties }> = ({ children, style }) => (
+  <div data-testid="regular-div" style={style}>
+    {children}
+  </div>
 );
 
 describe('Stagger', () => {
@@ -52,8 +60,8 @@ describe('Stagger', () => {
       // by checking that children without visible prop are rendered when visibility is true
       render(
         <Stagger visible>
-          <RegularDiv>Regular Item 1</RegularDiv>
-          <RegularDiv>Regular Item 2</RegularDiv>
+          <SimpleWrapper>Regular Item 1</SimpleWrapper>
+          <SimpleWrapper>Regular Item 2</SimpleWrapper>
         </Stagger>,
       );
 
@@ -74,7 +82,7 @@ describe('Stagger', () => {
           <Fade>
             <div>Motion Item</div>
           </Fade>
-          <RegularDiv>Regular Item</RegularDiv>
+          <SimpleWrapper>Regular Item</SimpleWrapper>
         </Stagger>,
       );
 
@@ -89,7 +97,7 @@ describe('Stagger', () => {
           <Slide key="motion-key">
             <div>Motion Item</div>
           </Slide>
-          <RegularDiv key="regular-key">Regular Item</RegularDiv>
+          <SimpleWrapper key="regular-key">Regular Item</SimpleWrapper>
         </Stagger>,
       );
 
@@ -136,7 +144,7 @@ describe('Stagger', () => {
     it('should handle single child', () => {
       render(
         <Stagger visible>
-          <RegularDiv>Single Item</RegularDiv>
+          <SimpleWrapper>Single Item</SimpleWrapper>
         </Stagger>,
       );
 
@@ -181,7 +189,7 @@ describe('Stagger', () => {
     it('should not pass visible prop to regular components', () => {
       render(
         <Stagger visible>
-          <RegularDiv>No Visible</RegularDiv>
+          <SimpleWrapper>No Visible</SimpleWrapper>
         </Stagger>,
       );
 
@@ -221,30 +229,30 @@ describe('Stagger', () => {
       expect(screen.getByText('Motion Item 2')).toBeDefined();
     });
 
-    it('should auto-detect mount mode for regular DOM elements', () => {
+    it('should auto-detect visibilityStyle mode for regular DOM elements', () => {
       render(
         <Stagger visible>
-          <RegularDiv>Regular Item 1</RegularDiv>
-          <RegularDiv>Regular Item 2</RegularDiv>
+          <SimpleWrapper>Regular Item 1</SimpleWrapper>
+          <SimpleWrapper>Regular Item 2</SimpleWrapper>
         </Stagger>,
       );
 
-      // Regular DOM elements should be rendered (mount mode)
+      // Regular DOM elements should be rendered (visibilityStyle mode is now default)
       const divs = screen.getAllByTestId('regular-div');
       expect(divs).toHaveLength(2);
     });
 
-    it('should auto-detect mount mode for mixed children', () => {
+    it('should auto-detect visibilityStyle mode for mixed children', () => {
       render(
         <Stagger visible>
           <Fade>
             <div>Motion Item</div>
           </Fade>
-          <RegularDiv>Regular Item</RegularDiv>
+          <SimpleWrapper>Regular Item</SimpleWrapper>
         </Stagger>,
       );
 
-      // Mixed children should trigger mount mode
+      // Mixed children should trigger visibilityStyle mode (changed from mount mode)
       expect(screen.getByText('Motion Item')).toBeDefined();
       expect(screen.getByTestId('regular-div')).toBeDefined();
     });
@@ -254,7 +262,7 @@ describe('Stagger', () => {
       // In practice, our mock makes items visible for testing purposes
       const { rerender } = render(
         <Stagger visible={false}>
-          <RegularDiv>Hidden Item</RegularDiv>
+          <SimpleWrapper>Hidden Item</SimpleWrapper>
         </Stagger>,
       );
 
@@ -267,12 +275,92 @@ describe('Stagger', () => {
       // Show items - they should be rendered
       rerender(
         <Stagger visible>
-          <RegularDiv>Visible Item</RegularDiv>
+          <SimpleWrapper>Visible Item</SimpleWrapper>
         </Stagger>,
       );
 
       // Now item should be rendered
       expect(screen.getByTestId('regular-div')).toBeDefined();
+    });
+  });
+
+  describe('visibilityStyle mode', () => {
+    // Reset mock before each test
+    beforeEach(() => {
+      mockUseStaggerItemsVisibility.mockClear();
+    });
+
+    it('should apply visibility:hidden style when item is not visible', () => {
+      // Mock to return specific visibility state
+      mockUseStaggerItemsVisibility.mockReturnValue({
+        itemsVisibility: [true, false, true], // Middle item hidden
+      });
+
+      render(
+        <Stagger visible mode="visibilityStyle">
+          <div data-testid="item-1">Item 1</div>
+          <div data-testid="item-2">Item 2</div>
+          <div data-testid="item-3">Item 3</div>
+        </Stagger>,
+      );
+
+      const item1 = screen.getByTestId('item-1');
+      const item2 = screen.getByTestId('item-2');
+      const item3 = screen.getByTestId('item-3');
+
+      // Item 1 should be visible
+      expect(item1.style.visibility).toBe('visible');
+      // Item 2 should be hidden
+      expect(item2.style.visibility).toBe('hidden');
+      // Item 3 should be visible
+      expect(item3.style.visibility).toBe('visible');
+
+      // All items should still be in the DOM (preserving layout)
+      expect(item1).toBeDefined();
+      expect(item2).toBeDefined();
+      expect(item3).toBeDefined();
+    });
+
+    it('should preserve existing style properties when adding visibility', () => {
+      mockUseStaggerItemsVisibility.mockReturnValue({
+        itemsVisibility: [false], // Item hidden
+      });
+
+      render(
+        <Stagger visible mode="visibilityStyle">
+          <div data-testid="styled-item" style={{ color: 'red', fontSize: '14px' }}>
+            Styled Item
+          </div>
+        </Stagger>,
+      );
+
+      const item = screen.getByTestId('styled-item');
+
+      // Should preserve existing styles
+      expect(item.style.color).toBe('red');
+      expect(item.style.fontSize).toBe('14px');
+      // And add visibility
+      expect(item.style.visibility).toBe('hidden');
+    });
+
+    it('should handle explicit visibilityStyle mode correctly', () => {
+      mockUseStaggerItemsVisibility.mockReturnValue({
+        itemsVisibility: [true, true],
+      });
+
+      render(
+        <Stagger visible mode="visibilityStyle">
+          <SimpleWrapper>Item 1</SimpleWrapper>
+          <SimpleWrapper>Item 2</SimpleWrapper>
+        </Stagger>,
+      );
+
+      // Both items should be rendered with visibility:visible
+      const items = screen.getAllByTestId('regular-div');
+      expect(items).toHaveLength(2);
+      items.forEach(item => {
+        expect(item.style.visibility).toBe('visible');
+      });
     });
   });
 });
