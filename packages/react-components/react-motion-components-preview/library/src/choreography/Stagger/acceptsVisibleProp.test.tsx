@@ -3,43 +3,47 @@ import { acceptsVisibleProp } from './stagger-utils';
 import { Fade } from '../../components/Fade';
 
 describe('acceptsVisibleProp', () => {
-  describe('for custom functional components without explicit visible prop', () => {
-    it('should be false', () => {
-      const CustomComponent: React.FC = () => <div />;
-      const element = React.createElement(CustomComponent, {});
-      expect(acceptsVisibleProp(element)).toBe(false);
+  describe('custom functional components', () => {
+    describe('without explicit visible prop', () => {
+      it('should be false', () => {
+        const CustomComponent: React.FC = () => <div />;
+        const element = React.createElement(CustomComponent, {});
+        expect(acceptsVisibleProp(element)).toBe(false);
+      });
+    });
+
+    describe('with explicit visible prop', () => {
+      it('should be true', () => {
+        const CustomComponent: React.FC<{ visible?: boolean; children?: React.ReactNode }> = () => <div />;
+        const element = React.createElement(CustomComponent, { visible: true });
+        expect(acceptsVisibleProp(element)).toBe(true);
+      });
     });
   });
 
-  describe('for custom functional components with explicit visible prop', () => {
-    it('should be true', () => {
-      const CustomComponent: React.FC<{ visible?: boolean; children?: React.ReactNode }> = () => <div />;
-      const element = React.createElement(CustomComponent, { visible: true });
-      expect(acceptsVisibleProp(element)).toBe(true);
+  describe('presence motion components', () => {
+    describe('without explicit visible prop', () => {
+      it('should be true', () => {
+        const element = (
+          <Fade>
+            <div>Content</div>
+          </Fade>
+        );
+
+        expect(acceptsVisibleProp(element)).toBe(true);
+      });
     });
-  });
 
-  describe('for presence motion components without an explicit visible prop', () => {
-    it('should be true', () => {
-      const element = (
-        <Fade>
-          <div>Content</div>
-        </Fade>
-      );
+    describe('with explicit visible prop', () => {
+      it('should be true', () => {
+        const element = (
+          <Fade visible={true}>
+            <div>Content</div>
+          </Fade>
+        );
 
-      expect(acceptsVisibleProp(element)).toBe(true);
-    });
-  });
-
-  describe('for presence motion components with an explicit visible prop', () => {
-    it('should be true', () => {
-      const element = (
-        <Fade visible={true}>
-          <div>Content</div>
-        </Fade>
-      );
-
-      expect(acceptsVisibleProp(element)).toBe(true);
+        expect(acceptsVisibleProp(element)).toBe(true);
+      });
     });
   });
 
