@@ -79,7 +79,7 @@ describe('Stagger Calculations', () => {
         direction: 'exit',
       });
 
-      expect(result.itemsVisibility).toEqual([false, true, true]);
+      expect(result.itemsVisibility).toEqual([false, false, true]);
     });
 
     it('hides all items when exit completes', () => {
@@ -118,7 +118,7 @@ describe('Stagger Calculations', () => {
       });
 
       // With reversed=true, last item disappears first
-      expect(result.itemsVisibility).toEqual([true, true, false]);
+      expect(result.itemsVisibility).toEqual([true, false, false]);
     });
   });
 

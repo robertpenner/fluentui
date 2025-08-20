@@ -64,12 +64,15 @@ export function staggerItemsVisibilityAtTime({
     // When itemDelay is 0 or negative, all steps complete immediately
     completedSteps = itemCount;
   } else {
-    // For enter: Math.floor(elapsed / itemDelay) gives 0 at t=0, but we want 1 item visible
-    // For exit: Math.floor(elapsed / itemDelay) gives 0 at t=0, which we'll negate to show all items
-    const offset = direction === 'enter' ? 1 : 0;
-    const stepsFromElapsedTime = Math.floor(elapsed / itemDelay) + offset;
-    // Clamp to itemCount to prevent showing more items than we have
-    completedSteps = Math.min(itemCount, stepsFromElapsedTime);
+    // Both enter and exit should start their first item immediately, but handle t=0 differently
+    if (elapsed === 0) {
+      // At exactly t=0, for enter we want first item visible, for exit we want all items visible
+      completedSteps = direction === 'enter' ? 1 : 0;
+    } else {
+      // After t=0, both directions should progress at the same rate
+      const stepsFromElapsedTime = Math.floor(elapsed / itemDelay) + 1;
+      completedSteps = Math.min(itemCount, stepsFromElapsedTime);
+    }
   }
 
   const itemsVisibility = Array.from({ length: itemCount }, (_, idx) => {

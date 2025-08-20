@@ -56,7 +56,7 @@ export const Default = () => {
       </div>
 
       <div className={classes.items}>
-        <Stagger visible={visible}>
+        <Stagger visible={visible} itemDelay={500}>
           {/* Create a list of items, each wrapped with a presence transition */}
           {Array.from({ length: 8 }, (_, i) => (
             <Slide key={`stagger-item-${i}`}>
