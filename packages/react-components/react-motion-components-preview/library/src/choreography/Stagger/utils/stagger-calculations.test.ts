@@ -92,6 +92,62 @@ describe('Stagger Calculations', () => {
 
       expect(result.itemsVisibility).toEqual([false, false, false]);
     });
+
+    it('starts first item animation immediately', () => {
+      const itemDelay = 500;
+
+      // At t=0: all items visible for exit
+      const t0Result = staggerItemsVisibilityAtTime({
+        itemCount: 3,
+        elapsed: 0,
+        itemDelay,
+        direction: 'exit',
+      });
+      expect(t0Result.itemsVisibility).toEqual([true, true, true]);
+
+      // At t=1ms: first item should start hiding immediately
+      const t1Result = staggerItemsVisibilityAtTime({
+        itemCount: 3,
+        elapsed: 1,
+        itemDelay,
+        direction: 'exit',
+      });
+      expect(t1Result.itemsVisibility).toEqual([false, true, true]);
+
+      // At t=500ms: first and second items hidden, third still visible
+      const t500Result = staggerItemsVisibilityAtTime({
+        itemCount: 3,
+        elapsed: 500,
+        itemDelay,
+        direction: 'exit',
+      });
+      expect(t500Result.itemsVisibility).toEqual([false, false, true]);
+    });
+
+    it('has symmetric timing with enter direction', () => {
+      const itemDelay = 100;
+      const testTimes = [1, 50, 100, 150, 200];
+
+      testTimes.forEach(elapsed => {
+        const enterResult = staggerItemsVisibilityAtTime({
+          itemCount: 3,
+          elapsed,
+          itemDelay,
+          direction: 'enter',
+        });
+
+        const exitResult = staggerItemsVisibilityAtTime({
+          itemCount: 3,
+          elapsed,
+          itemDelay,
+          direction: 'exit',
+        });
+
+        // Exit should be the logical inverse of enter (after t=0)
+        const expectedExitResult = enterResult.itemsVisibility.map(visible => !visible);
+        expect(exitResult.itemsVisibility).toEqual(expectedExitResult);
+      });
+    });
   });
 
   describe('staggerItemsVisibilityAtTime - REVERSED', () => {
