@@ -3,6 +3,39 @@ import StaggerModeComparisonDescription from './StaggerModeComparison.stories.md
 import { makeStyles, tokens, Button, Avatar } from '@fluentui/react-components';
 import { Stagger } from '@fluentui/react-motion-components-preview';
 
+const avatarData = [
+  { initials: 'DR', color: 'dark-red', name: 'darkRed avatar' },
+  { initials: 'CR', color: 'cranberry', name: 'cranberry avatar' },
+  { initials: 'RE', color: 'red', name: 'red avatar' },
+  { initials: 'PU', color: 'pumpkin', name: 'pumpkin avatar' },
+  { initials: 'PE', color: 'peach', name: 'peach avatar' },
+  { initials: 'MA', color: 'marigold', name: 'marigold avatar' },
+  { initials: 'GO', color: 'gold', name: 'gold avatar' },
+  { initials: 'BS', color: 'brass', name: 'brass avatar' },
+  { initials: 'BR', color: 'brown', name: 'brown avatar' },
+  { initials: 'FO', color: 'forest', name: 'forest avatar' },
+  { initials: 'SE', color: 'seafoam', name: 'seafoam avatar' },
+  { initials: 'DG', color: 'dark-green', name: 'darkGreen avatar' },
+  { initials: 'LT', color: 'light-teal', name: 'lightTeal avatar' },
+  { initials: 'TE', color: 'teal', name: 'teal avatar' },
+  { initials: 'ST', color: 'steel', name: 'steel avatar' },
+  { initials: 'BL', color: 'blue', name: 'blue avatar' },
+  { initials: 'RB', color: 'royal-blue', name: 'royalBlue avatar' },
+  { initials: 'CO', color: 'cornflower', name: 'cornflower avatar' },
+  { initials: 'NA', color: 'navy', name: 'navy avatar' },
+  { initials: 'LA', color: 'lavender', name: 'lavender avatar' },
+  { initials: 'PU', color: 'purple', name: 'purple avatar' },
+  { initials: 'GR', color: 'grape', name: 'grape avatar' },
+  { initials: 'LI', color: 'lilac', name: 'lilac avatar' },
+  { initials: 'PI', color: 'pink', name: 'pink avatar' },
+] as const;
+
+const renderAvatars = () => {
+  return avatarData.map(avatar => (
+    <Avatar key={avatar.name} initials={avatar.initials} color={avatar.color as any} name={avatar.name} />
+  ));
+};
+
 const useClasses = makeStyles({
   container: {
     display: 'flex',
@@ -64,30 +97,7 @@ export const ModeComparison = () => {
           <div className={classes.sectionTitle}>visibilityStyle mode</div>
           <div className={classes.items}>
             <Stagger visible={visible} mode="visibilityStyle" itemDelay={100}>
-              <Avatar initials="DR" color="dark-red" name="darkRed avatar" />
-              <Avatar initials="CR" color="cranberry" name="cranberry avatar" />
-              <Avatar initials="RE" color="red" name="red avatar" />
-              <Avatar initials="PU" color="pumpkin" name="pumpkin avatar" />
-              <Avatar initials="PE" color="peach" name="peach avatar" />
-              <Avatar initials="MA" color="marigold" name="marigold avatar" />
-              <Avatar initials="GO" color="gold" name="gold avatar" />
-              <Avatar initials="BS" color="brass" name="brass avatar" />
-              <Avatar initials="BR" color="brown" name="brown avatar" />
-              <Avatar initials="FO" color="forest" name="forest avatar" />
-              <Avatar initials="SE" color="seafoam" name="seafoam avatar" />
-              <Avatar initials="DG" color="dark-green" name="darkGreen avatar" />
-              <Avatar initials="LT" color="light-teal" name="lightTeal avatar" />
-              <Avatar initials="TE" color="teal" name="teal avatar" />
-              <Avatar initials="ST" color="steel" name="steel avatar" />
-              <Avatar initials="BL" color="blue" name="blue avatar" />
-              <Avatar initials="RB" color="royal-blue" name="royalBlue avatar" />
-              <Avatar initials="CO" color="cornflower" name="cornflower avatar" />
-              <Avatar initials="NA" color="navy" name="navy avatar" />
-              <Avatar initials="LA" color="lavender" name="lavender avatar" />
-              <Avatar initials="PU" color="purple" name="purple avatar" />
-              <Avatar initials="GR" color="grape" name="grape avatar" />
-              <Avatar initials="LI" color="lilac" name="lilac avatar" />
-              <Avatar initials="PI" color="pink" name="pink avatar" />
+              {renderAvatars()}
             </Stagger>
           </div>
           <div className={classes.description}>Items remain in DOM</div>
@@ -97,30 +107,7 @@ export const ModeComparison = () => {
           <div className={classes.sectionTitle}>unmount mode</div>
           <div className={classes.items}>
             <Stagger visible={visible} mode="unmount" itemDelay={100}>
-              <Avatar initials="DR" color="dark-red" name="darkRed avatar" />
-              <Avatar initials="CR" color="cranberry" name="cranberry avatar" />
-              <Avatar initials="RE" color="red" name="red avatar" />
-              <Avatar initials="PU" color="pumpkin" name="pumpkin avatar" />
-              <Avatar initials="PE" color="peach" name="peach avatar" />
-              <Avatar initials="MA" color="marigold" name="marigold avatar" />
-              <Avatar initials="GO" color="gold" name="gold avatar" />
-              <Avatar initials="BS" color="brass" name="brass avatar" />
-              <Avatar initials="BR" color="brown" name="brown avatar" />
-              <Avatar initials="FO" color="forest" name="forest avatar" />
-              <Avatar initials="SE" color="seafoam" name="seafoam avatar" />
-              <Avatar initials="DG" color="dark-green" name="darkGreen avatar" />
-              <Avatar initials="LT" color="light-teal" name="lightTeal avatar" />
-              <Avatar initials="TE" color="teal" name="teal avatar" />
-              <Avatar initials="ST" color="steel" name="steel avatar" />
-              <Avatar initials="BL" color="blue" name="blue avatar" />
-              <Avatar initials="RB" color="royal-blue" name="royalBlue avatar" />
-              <Avatar initials="CO" color="cornflower" name="cornflower avatar" />
-              <Avatar initials="NA" color="navy" name="navy avatar" />
-              <Avatar initials="LA" color="lavender" name="lavender avatar" />
-              <Avatar initials="PU" color="purple" name="purple avatar" />
-              <Avatar initials="GR" color="grape" name="grape avatar" />
-              <Avatar initials="LI" color="lilac" name="lilac avatar" />
-              <Avatar initials="PI" color="pink" name="pink avatar" />
+              {renderAvatars()}
             </Stagger>
           </div>
           <div className={classes.description}>Items removed from DOM</div>
