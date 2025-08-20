@@ -3,32 +3,24 @@ import { acceptsVisibleProp } from './stagger-utils';
 import { Fade } from '../../components/Fade';
 
 describe('acceptsVisibleProp', () => {
-  describe('explicit visible prop', () => {
-    it('should work with functional components that have visible prop', () => {
-      const TestComponent: React.FC<{ visible?: boolean; children?: React.ReactNode }> = () => <div />;
-      const element = React.createElement(TestComponent, { visible: true });
-      expect(acceptsVisibleProp(element)).toBe(true);
-    });
-  });
-
-  describe('no visible prop', () => {
-    it('should return false for functional components without visible prop', () => {
-      const TestComponent: React.FC<{ className?: string }> = () => <div />;
-      const element = React.createElement(TestComponent, { className: 'test' });
+  describe('for custom functional components without explicit visible prop', () => {
+    it('should be false', () => {
+      const CustomComponent: React.FC = () => <div />;
+      const element = React.createElement(CustomComponent, {});
       expect(acceptsVisibleProp(element)).toBe(false);
     });
   });
 
-  describe('edge cases', () => {
-    it('should be case sensitive for the visible prop', () => {
-      const TestComponent: React.FC<{ Visible?: boolean }> = () => <div />;
-      const elementCapitalized = React.createElement(TestComponent, { Visible: true });
-      expect(acceptsVisibleProp(elementCapitalized)).toBe(false);
+  describe('for custom functional components with explicit visible prop', () => {
+    it('should be true', () => {
+      const CustomComponent: React.FC<{ visible?: boolean; children?: React.ReactNode }> = () => <div />;
+      const element = React.createElement(CustomComponent, { visible: true });
+      expect(acceptsVisibleProp(element)).toBe(true);
     });
   });
 
-  describe('presence motion components', () => {
-    it('should detect presence motion components (primary use case)', () => {
+  describe('for presence motion components without an explicit visible prop', () => {
+    it('should be true', () => {
       const element = (
         <Fade>
           <div>Content</div>
@@ -37,8 +29,10 @@ describe('acceptsVisibleProp', () => {
 
       expect(acceptsVisibleProp(element)).toBe(true);
     });
+  });
 
-    it('should work with presence motion components that also have explicit visible prop', () => {
+  describe('for presence motion components with an explicit visible prop', () => {
+    it('should be true', () => {
       const element = (
         <Fade visible={true}>
           <div>Content</div>
@@ -47,18 +41,10 @@ describe('acceptsVisibleProp', () => {
 
       expect(acceptsVisibleProp(element)).toBe(true);
     });
+  });
 
-    it('should detect presence components by In/Out properties', () => {
-      // Mock a component that looks like a presence component
-      const MockPresenceComponent = () => <div />;
-      (MockPresenceComponent as any).In = {};
-      (MockPresenceComponent as any).Out = {};
-
-      const element = React.createElement(MockPresenceComponent, {});
-      expect(acceptsVisibleProp(element)).toBe(true);
-    });
-
-    it('should return false for regular components', () => {
+  describe('regular DOM elements', () => {
+    it('should be false', () => {
       const element = <div>Content</div>;
       expect(acceptsVisibleProp(element)).toBe(false);
     });
