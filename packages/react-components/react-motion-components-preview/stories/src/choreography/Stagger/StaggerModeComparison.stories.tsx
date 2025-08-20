@@ -1,5 +1,5 @@
 import * as React from 'react';
-import StaggerVisibilityStyleDescription from './StaggerVisibilityStyle.stories.md';
+import StaggerModeComparisonDescription from './StaggerModeComparison.stories.md';
 import { makeStyles, tokens, Button, Avatar } from '@fluentui/react-components';
 import { Stagger } from '@fluentui/react-motion-components-preview';
 
@@ -47,7 +47,7 @@ const useClasses = makeStyles({
   },
 });
 
-export const VisibilityStyleComparison = () => {
+export const ModeComparison = () => {
   const classes = useClasses();
   const [visible, setVisible] = React.useState(false);
 
@@ -130,12 +130,10 @@ export const VisibilityStyleComparison = () => {
   );
 };
 
-VisibilityStyleComparison.storyName = 'VisibilityStyle vs Unmount';
-
-VisibilityStyleComparison.parameters = {
+ModeComparison.parameters = {
   docs: {
     description: {
-      story: StaggerVisibilityStyleDescription,
+      story: StaggerModeComparisonDescription,
     },
   },
 };
