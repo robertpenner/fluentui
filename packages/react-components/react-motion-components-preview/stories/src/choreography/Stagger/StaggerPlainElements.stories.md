@@ -1,12 +1,9 @@
-With plain HTML elements (no motion components), `Stagger` will add or remove them from the DOM.
+By default, `Stagger` will hide plain elements using a `visibility: hidden` style, to preserve their layout.
 
 ```tsx
-import { Stagger } from '@fluentui/react-motion-components-preview';
-
 <Stagger visible={isVisible}>
-  <div>{/* plain element 1 */}</div>
-  <div>{/* plain element 2 */}</div>
-  <div>{/* plain element 3 */}</div>
-  // etc.
-</Stagger>;
+  <div>1</div>
+  <div>2</div>
+  <div>3</div>
+</Stagger>
 ```
