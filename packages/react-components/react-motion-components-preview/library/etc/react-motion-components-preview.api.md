@@ -76,7 +76,7 @@ export interface StaggerProps {
     children: React_2.ReactNode;
     itemDelay?: number;
     itemDuration?: number;
-    mode?: StaggerMode;
+    mode?: StaggerHideMode;
     onMotionFinish?: () => void;
     reversed?: boolean;
     visible?: PresenceComponentProps['visible'];
