@@ -34,10 +34,10 @@ const useClasses = makeStyles({
     backgroundColor: tokens.colorNeutralBackground1,
   },
   collapsed: {
-    height: '160px', // Height for showing 2 items + peek of 3rd item for affordance
+    height: '130px', // Height for showing 2 items + peek of 3rd item for affordance
   },
   expanded: {
-    height: '505px', // Height for showing all 8 items (36px each + padding + gaps + buffer)
+    height: '445px', // Height for showing all 8 items (36px each + padding + gaps + buffer)
   },
   list: {
     display: 'flex',
@@ -48,7 +48,7 @@ const useClasses = makeStyles({
   item: {
     display: 'flex',
     alignItems: 'center',
-    padding: tokens.spacingVerticalS,
+    padding: tokens.spacingVerticalXS,
     backgroundColor: tokens.colorNeutralBackground2,
     border: `${tokens.strokeWidthThin} solid ${tokens.colorNeutralStroke2}`,
     borderRadius: tokens.borderRadiusSmall,
