@@ -8,9 +8,10 @@ import {
   PresenceBadgeStatus,
   Text,
   makeStyles,
+  motionTokens,
   tokens,
 } from '@fluentui/react-components';
-import { Stagger, CollapseRelaxed } from '@fluentui/react-motion-components-preview';
+import { Stagger, CollapseRelaxed, CollapseDelayed } from '@fluentui/react-motion-components-preview';
 import { MoreHorizontal20Regular } from '@fluentui/react-icons';
 
 const useClasses = makeStyles({
@@ -94,9 +95,9 @@ export const OneWayIn = () => {
         </Button>
       </div>
 
-      <Stagger.In key={animationKey}>
+      <Stagger.In itemDelay={motionTokens.durationFast} key={animationKey}>
         {users.map((user, index) => (
-          <CollapseRelaxed.In key={index}>
+          <CollapseRelaxed.In easing={motionTokens.curveDecelerateMin} key={index}>
             <Card className={classes.userCard}>
               <CardHeader
                 className={classes.cardHeader}
