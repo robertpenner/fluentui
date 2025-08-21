@@ -7,6 +7,7 @@ export { ItemDelay } from './StaggerItemDelay.stories';
 export { PlainElements } from './StaggerPlainElements.stories';
 export { ModeComparison } from './StaggerModeComparison.stories';
 export { OneWayIn } from './StaggerOneWayIn.stories';
+export { ExpandableContainer } from './StaggerExpandableContainer.stories';
 
 export default {
   title: 'Motion/Choreography (preview)/Stagger',
