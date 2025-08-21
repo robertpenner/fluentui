@@ -1,7 +1,7 @@
 import * as React from 'react';
 import StaggerModeComparisonDescription from './StaggerModeComparison.stories.md';
-import { makeStyles, tokens, Button, Avatar } from '@fluentui/react-components';
-import { Stagger } from '@fluentui/react-motion-components-preview';
+import { makeStyles, tokens, Button, Avatar, Checkbox } from '@fluentui/react-components';
+import { Blur, Rotate, Scale, Stagger } from '@fluentui/react-motion-components-preview';
 
 const avatarData = [
   { initials: 'DR', color: 'dark-red', name: 'darkRed avatar' },
@@ -33,6 +33,14 @@ const avatarData = [
 const renderAvatars = () => {
   return avatarData.map(avatar => (
     <Avatar key={avatar.name} initials={avatar.initials} color={avatar.color as any} name={avatar.name} />
+  ));
+};
+
+const renderAvatarsWithTransition = () => {
+  return avatarData.map(avatar => (
+    <Blur key={avatar.name}>
+      <Avatar initials={avatar.initials} color={avatar.color as any} name={avatar.name} />
+    </Blur>
   ));
 };
 
@@ -68,6 +76,7 @@ const useClasses = makeStyles({
   items: {
     display: 'flex',
     flexWrap: 'wrap',
+    alignItems: 'center',
     gap: tokens.spacingHorizontalS,
     padding: tokens.spacingVerticalM,
     border: `${tokens.strokeWidthThin} dashed ${tokens.colorNeutralStroke2}`,
@@ -83,6 +92,8 @@ const useClasses = makeStyles({
 export const ModeComparison = () => {
   const classes = useClasses();
   const [visible, setVisible] = React.useState(false);
+  const [reversed, setReversed] = React.useState(false);
+  const itemDelay = 50;
 
   return (
     <div className={classes.container}>
@@ -90,27 +101,35 @@ export const ModeComparison = () => {
         <Button onClick={() => setVisible(!visible)} appearance="primary">
           {visible ? 'Hide' : 'Show'} Avatars
         </Button>
+        <Checkbox checked={reversed} onChange={(_, data) => setReversed(data.checked === true)} label="Reversed" />
       </div>
 
       <div className={classes.comparison}>
         <div className={classes.section}>
+          <div className={classes.sectionTitle}>visibleProp mode</div>
+          <div className={classes.items}>
+            <Stagger visible={visible} mode="visibleProp" itemDelay={itemDelay} reversed={reversed}>
+              {renderAvatarsWithTransition()}
+            </Stagger>
+          </div>
+        </div>
+
+        <div className={classes.section}>
           <div className={classes.sectionTitle}>visibilityStyle mode</div>
           <div className={classes.items}>
-            <Stagger visible={visible} mode="visibilityStyle" itemDelay={100}>
+            <Stagger visible={visible} mode="visibilityStyle" itemDelay={itemDelay} reversed={reversed}>
               {renderAvatars()}
             </Stagger>
           </div>
-          <div className={classes.description}>Items remain in DOM</div>
         </div>
 
         <div className={classes.section}>
           <div className={classes.sectionTitle}>unmount mode</div>
           <div className={classes.items}>
-            <Stagger visible={visible} mode="unmount" itemDelay={100}>
+            <Stagger visible={visible} mode="unmount" itemDelay={itemDelay} reversed={reversed}>
               {renderAvatars()}
             </Stagger>
           </div>
-          <div className={classes.description}>Items removed from DOM</div>
         </div>
       </div>
     </div>
