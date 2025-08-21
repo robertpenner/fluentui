@@ -7,6 +7,9 @@ type CollapseBaseParams = PresenceEasing &
   AnimateOpacity & {
     /** The orientation of the size animation. Defaults to `'vertical'` to expand/collapse the height. */
     orientation?: CollapseOrientation;
+
+    /** Size (width or height) in the collapsed state. Defaults to 0, to hide the content completely. */
+    fromSize?: string;
   };
 
 export type CollapseParams = CollapseBaseParams & PresenceDuration;

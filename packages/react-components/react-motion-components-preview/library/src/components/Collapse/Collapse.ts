@@ -14,6 +14,7 @@ function createCollapseAtoms({
   element,
   orientation,
   animateOpacity,
+  fromSize,
 
   // Enter params
   sizeDuration,
@@ -32,7 +33,7 @@ function createCollapseAtoms({
   // ----- ENTER -----
   // The enter transition is an array of up to 3 motion atoms: size, whitespace and opacity.
   const enterAtoms: AtomMotion[] = [
-    sizeEnterAtom({ orientation, duration: sizeDuration, easing, element }),
+    sizeEnterAtom({ orientation, duration: sizeDuration, easing, element, fromSize }),
     whitespaceAtom({ direction: 'enter', orientation, duration: sizeDuration, easing }),
   ];
   // Fade in only if animateOpacity is true. Otherwise, leave opacity unaffected.
@@ -53,7 +54,7 @@ function createCollapseAtoms({
   }
 
   exitAtoms.push(
-    sizeExitAtom({ orientation, duration: exitSizeDuration, easing: exitEasing, element, delay: exitDelay }),
+    sizeExitAtom({ orientation, duration: exitSizeDuration, easing: exitEasing, element, delay: exitDelay, fromSize }),
     whitespaceAtom({
       direction: 'exit',
       orientation,
@@ -88,6 +89,7 @@ const collapsePresenceFn: PresenceMotionFn<CollapseParams> = ({
   exitEasing = easing,
   animateOpacity = true,
   orientation = 'vertical',
+  fromSize = '0px',
 }) => {
   return createCollapseAtoms({
     element,
@@ -101,6 +103,7 @@ const collapsePresenceFn: PresenceMotionFn<CollapseParams> = ({
     exitEasing,
     delay: 0,
     exitDelay: 0,
+    fromSize,
   });
 };
 
@@ -131,6 +134,7 @@ const collapseDelayedPresenceFn: PresenceMotionFn<CollapseDelayedParams> = ({
   exitDelay = motionTokens.durationSlower,
   animateOpacity = true,
   orientation = 'vertical',
+  fromSize = '0px',
 }) => {
   return createCollapseAtoms({
     element,
@@ -144,6 +148,7 @@ const collapseDelayedPresenceFn: PresenceMotionFn<CollapseDelayedParams> = ({
     exitOpacityDuration,
     exitEasing,
     exitDelay,
+    fromSize,
   });
 };
 
