@@ -32,14 +32,14 @@ const avatarData = [
 
 const renderAvatars = () => {
   return avatarData.map(avatar => (
-    <Avatar key={avatar.name} initials={avatar.initials} color={avatar.color as any} name={avatar.name} />
+    <Avatar key={avatar.name} initials={avatar.initials} color={avatar.color} name={avatar.name} />
   ));
 };
 
 const renderAvatarsWithTransition = () => {
   return avatarData.map(avatar => (
     <Blur key={avatar.name}>
-      <Avatar initials={avatar.initials} color={avatar.color as any} name={avatar.name} />
+      <Avatar initials={avatar.initials} color={avatar.color} name={avatar.name} />
     </Blur>
   ));
 };
