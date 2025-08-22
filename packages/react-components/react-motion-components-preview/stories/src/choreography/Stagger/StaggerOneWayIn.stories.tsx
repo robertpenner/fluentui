@@ -11,7 +11,7 @@ import {
   motionTokens,
   tokens,
 } from '@fluentui/react-components';
-import { Stagger, CollapseRelaxed, CollapseDelayed } from '@fluentui/react-motion-components-preview';
+import { Stagger, CollapseRelaxed } from '@fluentui/react-motion-components-preview';
 import { MoreHorizontal20Regular } from '@fluentui/react-icons';
 
 const useClasses = makeStyles({

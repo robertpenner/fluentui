@@ -1,7 +1,7 @@
 import * as React from 'react';
 import StaggerModeComparisonDescription from './StaggerModeComparison.stories.md';
 import { makeStyles, tokens, Button, Avatar, Checkbox } from '@fluentui/react-components';
-import { Blur, Rotate, Scale, Stagger } from '@fluentui/react-motion-components-preview';
+import { Blur, Stagger } from '@fluentui/react-motion-components-preview';
 
 const avatarData = [
   { initials: 'DR', color: 'dark-red', name: 'darkRed avatar' },
