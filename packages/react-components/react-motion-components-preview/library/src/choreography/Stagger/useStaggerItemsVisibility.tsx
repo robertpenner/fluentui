@@ -41,6 +41,18 @@ export function useStaggerItemsVisibility({
 }: UseStaggerItemsVisibilityParams): { itemsVisibility: boolean[] } {
   const [requestAnimationFrame, cancelAnimationFrame] = useAnimationFrame();
 
+  // Track animation state independently of item count
+  const [animationKey, setAnimationKey] = React.useState(0);
+  const prevDirection = React.useRef(direction);
+
+  // Only trigger new animation when direction actually changes, not when itemCount changes
+  React.useEffect(() => {
+    if (prevDirection.current !== direction) {
+      setAnimationKey(prev => prev + 1);
+      prevDirection.current = direction;
+    }
+  }, [direction]);
+
   // State: visibility array for all items
   const [itemsVisibility, setItemsVisibility] = React.useState<boolean[]>(() => {
     // For unmount mode, items should start hidden and appear by being added to the DOM
@@ -51,6 +63,24 @@ export function useStaggerItemsVisibility({
       return Array(itemCount).fill(direction === 'enter');
     }
   });
+
+  // Update array size when itemCount changes without triggering animation
+  React.useEffect(() => {
+    setItemsVisibility(prev => {
+      if (itemCount === prev.length) {
+        return prev; // No change needed
+      }
+
+      if (itemCount > prev.length) {
+        // Add new items in their target state
+        const targetState = direction === 'enter';
+        return [...prev, ...Array(itemCount - prev.length).fill(targetState)];
+      } else {
+        // Remove items from the end
+        return prev.slice(0, itemCount);
+      }
+    });
+  }, [itemCount, direction]);
 
   // Refs: animation timing and control
   const startTimeRef = React.useRef<number | null>(null);
@@ -129,7 +159,7 @@ export function useStaggerItemsVisibility({
       }
     };
   }, [
-    itemCount,
+    animationKey, // Only trigger on explicit animation changes, not itemCount changes
     itemDelay,
     itemDuration,
     direction,
