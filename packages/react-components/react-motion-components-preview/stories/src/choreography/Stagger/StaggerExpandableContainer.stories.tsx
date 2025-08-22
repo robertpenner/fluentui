@@ -12,16 +12,10 @@ const COLLAPSED_HEIGHT = '130px';
 const ITEM_HEIGHT = '36px';
 const STAGGER_ITEM_DELAY = 100;
 
-const itemData = [
-  { id: 1, title: 'Item 1' },
-  { id: 2, title: 'Item 2' },
-  { id: 3, title: 'Item 3' },
-  { id: 4, title: 'Item 4' },
-  { id: 5, title: 'Item 5' },
-  { id: 6, title: 'Item 6' },
-  { id: 7, title: 'Item 7' },
-  { id: 8, title: 'Item 8' },
-];
+const itemData = Array.from({ length: TOTAL_ITEMS }, (_, index) => ({
+  id: index + 1,
+  title: `Item ${index + 1}`,
+}));
 
 const useClasses = makeStyles({
   container: {
