@@ -102,6 +102,7 @@ export const ExpandableContainer = () => {
   const [expanded, setExpanded] = React.useState(false);
   const [staggerVisible, setStaggerVisible] = React.useState(false);
   const [totalItems, setTotalItems] = React.useState(8);
+  const [isDraggingSlider, setIsDraggingSlider] = React.useState(false);
 
   const itemData = React.useMemo(
     () =>
@@ -113,7 +114,6 @@ export const ExpandableContainer = () => {
   );
 
   // Always show first 3 items (2 fully visible + 1 partially visible for affordance), additional items animate via Stagger
-  // If totalItems <= VISIBLE_ITEMS_COUNT, staggerItems will be empty and only staticItems will show
   const staticItems = itemData.slice(0, VISIBLE_ITEMS_COUNT);
   const staggerItems = itemData.slice(VISIBLE_ITEMS_COUNT);
 
@@ -148,6 +148,10 @@ export const ExpandableContainer = () => {
           step={1}
           value={totalItems}
           onChange={(_, data) => setTotalItems(data.value)}
+          onMouseDown={() => setIsDraggingSlider(true)}
+          onMouseUp={() => setIsDraggingSlider(false)}
+          onTouchStart={() => setIsDraggingSlider(true)}
+          onTouchEnd={() => setIsDraggingSlider(false)}
         />
       </div>
 
@@ -181,7 +185,11 @@ export const ExpandableContainer = () => {
             ))}
 
             {/* Items that animate via Stagger */}
-            <Stagger visible={staggerVisible} itemDelay={STAGGER_ITEM_DELAY} reversed={!staggerVisible}>
+            <Stagger
+              visible={staggerVisible}
+              itemDelay={isDraggingSlider ? 0 : STAGGER_ITEM_DELAY}
+              reversed={!staggerVisible}
+            >
               {staggerItems.map(item => (
                 <Slide key={item.id}>
                   <div className={classes.item}>
