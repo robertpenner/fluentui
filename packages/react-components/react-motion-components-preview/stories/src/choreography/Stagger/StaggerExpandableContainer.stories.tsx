@@ -3,6 +3,15 @@ import StaggerExpandableContainerDescription from './StaggerExpandableContainer.
 import { makeStyles, tokens, Button, motionTokens } from '@fluentui/react-components';
 import { Stagger, Slide, Collapse } from '@fluentui/react-motion-components-preview';
 
+const TOTAL_ITEMS = 8;
+const VISIBLE_ITEMS_COUNT = 3;
+const COLLAPSE_EXPAND_DELAY = 200;
+const STAGGER_EXIT_DELAY = 300;
+const COLLAPSE_DURATION = 600;
+const COLLAPSED_HEIGHT = '130px';
+const ITEM_HEIGHT = '36px';
+const STAGGER_ITEM_DELAY = 100;
+
 const itemData = [
   { id: 1, title: 'Item 1' },
   { id: 2, title: 'Item 2' },
@@ -44,7 +53,7 @@ const useClasses = makeStyles({
     backgroundColor: tokens.colorNeutralBackground2,
     border: `${tokens.strokeWidthThin} solid ${tokens.colorNeutralStroke2}`,
     borderRadius: tokens.borderRadiusSmall,
-    height: '36px',
+    height: ITEM_HEIGHT,
     justifyContent: 'center',
   },
   itemTitle: {
@@ -60,8 +69,8 @@ export const ExpandableContainer = () => {
   const [staggerVisible, setStaggerVisible] = React.useState(false);
 
   // Always show first 3 items (2 fully visible + 1 partially visible for affordance), additional items (4-8) animate via Stagger
-  const staticItems = itemData.slice(0, 3);
-  const staggerItems = itemData.slice(3);
+  const staticItems = itemData.slice(0, VISIBLE_ITEMS_COUNT);
+  const staggerItems = itemData.slice(VISIBLE_ITEMS_COUNT);
 
   const handleToggle = () => {
     if (!expanded) {
@@ -69,14 +78,14 @@ export const ExpandableContainer = () => {
       setExpanded(true);
       setTimeout(() => {
         setStaggerVisible(true);
-      }, 200); // Wait for Collapse expansion to start
+      }, COLLAPSE_EXPAND_DELAY); // Wait for Collapse expansion to start
     } else {
       // "See less": First hide extra items via Stagger (reversed), then contract container via Collapse
       setStaggerVisible(false);
       setTimeout(() => {
         setExpanded(false);
         // Don't set staggerVisible to true here since we want them hidden when collapsed
-      }, 300); // Wait for Stagger exit animation
+      }, STAGGER_EXIT_DELAY); // Wait for Stagger exit animation
     }
   };
 
@@ -84,9 +93,9 @@ export const ExpandableContainer = () => {
     <div className={classes.container}>
       <Collapse
         visible={expanded}
-        duration={600}
+        duration={COLLAPSE_DURATION}
         easing={motionTokens.curveEasyEase}
-        fromSize="130px"
+        fromSize={COLLAPSED_HEIGHT}
         animateOpacity={false}
       >
         <div className={classes.listContainer}>
@@ -99,7 +108,7 @@ export const ExpandableContainer = () => {
             ))}
 
             {/* Items that animate via Stagger */}
-            <Stagger visible={staggerVisible} itemDelay={100} reversed={!staggerVisible}>
+            <Stagger visible={staggerVisible} itemDelay={STAGGER_ITEM_DELAY} reversed={!staggerVisible}>
               {staggerItems.map(item => (
                 <Slide key={item.id}>
                   <div className={classes.item}>
