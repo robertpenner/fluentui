@@ -1,7 +1,7 @@
 import * as React from 'react';
 import StaggerExpandableContainerDescription from './StaggerExpandableContainer.stories.md';
-import { makeStyles, tokens, Button } from '@fluentui/react-components';
-import { Stagger, Slide } from '@fluentui/react-motion-components-preview';
+import { makeStyles, tokens, Button, motionTokens } from '@fluentui/react-components';
+import { Stagger, Slide, Collapse } from '@fluentui/react-motion-components-preview';
 
 const itemData = [
   { id: 1, title: 'Item 1' },
@@ -29,15 +29,7 @@ const useClasses = makeStyles({
   listContainer: {
     border: `${tokens.strokeWidthThin} solid ${tokens.colorNeutralStroke2}`,
     borderRadius: tokens.borderRadiusMedium,
-    overflow: 'hidden',
-    transition: 'height 600ms ease-in-out',
     backgroundColor: tokens.colorNeutralBackground1,
-  },
-  collapsed: {
-    height: '130px', // Height for showing 2 items + peek of 3rd item for affordance
-  },
-  expanded: {
-    height: '445px', // Height for showing all 8 items (36px each + padding + gaps + buffer)
   },
   list: {
     display: 'flex',
@@ -73,13 +65,13 @@ export const ExpandableContainer = () => {
 
   const handleToggle = () => {
     if (!expanded) {
-      // "See more": First expand container, then show items via Stagger
+      // "See more": First expand container via Collapse, then show items via Stagger
       setExpanded(true);
       setTimeout(() => {
         setStaggerVisible(true);
-      }, 300); // Wait for container expansion to start
+      }, 200); // Wait for Collapse expansion to start
     } else {
-      // "See less": First hide extra items via Stagger (reversed), then contract container
+      // "See less": First hide extra items via Stagger (reversed), then contract container via Collapse
       setStaggerVisible(false);
       setTimeout(() => {
         setExpanded(false);
@@ -90,27 +82,35 @@ export const ExpandableContainer = () => {
 
   return (
     <div className={classes.container}>
-      <div className={`${classes.listContainer} ${expanded ? classes.expanded : classes.collapsed}`}>
-        <div className={classes.list}>
-          {/* Always visible items */}
-          {staticItems.map(item => (
-            <div key={item.id} className={classes.item}>
-              <div className={classes.itemTitle}>{item.title}</div>
-            </div>
-          ))}
-
-          {/* Items that animate via Stagger */}
-          <Stagger visible={staggerVisible} itemDelay={100} reversed={!staggerVisible}>
-            {staggerItems.map(item => (
-              <Slide key={item.id}>
-                <div className={classes.item}>
-                  <div className={classes.itemTitle}>{item.title}</div>
-                </div>
-              </Slide>
+      <Collapse
+        visible={expanded}
+        duration={600}
+        easing={motionTokens.curveEasyEase}
+        fromSize="130px"
+        animateOpacity={false}
+      >
+        <div className={classes.listContainer}>
+          <div className={classes.list}>
+            {/* Always visible items */}
+            {staticItems.map(item => (
+              <div key={item.id} className={classes.item}>
+                <div className={classes.itemTitle}>{item.title}</div>
+              </div>
             ))}
-          </Stagger>
+
+            {/* Items that animate via Stagger */}
+            <Stagger visible={staggerVisible} itemDelay={100} reversed={!staggerVisible}>
+              {staggerItems.map(item => (
+                <Slide key={item.id}>
+                  <div className={classes.item}>
+                    <div className={classes.itemTitle}>{item.title}</div>
+                  </div>
+                </Slide>
+              ))}
+            </Stagger>
+          </div>
         </div>
-      </div>
+      </Collapse>
 
       <div className={classes.controls}>
         <Button onClick={handleToggle} appearance="primary">
