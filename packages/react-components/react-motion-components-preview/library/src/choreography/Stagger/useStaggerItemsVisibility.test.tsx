@@ -215,7 +215,7 @@ describe('useStaggerItemsVisibility', () => {
           itemCount: 3,
           itemDelay: 100,
           direction: 'exit', // Want items to exit (end up hidden)
-          mode: 'unmount',
+          hideMode: 'unmount',
           onMotionFinish: mockOnMotionFinish,
         });
         return <div data-testid="visibility">{JSON.stringify(itemsVisibility)}</div>;
@@ -241,7 +241,7 @@ describe('useStaggerItemsVisibility', () => {
           itemCount: 3,
           itemDelay: 100,
           direction,
-          mode: 'unmount',
+          hideMode: 'unmount',
           onMotionFinish: mockOnMotionFinish,
         });
         return <div data-testid="visibility">{JSON.stringify(itemsVisibility)}</div>;
@@ -272,7 +272,7 @@ describe('useStaggerItemsVisibility', () => {
           itemCount: 3,
           itemDelay: 100,
           direction: 'enter',
-          mode: 'unmount',
+          hideMode: 'unmount',
           onMotionFinish: mockOnMotionFinish,
         });
         return <div data-testid="visibility">{JSON.stringify(itemsVisibility)}</div>;
@@ -296,7 +296,7 @@ describe('useStaggerItemsVisibility', () => {
           itemCount: 3,
           itemDelay: 100,
           direction: 'enter',
-          mode: 'visibilityStyle',
+          hideMode: 'visibilityStyle',
           onMotionFinish: mockOnMotionFinish,
         });
         return <div data-testid="visibility">{JSON.stringify(itemsVisibility)}</div>;
