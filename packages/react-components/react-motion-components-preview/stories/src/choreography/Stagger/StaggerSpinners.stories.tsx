@@ -189,10 +189,10 @@ const BounceMotion = createMotionComponent<{ duration?: number }>(({ duration = 
     { transform: 'translateY(0px)', easing: motionTokens.curveEasyEase },
     { offset: 0.1, transform: 'translateY(10px)', easing: motionTokens.curveEasyEaseMax },
     { offset: 0.4, transform: 'translateY(-30px)', easing: motionTokens.curveAccelerateMid },
-    { offset: 0.6, transform: 'translateY(0px)' },
-    { offset: 0.61, transform: 'translateY(-7px)' },
-    { offset: 0.62, transform: 'translateY(0px)' },
-    { offset: 0.63, transform: 'translateY(-3px)' },
+    { offset: 0.6, transform: 'translateY(0px)', easing: motionTokens.curveDecelerateMid },
+    { offset: 0.61, transform: 'translateY(-7px)', easing: motionTokens.curveAccelerateMid },
+    { offset: 0.62, transform: 'translateY(0px)', easing: motionTokens.curveDecelerateMid },
+    { offset: 0.63, transform: 'translateY(-3px)', easing: motionTokens.curveAccelerateMid },
     { offset: 0.64, transform: 'translateY(0px)' },
     { transform: 'translateY(0px)' },
   ],
@@ -264,9 +264,9 @@ export const StaggerSpinners = () => {
           <div className={classes.controlGroup}>
             <Label>Bouncing Dots Duration: {bounceDuration}ms</Label>
             <Slider
-              min={500}
+              min={1000}
               max={5000}
-              step={100}
+              step={500}
               value={bounceDuration}
               onChange={(_ev, data) => setBounceDuration(data.value)}
             />
@@ -275,9 +275,9 @@ export const StaggerSpinners = () => {
           <div className={classes.controlGroup}>
             <Label>Bouncing Dots Item Delay: {bounceItemDelay}ms</Label>
             <Slider
-              min={0}
-              max={500}
-              step={25}
+              min={10}
+              max={200}
+              step={10}
               value={bounceItemDelay}
               onChange={(_ev, data) => setBounceItemDelay(data.value)}
             />
