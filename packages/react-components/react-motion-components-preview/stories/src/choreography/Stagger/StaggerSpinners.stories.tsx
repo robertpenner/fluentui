@@ -158,16 +158,27 @@ const ScaleMotion = createMotionComponent({
   easing: motionTokens.curveEasyEase,
 });
 
-const SlideMotion = createMotionComponent({
-  keyframes: [
-    { transform: 'translateX(0px)', easing: motionTokens.curveEasyEase },
-    { transform: 'translateX(-30px)', offset: 0.5, opacity: 0.5, easing: motionTokens.curveEasyEaseMax },
-    { transform: 'translateX(0px)', offset: 0.85 },
-    { transform: 'translateX(0px)' },
-  ],
-  duration: 2000,
-  iterations: Infinity,
-});
+const SlideMotion = createMotionComponent([
+  {
+    keyframes: [
+      { transform: 'translateX(0px)', easing: motionTokens.curveEasyEase },
+      { offset: 0.5, transform: 'translateX(-30px)', easing: motionTokens.curveEasyEaseMax },
+      { offset: 0.85, transform: 'translateX(0px)' },
+      { transform: 'translateX(0px)' },
+    ],
+    duration: 2000,
+    iterations: Infinity,
+  },
+  {
+    keyframes: [
+      { offset: 0.5, opacity: 0.5, easing: motionTokens.curveEasyEaseMax },
+      { offset: 0.65, opacity: 0.5 },
+      { offset: 0.66, opacity: 1 },
+    ],
+    duration: 2000,
+    iterations: Infinity,
+  },
+]);
 
 // Orbital motion for dots
 const OrbitMotion = createMotionComponent(({ element }) => {
