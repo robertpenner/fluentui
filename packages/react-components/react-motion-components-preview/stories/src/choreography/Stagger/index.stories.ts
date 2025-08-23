@@ -9,6 +9,7 @@ export { ExpandableContainer } from './StaggerExpandableContainer.stories';
 export { OneWayIn } from './StaggerOneWayIn.stories';
 export { ModeComparison } from './StaggerModeComparison.stories';
 export { StaggerSpinners } from './StaggerSpinners.stories';
+export { BouncingDots } from './StaggerBouncingDots.stories';
 
 export default {
   title: 'Motion/Choreography (preview)/Stagger',
