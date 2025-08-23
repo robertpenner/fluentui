@@ -55,12 +55,13 @@ const useClasses = makeStyles({
   arc: {
     position: 'absolute',
     borderRadius: '50%',
+    borderTopColor: tokens.colorBrandBackground,
+    borderBottomColor: tokens.colorBrandBackground,
   },
   arc1: {
     width: '60px',
     height: '60px',
     border: '4px solid transparent',
-    borderTopColor: tokens.colorBrandBackground,
   },
   arc2: {
     width: '45px',
@@ -129,50 +130,54 @@ const useClasses = makeStyles({
 });
 
 // Motion components for continuous animations
-const SpinMotion = createMotionComponent<{ duration?: number; spins?: number }>(({ duration = 2000, spins = 1.5 }) => [
+const SpinMotion = createMotionComponent<{ duration?: number; spins?: number }>(({ duration = 4000, spins = 2 }) => [
   {
     keyframes: [
       { easing: motionTokens.curveEasyEase },
-      { rotate: `${360 * spins}deg`, offset: 0.9 },
+      { offset: 0.2, rotate: `-60deg`, easing: motionTokens.curveEasyEase },
+      { offset: 0.9, rotate: `${360 * spins}deg` },
       { rotate: `${360 * spins}deg` },
     ],
     duration,
     iterations: Infinity,
-    composite: 'add',
+    // direction: 'alternate',
+    // composite: 'add',
   },
   // {
   //   keyframes: [
-  //     { scale: 1, easing: motionTokens.curveEasyEase },
-  //     { scale: 1.1, offset: 0.45, easing: motionTokens.curveEasyEase },
-  //     { scale: 1, offset: 0.9 },
-  //     { scale: 1 },
+  //     { offset: 0.2, borderWidth: '4px', easing: motionTokens.curveEasyEase },
+  //     { offset: 0.55, borderWidth: '6px', easing: motionTokens.curveEasyEase },
+  //     { offset: 0.9, borderWidth: '4px' },
   //   ],
   //   duration,
   //   iterations: Infinity,
   // },
-  {
-    keyframes: [
-      { easing: motionTokens.curveEasyEase },
-      { borderWidth: '6px', offset: 0.45, easing: motionTokens.curveEasyEase },
-      { offset: 0.9 },
-    ],
-    duration,
-    iterations: Infinity,
-  },
+  // {
+  //   keyframes: [
+  //     { offset: 0.2, scale: 1, easing: motionTokens.curveEasyEase },
+  //     { offset: 0.55, scale: 0.8, easing: motionTokens.curveEasyEase },
+  //     { offset: 0.9, scale: 1 },
+  //   ],
+  //   duration,
+  //   iterations: Infinity,
+  // },
 ]);
 
-const BounceMotion = createMotionComponent({
+const BounceMotion = createMotionComponent<{ duration?: number }>(({ duration = 2000 }) => ({
   keyframes: [
     { transform: 'translateY(0px)', easing: motionTokens.curveEasyEase },
-    { transform: 'translateY(-20px)', offset: 0.1 },
-    { transform: 'translateY(-20px)', offset: 0.5, easing: motionTokens.curveEasyEase },
-    { transform: 'translateY(0px)', offset: 0.6 },
+    { offset: 0.1, transform: 'translateY(10px)', easing: motionTokens.curveEasyEaseMax },
+    { offset: 0.4, transform: 'translateY(-30px)', easing: motionTokens.curveAccelerateMid },
+    { offset: 0.6, transform: 'translateY(0px)' },
+    { offset: 0.61, transform: 'translateY(-6px)' },
+    { offset: 0.62, transform: 'translateY(0px)' },
+    { offset: 0.63, transform: 'translateY(-2px)' },
+    { offset: 0.64, transform: 'translateY(0px)' },
     { transform: 'translateY(0px)' },
   ],
-  duration: motionTokens.durationSlow * 10,
+  duration: 2000,
   iterations: Infinity,
-  // easing: motionTokens.curveEasyEase,
-});
+}));
 
 const ScaleMotion = createMotionComponent({
   keyframes: [{ transform: 'scaleY(0.3)' }, { transform: 'scaleY(1)' }, { transform: 'scaleY(0.3)' }],
@@ -236,7 +241,7 @@ export const StaggerSpinners = () => {
         <h3 className={classes.spinnerTitle}>Nested Arcs Spinner</h3>
         <div className={classes.spinnerContainer}>
           <div className={classes.arcSpinner}>
-            <Stagger.In itemDelay={motionTokens.durationFaster} key={`arcs-${animationKey}`}>
+            <Stagger.In itemDelay={60} key={`arcs-${animationKey}`}>
               <SpinMotion>
                 <div className={`${classes.arc} ${classes.arc3}`} />
               </SpinMotion>
@@ -272,8 +277,8 @@ export const StaggerSpinners = () => {
         <h3 className={classes.spinnerTitle}>Bouncing Dots Spinner</h3>
         <div className={classes.spinnerContainer}>
           <div className={classes.bouncingDotsSpinner}>
-            <Stagger.In itemDelay={motionTokens.durationFaster} key={`bounce-${animationKey}`}>
-              {Array.from({ length: 8 }, (_, i) => (
+            <Stagger.In itemDelay={100} key={`bounce-${animationKey}`}>
+              {Array.from({ length: 5 }, (_, i) => (
                 <BounceMotion key={i}>
                   <div className={classes.bouncingDot} />
                 </BounceMotion>
