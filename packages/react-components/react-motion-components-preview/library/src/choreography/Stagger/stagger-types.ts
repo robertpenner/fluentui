@@ -7,7 +7,7 @@ import * as React from 'react';
  * - 'visibilityStyle': Children remain in DOM with inline style `visibility: hidden | visible` (preserves layout space)
  * - 'unmount': Children are mounted/unmounted from DOM based on visibility
  */
-export type StaggerHideMode = 'visibleProp' | 'visibilityStyle' | 'unmount';
+export type StaggerHideMode = 'visibleProp' | 'visibilityStyle' | 'unmount' | 'alwaysVisible';
 
 /**
  * Props for the Stagger component that manages staggered entrance and exit animations.

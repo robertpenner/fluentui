@@ -12,9 +12,10 @@ export interface UseStaggerItemsVisibilityParams
  * Hook that tracks the visibility of a staggered sequence of items as time progresses.
  *
  * **Behavior:**
- * - All modes start in final state: visible for 'enter', hidden for 'exit'
- * - All modes: No animation on first render (items already in final state)
+ * - All modes except 'alwaysVisible' start in final state: visible for 'enter', hidden for 'exit'
+ * - All modes except 'alwaysVisible': No animation on first render (items already in final state)
  * - On subsequent renders: Items animate from start state to final state over time
+ * - 'alwaysVisible' mode: Items are always visible with no animations
  *
  * **States:**
  * - Enter direction: Items start visible (final state)
@@ -26,7 +27,7 @@ export interface UseStaggerItemsVisibilityParams
  * @param direction - 'enter' (show items) or 'exit' (hide items)
  * @param reversed - Whether to reverse the stagger order (last item first)
  * @param onMotionFinish - Callback fired when the full stagger sequence completes
- * @param mode - How children's visibility is managed: 'visibleProp', 'visibilityStyle', or 'unmount'
+ * @param mode - How children's visibility is managed: 'visibleProp', 'visibilityStyle', 'unmount', or 'alwaysVisible'
  *
  * @returns An `itemsVisibility` array of booleans indicating which items are currently visible
  */
@@ -55,9 +56,13 @@ export function useStaggerItemsVisibility({
 
   // State: visibility array for all items
   const [itemsVisibility, setItemsVisibility] = React.useState<boolean[]>(() => {
+    // For alwaysVisible mode, all items are always visible
+    if (mode === 'alwaysVisible') {
+      return Array(itemCount).fill(true);
+    }
     // For unmount mode, items should start hidden and appear by being added to the DOM
     // For visibleProp and visibilityStyle modes, items start in target state: visible for 'enter', hidden for 'exit'
-    if (mode === 'unmount') {
+    else if (mode === 'unmount') {
       return Array(itemCount).fill(direction === 'exit');
     } else {
       return Array(itemCount).fill(direction === 'enter');
@@ -73,14 +78,14 @@ export function useStaggerItemsVisibility({
 
       if (itemCount > prev.length) {
         // Add new items in their target state
-        const targetState = direction === 'enter';
+        const targetState = mode === 'alwaysVisible' ? true : direction === 'enter';
         return [...prev, ...Array(itemCount - prev.length).fill(targetState)];
       } else {
         // Remove items from the end
         return prev.slice(0, itemCount);
       }
     });
-  }, [itemCount, direction]);
+  }, [itemCount, direction, mode]);
 
   // Refs: animation timing and control
   const startTimeRef = React.useRef<number | null>(null);
@@ -102,6 +107,12 @@ export function useStaggerItemsVisibility({
     let cancelled = false;
     startTimeRef.current = null;
     finishedRef.current = false;
+
+    // For alwaysVisible mode, skip all animations and immediately finish
+    if (mode === 'alwaysVisible') {
+      onMotionFinish?.();
+      return; // No cleanup needed
+    }
 
     // Unmount mode should always animate, visibleProp and visibilityStyle modes only animate after first render
     // - Stagger.In (enter + unmount): DOM elements get added and animate from hidden to visible

@@ -29,7 +29,10 @@ const StaggerOneWay: React.FC<StaggerOneWayProps> = ({
       {elements.map((child, idx) => {
         const key = child.key ?? idx;
 
-        if (mode === 'visibleProp') {
+        if (mode === 'alwaysVisible') {
+          // Always render children without any visibility control
+          return React.cloneElement(child);
+        } else if (mode === 'visibleProp') {
           // Always render and control via visible prop (visibleProp mode)
           return React.cloneElement(child, { key, visible: itemsVisibility[idx] });
         } else if (mode === 'visibilityStyle') {
@@ -48,12 +51,12 @@ const StaggerOneWay: React.FC<StaggerOneWayProps> = ({
   );
 };
 
-const StaggerIn: React.FC<Omit<StaggerProps, 'visible' | 'mode'>> = props => (
-  <StaggerOneWay {...props} direction="enter" mode="unmount" />
+const StaggerIn: React.FC<Omit<StaggerProps, 'visible'>> = ({ mode = 'unmount', ...props }) => (
+  <StaggerOneWay {...props} direction="enter" mode={mode} />
 );
 
-const StaggerOut: React.FC<Omit<StaggerProps, 'visible' | 'mode'>> = props => (
-  <StaggerOneWay {...props} direction="exit" mode="unmount" />
+const StaggerOut: React.FC<Omit<StaggerProps, 'visible'>> = ({ mode = 'unmount', ...props }) => (
+  <StaggerOneWay {...props} direction="exit" mode={mode} />
 );
 
 // Main Stagger component with auto-detection or explicit mode
@@ -94,6 +97,7 @@ const StaggerMain: React.FC<StaggerProps> = props => {
  * - `'visibleProp'`: Children are presence components with `visible` prop (always rendered, visibility controlled via prop)
  * - `'visibilityStyle'`: Children remain in DOM with inline style visibility: hidden/visible (preserves layout space)
  * - `'unmount'`: Children are mounted/unmounted from DOM based on visibility
+ * - `'alwaysVisible'`: Children are always visible and rendered without any stagger animation
  *
  * **Static variants:**
  * - `<Stagger.In>` - One-way stagger for entrance animations only (uses unmount mode)
@@ -124,6 +128,12 @@ const StaggerMain: React.FC<StaggerProps> = props => {
  * <Stagger visible={isVisible} mode="visibilityStyle">
  *   <div>Card 1</div>
  *   <div>Card 2</div>
+ * </Stagger>
+ *
+ * // AlwaysVisible mode shows all children without any stagger animation
+ * <Stagger visible={isVisible} mode="alwaysVisible">
+ *   <div>Always visible item 1</div>
+ *   <div>Always visible item 2</div>
  * </Stagger>
  * ```
  */

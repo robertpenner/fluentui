@@ -363,4 +363,81 @@ describe('Stagger', () => {
       });
     });
   });
+
+  describe('alwaysVisible mode', () => {
+    beforeEach(() => {
+      mockUseStaggerItemsVisibility.mockClear();
+    });
+
+    it('should render all items without any visibility control', () => {
+      mockUseStaggerItemsVisibility.mockReturnValue({
+        itemsVisibility: [true, false, true], // Visibility state should be ignored
+      });
+
+      render(
+        <Stagger visible mode="alwaysVisible">
+          <div data-testid="item-1">Item 1</div>
+          <div data-testid="item-2">Item 2</div>
+          <div data-testid="item-3">Item 3</div>
+        </Stagger>,
+      );
+
+      // All items should be rendered without any visibility styling
+      const item1 = screen.getByTestId('item-1');
+      const item2 = screen.getByTestId('item-2');
+      const item3 = screen.getByTestId('item-3');
+
+      expect(item1).toBeDefined();
+      expect(item2).toBeDefined();
+      expect(item3).toBeDefined();
+
+      // No visibility styles should be applied
+      expect(item1.style.visibility).toBe('');
+      expect(item2.style.visibility).toBe('');
+      expect(item3.style.visibility).toBe('');
+    });
+
+    it('should preserve existing style properties without adding visibility', () => {
+      mockUseStaggerItemsVisibility.mockReturnValue({
+        itemsVisibility: [false], // Should be ignored
+      });
+
+      render(
+        <Stagger visible mode="alwaysVisible">
+          <div data-testid="styled-item" style={{ color: 'red', fontSize: '14px' }}>
+            Styled Item
+          </div>
+        </Stagger>,
+      );
+
+      const item = screen.getByTestId('styled-item');
+
+      // Should preserve existing styles
+      expect(item.style.color).toBe('red');
+      expect(item.style.fontSize).toBe('14px');
+      // Should not add visibility
+      expect(item.style.visibility).toBe('');
+    });
+
+    it('should work with motion components without passing visible prop', () => {
+      mockUseStaggerItemsVisibility.mockReturnValue({
+        itemsVisibility: [false, false], // Should be ignored
+      });
+
+      render(
+        <Stagger visible mode="alwaysVisible">
+          <Fade>
+            <div data-testid="fade-item">Fade Item</div>
+          </Fade>
+          <Scale>
+            <div data-testid="scale-item">Scale Item</div>
+          </Scale>
+        </Stagger>,
+      );
+
+      // Items should be rendered without visible prop being passed
+      expect(screen.getByTestId('fade-item')).toBeDefined();
+      expect(screen.getByTestId('scale-item')).toBeDefined();
+    });
+  });
 });

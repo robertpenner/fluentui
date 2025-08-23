@@ -174,11 +174,18 @@ describe('useStaggerItemsVisibility', () => {
         { mode: 'visibilityStyle', direction: 'exit', expectedInitial: false },
         { mode: 'unmount', direction: 'enter', expectedInitial: true },
         { mode: 'unmount', direction: 'exit', expectedInitial: false },
+        { mode: 'alwaysVisible', direction: 'enter', expectedInitial: true },
+        { mode: 'alwaysVisible', direction: 'exit', expectedInitial: true }, // Always visible regardless of direction
       ];
 
       testScenarios.forEach(({ mode, direction, expectedInitial }) => {
         // Simulate the useState logic from useStaggerItemsVisibility
-        const initialState = direction === 'enter';
+        let initialState;
+        if (mode === 'alwaysVisible') {
+          initialState = true; // Always visible regardless of direction
+        } else {
+          initialState = direction === 'enter';
+        }
 
         expect(initialState).toBe(expectedInitial);
       });
@@ -309,6 +316,60 @@ describe('useStaggerItemsVisibility', () => {
       expect(JSON.parse(getByTestId('visibility').textContent!)).toEqual([true, true, true]);
       expect(mockOnMotionFinish).toHaveBeenCalledTimes(1); // Should finish immediately on first render
       expect(mockRequestAnimationFrame).not.toHaveBeenCalled(); // No animation on first render
+    });
+  });
+
+  describe('alwaysVisible mode', () => {
+    it('should always show all items as visible regardless of direction', () => {
+      const mockOnMotionFinish = jest.fn();
+
+      const TestComponent = () => {
+        const { itemsVisibility } = useStaggerItemsVisibility({
+          itemCount: 3,
+          itemDelay: 100,
+          direction: 'exit', // Even with exit, should show as visible
+          mode: 'alwaysVisible',
+          onMotionFinish: mockOnMotionFinish,
+        });
+        return <div data-testid="visibility">{JSON.stringify(itemsVisibility)}</div>;
+      };
+
+      const { getByTestId } = render(<TestComponent />);
+
+      // AlwaysVisible mode should show all items as visible regardless of direction
+      expect(JSON.parse(getByTestId('visibility').textContent!)).toEqual([true, true, true]);
+      expect(mockOnMotionFinish).toHaveBeenCalledTimes(1); // Should finish immediately
+      expect(mockRequestAnimationFrame).not.toHaveBeenCalled(); // No animation
+    });
+
+    it('should not animate when direction changes', () => {
+      const mockOnMotionFinish = jest.fn();
+
+      const TestComponent = ({ direction }: { direction: 'enter' | 'exit' }) => {
+        const { itemsVisibility } = useStaggerItemsVisibility({
+          itemCount: 2,
+          itemDelay: 100,
+          direction,
+          mode: 'alwaysVisible',
+          onMotionFinish: mockOnMotionFinish,
+        });
+        return <div data-testid="visibility">{JSON.stringify(itemsVisibility)}</div>;
+      };
+
+      const { getByTestId, rerender } = render(<TestComponent direction="enter" />);
+
+      // Initial state
+      expect(JSON.parse(getByTestId('visibility').textContent!)).toEqual([true, true]);
+      expect(mockOnMotionFinish).toHaveBeenCalledTimes(1);
+
+      // Change direction - should still be visible and no animation
+      act(() => {
+        rerender(<TestComponent direction="exit" />);
+      });
+
+      expect(JSON.parse(getByTestId('visibility').textContent!)).toEqual([true, true]);
+      expect(mockOnMotionFinish).toHaveBeenCalledTimes(3); // Called again immediately (once for initial, once for item count effect, once for direction change)
+      expect(mockRequestAnimationFrame).not.toHaveBeenCalled(); // Still no animation
     });
   });
 });

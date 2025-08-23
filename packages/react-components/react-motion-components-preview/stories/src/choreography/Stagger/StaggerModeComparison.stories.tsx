@@ -131,6 +131,19 @@ export const ModeComparison = () => {
             </Stagger>
           </div>
         </div>
+
+        <div className={classes.section}>
+          <div className={classes.sectionTitle}>alwaysVisible mode</div>
+          <div className={classes.items}>
+            <Stagger visible={visible} itemDelay={itemDelay} reversed={reversed}>
+              {avatarData.map(avatar => (
+                <Blur key={avatar.name} animateOpacity={false}>
+                  <Avatar initials={avatar.initials} color={avatar.color} name={avatar.name} />
+                </Blur>
+              ))}
+            </Stagger>
+          </div>
+        </div>
       </div>
     </div>
   );
