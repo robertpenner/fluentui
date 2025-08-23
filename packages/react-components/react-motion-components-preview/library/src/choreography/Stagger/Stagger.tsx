@@ -48,12 +48,12 @@ const StaggerOneWay: React.FC<StaggerOneWayProps> = ({
   );
 };
 
-const StaggerIn: React.FC<Omit<StaggerProps, 'visible' | 'mode'>> = props => (
-  <StaggerOneWay {...props} direction="enter" mode="unmount" />
+const StaggerIn: React.FC<Omit<StaggerProps, 'visible'>> = ({ mode = 'unmount', ...props }) => (
+  <StaggerOneWay {...props} direction="enter" mode={mode} />
 );
 
-const StaggerOut: React.FC<Omit<StaggerProps, 'visible' | 'mode'>> = props => (
-  <StaggerOneWay {...props} direction="exit" mode="unmount" />
+const StaggerOut: React.FC<Omit<StaggerProps, 'visible'>> = ({ mode = 'unmount', ...props }) => (
+  <StaggerOneWay {...props} direction="exit" mode={mode} />
 );
 
 // Main Stagger component with auto-detection or explicit mode

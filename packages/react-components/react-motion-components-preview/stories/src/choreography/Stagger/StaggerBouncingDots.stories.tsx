@@ -9,6 +9,7 @@ import {
   createMotionComponent,
   Slider,
   Label,
+  createPresenceComponent,
 } from '@fluentui/react-components';
 import { Stagger } from '@fluentui/react-motion-components-preview';
 
@@ -76,20 +77,23 @@ const useClasses = makeStyles({
   },
 });
 
-const BounceMotion = createMotionComponent<{ duration?: number }>(({ duration = 2000 }) => ({
-  keyframes: [
-    { transform: 'translateY(0px)', easing: motionTokens.curveEasyEase },
-    { offset: 0.1, transform: 'translateY(10px)', easing: motionTokens.curveEasyEaseMax },
-    { offset: 0.4, transform: 'translateY(-30px)', easing: motionTokens.curveAccelerateMid },
-    { offset: 0.6, transform: 'translateY(0px)', easing: motionTokens.curveDecelerateMid },
-    { offset: 0.61, transform: 'translateY(-7px)', easing: motionTokens.curveAccelerateMid },
-    { offset: 0.62, transform: 'translateY(0px)', easing: motionTokens.curveDecelerateMid },
-    { offset: 0.63, transform: 'translateY(-3px)', easing: motionTokens.curveAccelerateMid },
-    { offset: 0.64, transform: 'translateY(0px)' },
-    { transform: 'translateY(0px)' },
-  ],
-  duration,
-  iterations: Infinity,
+const BounceMotion = createPresenceComponent<{ duration?: number }>(({ duration = 2000 }) => ({
+  enter: {
+    keyframes: [
+      { transform: 'translateY(0px)', easing: motionTokens.curveEasyEase },
+      { offset: 0.1, transform: 'translateY(10px)', easing: motionTokens.curveEasyEaseMax },
+      { offset: 0.4, transform: 'translateY(-30px)', easing: motionTokens.curveAccelerateMid },
+      { offset: 0.6, transform: 'translateY(0px)', easing: motionTokens.curveDecelerateMid },
+      { offset: 0.61, transform: 'translateY(-7px)', easing: motionTokens.curveAccelerateMid },
+      { offset: 0.62, transform: 'translateY(0px)', easing: motionTokens.curveDecelerateMid },
+      { offset: 0.63, transform: 'translateY(-3px)', easing: motionTokens.curveAccelerateMid },
+      { offset: 0.64, transform: 'translateY(0px)' },
+      { transform: 'translateY(0px)' },
+    ],
+    duration,
+    iterations: Infinity,
+  },
+  exit: { keyframes: [] },
 }));
 
 export const BouncingDots = () => {
@@ -145,9 +149,9 @@ export const BouncingDots = () => {
           <div className={classes.bouncingDotsSpinner}>
             <Stagger.In itemDelay={bounceItemDelay} key={`bounce-${animationKey}`}>
               {Array.from({ length: 5 }, (_, i) => (
-                <BounceMotion key={i} duration={bounceDuration}>
+                <BounceMotion.In key={i} duration={bounceDuration}>
                   <div className={classes.bouncingDot} />
-                </BounceMotion>
+                </BounceMotion.In>
               ))}
             </Stagger.In>
           </div>
