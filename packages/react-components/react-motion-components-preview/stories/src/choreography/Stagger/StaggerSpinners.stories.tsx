@@ -158,7 +158,7 @@ const ScaleMotion = createMotionComponent({
   easing: motionTokens.curveEasyEase,
 });
 
-const SlideMotion = createMotionComponent([
+const SlideMotion = createMotionComponent<{ delay?: number }>(({ delay = 0 }) => [
   {
     keyframes: [
       { transform: 'translateX(0px)', easing: motionTokens.curveEasyEase },
@@ -167,6 +167,7 @@ const SlideMotion = createMotionComponent([
       { transform: 'translateX(0px)' },
     ],
     duration: 2000,
+    delay,
     iterations: Infinity,
   },
   {
@@ -176,6 +177,7 @@ const SlideMotion = createMotionComponent([
       { offset: 0.66, opacity: 1 },
     ],
     duration: 2000,
+    delay,
     iterations: Infinity,
   },
 ]);
@@ -224,7 +226,7 @@ export const StaggerSpinners = () => {
         <h3 className={classes.spinnerTitle}>Nested Arcs Spinner</h3>
         <div className={classes.spinnerContainer}>
           <div className={classes.arcSpinner}>
-            <Stagger.In itemDelay={60} key={`arcs-${animationKey}`}>
+            <Stagger.In delayMode="timing" itemDelay={60} key={`arcs-${animationKey}`}>
               <SpinMotion>
                 <div className={`${classes.arc} ${classes.arc3}`} />
               </SpinMotion>

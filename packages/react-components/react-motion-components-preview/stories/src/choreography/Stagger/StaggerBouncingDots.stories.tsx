@@ -144,9 +144,9 @@ export const BouncingDots = () => {
         <h3 className={classes.spinnerTitle}>Bouncing Dots Spinner</h3>
         <div className={classes.spinnerContainer}>
           <div className={classes.bouncingDotsSpinner}>
-            <Stagger.In itemDelay={0} key={`bounce-${animationKey}`}>
+            <Stagger.In itemDelay={bounceItemDelay} key={`bounce-${animationKey}`}>
               {Array.from({ length: 5 }, (_, i) => (
-                <BounceMotion key={i} duration={bounceDuration} delay={i * bounceItemDelay}>
+                <BounceMotion key={i} duration={bounceDuration}>
                   <div className={classes.bouncingDot} />
                 </BounceMotion>
               ))}
