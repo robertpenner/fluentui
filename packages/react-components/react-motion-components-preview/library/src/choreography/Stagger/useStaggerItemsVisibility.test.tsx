@@ -66,23 +66,23 @@ describe('useStaggerItemsVisibility', () => {
   });
 
   it('starts animation on parameter change', () => {
-    const TestComponent = ({ itemCount }: { itemCount: number }) => {
+    const TestComponent = ({ itemDelay }: { itemDelay: number }) => {
       const { itemsVisibility } = useStaggerItemsVisibility({
-        itemCount,
-        itemDelay: 100,
+        itemCount: 2,
+        itemDelay,
         direction: 'enter',
       });
       return <div data-testid="visibility">{JSON.stringify(itemsVisibility)}</div>;
     };
 
-    const { rerender } = render(<TestComponent itemCount={2} />);
+    const { rerender } = render(<TestComponent itemDelay={100} />);
 
     // First render - no animation frame requested yet
     expect(mockRequestAnimationFrame).not.toHaveBeenCalled();
 
-    // Change parameters to trigger animation
+    // Change parameters to trigger animation (using itemDelay instead of itemCount)
     act(() => {
-      rerender(<TestComponent itemCount={3} />);
+      rerender(<TestComponent itemDelay={200} />);
     });
 
     // Should request animation frame for parameter change
@@ -129,13 +129,37 @@ describe('useStaggerItemsVisibility', () => {
     // Initial state for 2 items
     expect(JSON.parse(getByTestId('visibility').textContent!)).toEqual([true, true]);
 
-    // Change to 3 items - should start animation from start state
+    // Change to 3 items - should NOT start animation, just update array size
     act(() => {
       rerender(<TestComponent itemCount={3} />);
     });
 
-    // During animation, should show start state (hidden for enter direction)
-    expect(JSON.parse(getByTestId('visibility').textContent!)).toEqual([false, false, false]);
+    // Should maintain final state (visible for enter direction), not restart animation
+    expect(JSON.parse(getByTestId('visibility').textContent!)).toEqual([true, true, true]);
+  });
+
+  it('should not trigger animation when itemCount changes', () => {
+    const TestComponent = ({ itemCount }: { itemCount: number }) => {
+      useStaggerItemsVisibility({
+        itemCount,
+        itemDelay: 100,
+        direction: 'enter',
+      });
+      return <div>Test</div>;
+    };
+
+    const { rerender } = render(<TestComponent itemCount={2} />);
+
+    // Clear any initial calls
+    mockRequestAnimationFrame.mockClear();
+
+    // Change itemCount - should NOT trigger animation
+    act(() => {
+      rerender(<TestComponent itemCount={5} />);
+    });
+
+    // Should not request animation frame for itemCount change
+    expect(mockRequestAnimationFrame).not.toHaveBeenCalled();
   });
 
   describe('Mode-based initial state logic (from Node test analysis)', () => {

@@ -88,6 +88,14 @@ export function useStaggerItemsVisibility({
   const finishedRef = React.useRef(false);
   const isFirstRender = React.useRef(true);
 
+  // Use ref to avoid re-running the animation when item count changes
+  const itemCountRef = React.useRef(itemCount);
+
+  // Update itemCount ref whenever it changes
+  React.useEffect(() => {
+    itemCountRef.current = itemCount;
+  }, [itemCount]);
+
   // ====== ANIMATION EFFECT ======
 
   React.useEffect(() => {
@@ -119,7 +127,8 @@ export function useStaggerItemsVisibility({
       // - Enter animation: start hidden (false), animate to visible (true)
       // - Exit animation: start visible (true), animate to hidden (false)
       const startState = direction === 'exit';
-      setItemsVisibility(Array(itemCount).fill(startState));
+      // Use itemCountRef.current to avoid adding itemCount to dependencies
+      setItemsVisibility(Array(itemCountRef.current).fill(startState));
     }
 
     // Animation loop: update visibility on each frame until complete
@@ -133,7 +142,7 @@ export function useStaggerItemsVisibility({
       const elapsed = now - (startTimeRef.current as number);
 
       const result = staggerItemsVisibilityAtTime({
-        itemCount,
+        itemCount: itemCountRef.current,
         elapsed,
         itemDelay,
         itemDuration,
@@ -159,7 +168,7 @@ export function useStaggerItemsVisibility({
       }
     };
   }, [
-    animationKey, // Only trigger on explicit animation changes, not itemCount changes
+    animationKey,
     itemDelay,
     itemDuration,
     direction,
