@@ -45,7 +45,13 @@ export interface StaggerProps {
   onMotionFinish?: () => void;
 }
 
-export interface StaggerOneWayProps extends Omit<StaggerProps, 'visible'> {
+export interface StaggerOneWayProps extends Omit<StaggerProps, 'visible' | 'hideMode' | 'delayMode'> {
   /** Animation direction: 'enter' or 'exit'. */
   direction: PresenceDirection;
+
+  /** How children's visibility/mounting is managed. Required - provided by wrapper components. */
+  hideMode: StaggerHideMode;
+
+  /** How staggering timing is implemented. Required - provided by wrapper components. */
+  delayMode: StaggerDelayMode;
 }
