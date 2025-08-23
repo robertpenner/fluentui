@@ -171,7 +171,7 @@ const SlideMotion = createMotionComponent({
 
 // Orbital motion for dots
 const OrbitMotion = createMotionComponent(({ element }) => {
-  const index = parseInt(element.dataset.index || '0');
+  const index = parseInt(element.dataset.index || '0', 10);
   const angle = index * 60 - 90; // 6 dots, 60 degrees apart, start at top
   const radius = 25;
 
