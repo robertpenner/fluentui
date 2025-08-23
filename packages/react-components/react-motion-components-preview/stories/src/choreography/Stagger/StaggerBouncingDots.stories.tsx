@@ -76,7 +76,7 @@ const useClasses = makeStyles({
   },
 });
 
-const BounceMotion = createMotionComponent<{ duration?: number }>(({ duration = 2000 }) => ({
+const BounceMotion = createMotionComponent<{ delay?: number; duration?: number }>(({ delay = 0, duration = 2000 }) => ({
   keyframes: [
     { transform: 'translateY(0px)', easing: motionTokens.curveEasyEase },
     { offset: 0.1, transform: 'translateY(10px)', easing: motionTokens.curveEasyEaseMax },
@@ -89,6 +89,7 @@ const BounceMotion = createMotionComponent<{ duration?: number }>(({ duration = 
     { transform: 'translateY(0px)' },
   ],
   duration,
+  delay,
   iterations: Infinity,
 }));
 
@@ -143,9 +144,9 @@ export const BouncingDots = () => {
         <h3 className={classes.spinnerTitle}>Bouncing Dots Spinner</h3>
         <div className={classes.spinnerContainer}>
           <div className={classes.bouncingDotsSpinner}>
-            <Stagger.In itemDelay={bounceItemDelay} key={`bounce-${animationKey}`}>
+            <Stagger.In itemDelay={0} key={`bounce-${animationKey}`}>
               {Array.from({ length: 5 }, (_, i) => (
-                <BounceMotion key={i} duration={bounceDuration}>
+                <BounceMotion key={i} duration={bounceDuration} delay={i * bounceItemDelay}>
                   <div className={classes.bouncingDot} />
                 </BounceMotion>
               ))}
