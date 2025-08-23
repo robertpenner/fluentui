@@ -1,6 +1,15 @@
 import * as React from 'react';
 import StaggerSpinnersDescription from './StaggerSpinners.stories.md';
-import { Button, Field, makeStyles, tokens, motionTokens, createMotionComponent } from '@fluentui/react-components';
+import {
+  Button,
+  Field,
+  makeStyles,
+  tokens,
+  motionTokens,
+  createMotionComponent,
+  Slider,
+  Label,
+} from '@fluentui/react-components';
 import { Stagger } from '@fluentui/react-motion-components-preview';
 
 const useClasses = makeStyles({
@@ -19,6 +28,18 @@ const useClasses = makeStyles({
     borderRadius: tokens.borderRadiusMedium,
     backgroundColor: tokens.colorNeutralBackground1,
     boxShadow: tokens.shadow8,
+  },
+  controlsRow: {
+    display: 'flex',
+    gap: tokens.spacingHorizontalL,
+    alignItems: 'center',
+    flexWrap: 'wrap',
+  },
+  controlGroup: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: tokens.spacingVerticalS,
+    minWidth: '200px',
   },
   spinnerSection: {
     display: 'flex',
@@ -169,13 +190,13 @@ const BounceMotion = createMotionComponent<{ duration?: number }>(({ duration = 
     { offset: 0.1, transform: 'translateY(10px)', easing: motionTokens.curveEasyEaseMax },
     { offset: 0.4, transform: 'translateY(-30px)', easing: motionTokens.curveAccelerateMid },
     { offset: 0.6, transform: 'translateY(0px)' },
-    { offset: 0.61, transform: 'translateY(-6px)' },
+    { offset: 0.61, transform: 'translateY(-7px)' },
     { offset: 0.62, transform: 'translateY(0px)' },
-    { offset: 0.63, transform: 'translateY(-2px)' },
+    { offset: 0.63, transform: 'translateY(-3px)' },
     { offset: 0.64, transform: 'translateY(0px)' },
     { transform: 'translateY(0px)' },
   ],
-  duration: 2000,
+  duration,
   iterations: Infinity,
 }));
 
@@ -222,6 +243,10 @@ export const StaggerSpinners = () => {
   const classes = useClasses();
   const [animationKey, setAnimationKey] = React.useState<number>(0);
 
+  // Bouncing Dots controls
+  const [bounceDuration, setBounceDuration] = React.useState<number>(2000);
+  const [bounceItemDelay, setBounceItemDelay] = React.useState<number>(100);
+
   const replayAnimation = () => {
     setAnimationKey(prev => prev + 1);
   };
@@ -234,6 +259,46 @@ export const StaggerSpinners = () => {
             Replay Stagger Animations
           </Button>
         </Field>
+
+        <div className={classes.controlsRow}>
+          <div className={classes.controlGroup}>
+            <Label>Bouncing Dots Duration: {bounceDuration}ms</Label>
+            <Slider
+              min={500}
+              max={5000}
+              step={100}
+              value={bounceDuration}
+              onChange={(_ev, data) => setBounceDuration(data.value)}
+            />
+          </div>
+
+          <div className={classes.controlGroup}>
+            <Label>Bouncing Dots Item Delay: {bounceItemDelay}ms</Label>
+            <Slider
+              min={0}
+              max={500}
+              step={25}
+              value={bounceItemDelay}
+              onChange={(_ev, data) => setBounceItemDelay(data.value)}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Bouncing Dots Spinner */}
+      <div className={classes.spinnerSection}>
+        <h3 className={classes.spinnerTitle}>Bouncing Dots Spinner</h3>
+        <div className={classes.spinnerContainer}>
+          <div className={classes.bouncingDotsSpinner}>
+            <Stagger.In itemDelay={bounceItemDelay} key={`bounce-${animationKey}`}>
+              {Array.from({ length: 5 }, (_, i) => (
+                <BounceMotion key={i} duration={bounceDuration}>
+                  <div className={classes.bouncingDot} />
+                </BounceMotion>
+              ))}
+            </Stagger.In>
+          </div>
+        </div>
       </div>
 
       {/* Nested Arcs Spinner */}
@@ -266,22 +331,6 @@ export const StaggerSpinners = () => {
                 <OrbitMotion key={i}>
                   <div className={classes.orbitDot} data-index={i} />
                 </OrbitMotion>
-              ))}
-            </Stagger.In>
-          </div>
-        </div>
-      </div>
-
-      {/* Bouncing Dots Spinner */}
-      <div className={classes.spinnerSection}>
-        <h3 className={classes.spinnerTitle}>Bouncing Dots Spinner</h3>
-        <div className={classes.spinnerContainer}>
-          <div className={classes.bouncingDotsSpinner}>
-            <Stagger.In itemDelay={100} key={`bounce-${animationKey}`}>
-              {Array.from({ length: 5 }, (_, i) => (
-                <BounceMotion key={i}>
-                  <div className={classes.bouncingDot} />
-                </BounceMotion>
               ))}
             </Stagger.In>
           </div>
