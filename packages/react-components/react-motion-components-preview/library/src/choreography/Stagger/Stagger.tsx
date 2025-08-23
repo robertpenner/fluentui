@@ -7,7 +7,31 @@ import {
   acceptsVisibleProp,
   acceptsDelayProps,
 } from './utils';
-import { StaggerOneWayProps, StaggerProps, type StaggerHideMode } from './stagger-types';
+import { StaggerOneWayProps, StaggerProps, type StaggerHideMode, type StaggerDelayMode } from './stagger-types';
+
+/**
+ * Shared utility to detect optimal stagger modes based on children components.
+ * Consolidates the auto-detection logic used by both StaggerMain and createStaggerDirection.
+ */
+const detectStaggerModes = (
+  children: React.ReactNode,
+  options: {
+    hideMode?: StaggerHideMode;
+    delayMode?: StaggerDelayMode;
+    defaultHideMode?: StaggerHideMode;
+  },
+): { hideMode: StaggerHideMode; delayMode: StaggerDelayMode } => {
+  const { hideMode, delayMode, defaultHideMode = 'visibilityStyle' } = options;
+
+  const elements = toElementArray(children);
+  const hasVisibleSupport = elements.every(child => acceptsVisibleProp(child));
+  const hasDelaySupport = elements.every(child => acceptsDelayProps(child));
+
+  return {
+    hideMode: hideMode ?? (hasVisibleSupport ? 'visibleProp' : defaultHideMode),
+    delayMode: delayMode ?? (hasDelaySupport ? 'delayProp' : 'timing'),
+  };
+};
 
 const StaggerOneWay: React.FC<StaggerOneWayProps> = ({
   children,
@@ -21,14 +45,6 @@ const StaggerOneWay: React.FC<StaggerOneWayProps> = ({
 }) => {
   const elements = toElementArray(children);
 
-  // Auto-detect hideMode if not specified
-  const resolvedHideMode: StaggerHideMode =
-    hideMode ??
-    (() => {
-      const hasVisibleSupport = elements.every(child => acceptsVisibleProp(child));
-      return hasVisibleSupport ? 'visibleProp' : 'visibilityStyle';
-    })();
-
   // For delayProp mode, pass delay props directly to motion components
   if (delayMode === 'delayProp') {
     return (
@@ -41,9 +57,12 @@ const StaggerOneWay: React.FC<StaggerOneWayProps> = ({
           // Clone element with delay prop (for enter direction) or exitDelay prop (for exit direction)
           const delayProp = direction === 'enter' ? { delay } : { exitDelay: delay };
 
+          // Only set visible prop if the component supports it
+          const visibleProp = acceptsVisibleProp(child) ? { visible: true } : {};
+
           return React.cloneElement(child, {
             key,
-            visible: true, // Always visible, let the delay handle the timing
+            ...visibleProp,
             ...delayProp,
           });
         })}
@@ -59,7 +78,7 @@ const StaggerOneWay: React.FC<StaggerOneWayProps> = ({
     direction,
     reversed,
     onMotionFinish,
-    mode: resolvedHideMode,
+    hideMode: hideMode,
   });
 
   return (
@@ -67,9 +86,9 @@ const StaggerOneWay: React.FC<StaggerOneWayProps> = ({
       {elements.map((child, idx) => {
         const key = child.key ?? idx;
 
-        if (resolvedHideMode === 'visibleProp') {
+        if (hideMode === 'visibleProp') {
           return React.cloneElement(child, { key, visible: itemsVisibility[idx] });
-        } else if (resolvedHideMode === 'visibilityStyle') {
+        } else if (hideMode === 'visibilityStyle') {
           const style = {
             ...child.props.style,
             visibility: itemsVisibility[idx] ? 'visible' : 'hidden',
@@ -84,35 +103,43 @@ const StaggerOneWay: React.FC<StaggerOneWayProps> = ({
   );
 };
 
-const StaggerIn: React.FC<Omit<StaggerProps, 'visible'>> = props => (
-  <StaggerOneWay {...props} direction="enter" hideMode="unmount" />
-);
+// Shared helper for StaggerIn and StaggerOut
+const createStaggerDirection = (direction: 'enter' | 'exit') => {
+  const StaggerDirection: React.FC<Omit<StaggerProps, 'visible'>> = ({ hideMode, delayMode, children, ...props }) => {
+    // Auto-detect modes for better performance with motion components
+    const { hideMode: resolvedHideMode, delayMode: resolvedDelayMode } = detectStaggerModes(children, {
+      hideMode,
+      delayMode,
+      defaultHideMode: 'unmount', // One-way staggers default to unmount
+    });
 
-const StaggerOut: React.FC<Omit<StaggerProps, 'visible'>> = props => (
-  <StaggerOneWay {...props} direction="exit" hideMode="unmount" />
-);
+    return (
+      <StaggerOneWay
+        {...props}
+        children={children}
+        direction={direction}
+        hideMode={resolvedHideMode}
+        delayMode={resolvedDelayMode}
+      />
+    );
+  };
+
+  return StaggerDirection;
+};
+
+const StaggerIn = createStaggerDirection('enter');
+const StaggerOut = createStaggerDirection('exit');
 
 // Main Stagger component with auto-detection or explicit modes
 const StaggerMain: React.FC<StaggerProps> = props => {
   const { children, visible = false, hideMode, delayMode, ...rest } = props;
 
-  // Auto-detect hideMode if not specified
-  const resolvedHideMode: StaggerHideMode =
-    hideMode ??
-    (() => {
-      const elements = toElementArray(children);
-      const hasDelaySupport = elements.every(child => acceptsDelayProps(child));
-      const hasVisibleSupport = elements.every(child => acceptsVisibleProp(child));
-
-      // Prefer delayProp mode if all children support it (most performant)
-      if (hasDelaySupport && delayMode === 'delayProp') {
-        return 'visibleProp';
-      } else if (hasVisibleSupport) {
-        return 'visibleProp';
-      } else {
-        return 'visibilityStyle';
-      }
-    })();
+  // Auto-detect modes for bidirectional stagger
+  const { hideMode: resolvedHideMode, delayMode: resolvedDelayMode } = detectStaggerModes(children, {
+    hideMode,
+    delayMode,
+    defaultHideMode: 'visibilityStyle', // Bidirectional staggers default to visibilityStyle
+  });
 
   const direction = visible ? 'enter' : 'exit';
 
@@ -121,7 +148,7 @@ const StaggerMain: React.FC<StaggerProps> = props => {
       {...rest}
       children={children}
       hideMode={resolvedHideMode}
-      delayMode={delayMode}
+      delayMode={resolvedDelayMode}
       direction={direction}
     />
   );
@@ -138,49 +165,52 @@ const StaggerMain: React.FC<StaggerProps> = props => {
  * @param itemDuration - Milliseconds each item's animation lasts. Only used with `delayMode="timing"`. Defaults to 200ms.
  * @param reversed - Whether to reverse the stagger sequence (last item animates first). Defaults to `false`.
  * @param hideMode - How children's visibility/mounting is managed. Auto-detects if not specified.
- * @param delayMode - How staggering timing is implemented. Defaults to 'timing'.
+ * @param delayMode - How staggering timing is implemented. Auto-detects if not specified.
  * @param onMotionFinish - Callback invoked when the staggered animation sequence completes.
  *
- * **hideMode behavior:**
+ * **Auto-detection behavior:**
+ * - **hideMode**: Presence components use `'visibleProp'`, DOM elements use `'visibilityStyle'`
+ * - **delayMode**: Components with delay support use `'delayProp'` (most performant), others use `'timing'`
+ *
+ * **hideMode options:**
  * - `'visibleProp'`: Children are presence components with `visible` prop (always rendered, visibility controlled via prop)
  * - `'visibilityStyle'`: Children remain in DOM with inline style visibility: hidden/visible (preserves layout space)
  * - `'unmount'`: Children are mounted/unmounted from DOM based on visibility
  *
- * **delayMode behavior:**
- * - `'timing'`: Manages visibility over time using JavaScript timing (current behavior)
+ * **delayMode options:**
+ * - `'timing'`: Manages visibility over time using JavaScript timing
  * - `'delayProp'`: Passes delay props to motion components to use native Web Animations API delays (most performant)
  *
  * **Static variants:**
- * - `<Stagger.In>` - One-way stagger for entrance animations only (uses unmount hideMode)
- * - `<Stagger.Out>` - One-way stagger for exit animations only (uses unmount hideMode)
+ * - `<Stagger.In>` - One-way stagger for entrance animations only (auto-detects optimal modes)
+ * - `<Stagger.Out>` - One-way stagger for exit animations only (auto-detects optimal modes)
  *
  * @example
  * ```tsx
- * // Auto-detects hideMode, uses timing delayMode by default
+ * // Auto-detects optimal modes for presence components (delayProp + visibleProp)
  * <Stagger visible={isVisible} itemDelay={150}>
  *   <Scale><div>Item 1</div></Scale>
  *   <Fade><div>Item 2</div></Fade>
  *   <Rotate><div>Item 3</div></Rotate>
  * </Stagger>
  *
- * // Use delayProp mode for better performance with motion components
- * <Stagger visible={isVisible} delayMode="delayProp" itemDelay={100}>
- *   <Scale><div>Item 1</div></Scale>
- *   <Fade><div>Item 2</div></Fade>
- * </Stagger>
+ * // Auto-detects optimal modes for motion components (delayProp + unmount)
+ * <Stagger.In itemDelay={100}>
+ *   <Scale.In><div>Item 1</div></Scale.In>
+ *   <Fade.In><div>Item 2</div></Fade.In>
+ * </Stagger.In>
  *
- * // Auto-detects visibilityStyle hideMode for DOM elements
+ * // Auto-detects timing mode for DOM elements (timing + visibilityStyle)
  * <Stagger visible={isVisible} itemDelay={150} onMotionFinish={handleComplete}>
  *   <div>Item 1</div>
  *   <div>Item 2</div>
  *   <div>Item 3</div>
  * </Stagger>
  *
- * // Static variants for one-way animations
- * <Stagger.In itemDelay={100}>
- *   <div>Item 1</div>
- *   <div>Item 2</div>
- * </Stagger.In>
+ * // Override auto-detection when needed
+ * <Stagger visible={isVisible} delayMode="timing" hideMode="unmount">
+ *   <CustomComponent>Item 1</CustomComponent>
+ * </Stagger>
  * ```
  */
 export const Stagger = Object.assign(StaggerMain, {
