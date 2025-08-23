@@ -12,7 +12,7 @@ import * as React_2 from 'react';
 export const Blur: PresenceComponent<BlurParams>;
 
 // @public (undocumented)
-export type BlurParams = PresenceDuration & PresenceEasing & AnimateOpacity & {
+export type BlurParams = PresenceDuration & PresenceEasing & PresenceDelay & AnimateOpacity & {
     fromRadius?: string;
 };
 
@@ -41,7 +41,7 @@ export const FadeSnappy: PresenceComponent<FadeParams>;
 export const Rotate: PresenceComponent<RotateParams>;
 
 // @public (undocumented)
-export type RotateParams = PresenceDuration & PresenceEasing & AnimateOpacity & {
+export type RotateParams = PresenceDuration & PresenceEasing & PresenceDelay & AnimateOpacity & {
     axis?: Axis3D;
     angle?: number;
     exitAngle?: number;
@@ -67,16 +67,17 @@ export const SlideSnappy: PresenceComponent<SlideParams>;
 
 // @public
 export const Stagger: React_2.FC<StaggerProps> & {
-    In: React_2.FC<Omit<StaggerProps, "visible" | "mode">>;
-    Out: React_2.FC<Omit<StaggerProps, "visible" | "mode">>;
+    In: React_2.FC<Omit<StaggerProps, "visible">>;
+    Out: React_2.FC<Omit<StaggerProps, "visible">>;
 };
 
 // @public
 export interface StaggerProps {
     children: React_2.ReactNode;
+    delayMode?: StaggerDelayMode;
+    hideMode?: StaggerHideMode;
     itemDelay?: number;
     itemDuration?: number;
-    mode?: StaggerHideMode;
     onMotionFinish?: () => void;
     reversed?: boolean;
     visible?: PresenceComponentProps['visible'];

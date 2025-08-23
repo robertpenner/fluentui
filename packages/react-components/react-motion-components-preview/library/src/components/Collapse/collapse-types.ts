@@ -1,4 +1,4 @@
-import type { PresenceDuration, PresenceEasing, AnimateOpacity } from '../../types';
+import type { PresenceDuration, PresenceEasing, PresenceDelay, AnimateOpacity } from '../../types';
 
 export type CollapseOrientation = 'horizontal' | 'vertical';
 
@@ -12,7 +12,7 @@ type CollapseBaseParams = PresenceEasing &
     fromSize?: string;
   };
 
-export type CollapseParams = CollapseBaseParams & PresenceDuration;
+export type CollapseParams = CollapseBaseParams & PresenceDuration & PresenceDelay;
 
 export type CollapseDelayedParams = CollapseBaseParams & {
   /** Time (ms) for the size expand. Defaults to the `durationNormal` value (200 ms). */
