@@ -2,17 +2,23 @@ import { PresenceComponentProps, PresenceDirection } from '@fluentui/react-motio
 import * as React from 'react';
 
 /**
- * Defines how Stagger manages its children's visibility.
- * - 'visibleProp': Children are components with a `visible` prop and they show/hide themselves (e.g. Fade motion component)
- * - 'visibilityStyle': Children remain in DOM with inline style `visibility: hidden | visible` (preserves layout space)
+ * Defines how Stagger manages its children's visibility/mounting.
+ * - 'visibleProp': Children are components with a `visible` prop (e.g. motion components)
+ * - 'visibilityStyle': Children remain in DOM with inline style `visibility: hidden | visible`
  * - 'unmount': Children are mounted/unmounted from DOM based on visibility
  */
 export type StaggerHideMode = 'visibleProp' | 'visibilityStyle' | 'unmount';
 
 /**
+ * Defines how Stagger implements the timing of staggered animations.
+ * - 'timing': Manages visibility over time using JavaScript timing (current behavior)
+ * - 'delayProp': Passes delay props to motion components to use native Web Animations API delays
+ */
+export type StaggerDelayMode = 'timing' | 'delayProp';
+
+/**
  * Props for the Stagger component that manages staggered entrance and exit animations.
  */
-
 export interface StaggerProps {
   /** React elements to animate. Elements are cloned with animation props. */
   children: React.ReactNode;
@@ -21,16 +27,19 @@ export interface StaggerProps {
   visible?: PresenceComponentProps['visible'];
 
   /** Whether to reverse the stagger sequence (last item animates first). Defaults to `false`. */
-  reversed?: boolean; // run sequence backward (defaults to false)
+  reversed?: boolean;
 
   /** Milliseconds between each child's animation start. Defaults to 100ms. */
   itemDelay?: number;
 
-  /** Milliseconds each child's animation lasts. Defaults to 200ms. */
+  /** Milliseconds each child's animation lasts. Only used with `delayMode="timing"`. Defaults to 200ms. */
   itemDuration?: number;
 
-  /** How children's visibility is managed. If undefined, auto-detects based on children. */
-  mode?: StaggerHideMode;
+  /** How children's visibility/mounting is managed. Auto-detects if not specified. */
+  hideMode?: StaggerHideMode;
+
+  /** How staggering timing is implemented. Defaults to 'timing'. */
+  delayMode?: StaggerDelayMode;
 
   /** Callback invoked when the staggered animation sequence completes. */
   onMotionFinish?: () => void;

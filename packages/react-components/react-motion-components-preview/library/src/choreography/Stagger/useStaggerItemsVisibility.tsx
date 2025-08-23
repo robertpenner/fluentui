@@ -5,8 +5,10 @@ import { staggerItemsVisibilityAtTime, type StaggerItemsVisibilityAtTimeParams }
 import { DEFAULT_ITEM_DURATION } from './utils/constants';
 
 export interface UseStaggerItemsVisibilityParams
-  extends Pick<StaggerProps, 'onMotionFinish' | 'mode'>,
-    Omit<StaggerItemsVisibilityAtTimeParams, 'elapsed'> {}
+  extends Pick<StaggerProps, 'onMotionFinish'>,
+    Omit<StaggerItemsVisibilityAtTimeParams, 'elapsed'> {
+  mode: StaggerProps['hideMode'];
+}
 
 /**
  * Hook that tracks the visibility of a staggered sequence of items as time progresses.

@@ -15,6 +15,7 @@ jest.mock('./utils', () => ({
   DEFAULT_ITEM_DELAY: 100,
   DEFAULT_ITEM_DURATION: 200,
   acceptsVisibleProp: jest.requireActual('./utils').acceptsVisibleProp,
+  acceptsDelayProps: jest.requireActual('./utils').acceptsDelayProps,
 }));
 
 // Import after mocking
