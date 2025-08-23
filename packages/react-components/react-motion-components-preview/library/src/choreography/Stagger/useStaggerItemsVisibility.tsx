@@ -7,7 +7,7 @@ import { DEFAULT_ITEM_DURATION } from './utils/constants';
 export interface UseStaggerItemsVisibilityParams
   extends Pick<StaggerProps, 'onMotionFinish'>,
     Omit<StaggerItemsVisibilityAtTimeParams, 'elapsed'> {
-  mode: StaggerProps['hideMode'];
+  hideMode: StaggerProps['hideMode'];
 }
 
 /**
@@ -28,7 +28,7 @@ export interface UseStaggerItemsVisibilityParams
  * @param direction - 'enter' (show items) or 'exit' (hide items)
  * @param reversed - Whether to reverse the stagger order (last item first)
  * @param onMotionFinish - Callback fired when the full stagger sequence completes
- * @param mode - How children's visibility is managed: 'visibleProp', 'visibilityStyle', or 'unmount'
+ * @param hideMode - How children's visibility is managed: 'visibleProp', 'visibilityStyle', or 'unmount'
  *
  * @returns An `itemsVisibility` array of booleans indicating which items are currently visible
  */
@@ -39,7 +39,7 @@ export function useStaggerItemsVisibility({
   direction,
   reversed = false,
   onMotionFinish,
-  mode = 'visibleProp',
+  hideMode = 'visibleProp',
 }: UseStaggerItemsVisibilityParams): { itemsVisibility: boolean[] } {
   const [requestAnimationFrame, cancelAnimationFrame] = useAnimationFrame();
 
@@ -59,7 +59,7 @@ export function useStaggerItemsVisibility({
   const [itemsVisibility, setItemsVisibility] = React.useState<boolean[]>(() => {
     // For unmount mode, items should start hidden and appear by being added to the DOM
     // For visibleProp and visibilityStyle modes, items start in target state: visible for 'enter', hidden for 'exit'
-    if (mode === 'unmount') {
+    if (hideMode === 'unmount') {
       return Array(itemCount).fill(direction === 'exit');
     } else {
       return Array(itemCount).fill(direction === 'enter');
@@ -108,7 +108,7 @@ export function useStaggerItemsVisibility({
     // Unmount mode should always animate, visibleProp and visibilityStyle modes only animate after first render
     // - Stagger.In (enter + unmount): DOM elements get added and animate from hidden to visible
     // - Stagger.Out (exit + unmount): DOM elements start visible and animate out before removal
-    if ((mode === 'visibleProp' || mode === 'visibilityStyle') && isFirstRender.current) {
+    if ((hideMode === 'visibleProp' || hideMode === 'visibilityStyle') && isFirstRender.current) {
       isFirstRender.current = false;
       // Items are already in their final state from useState, no animation needed
       onMotionFinish?.();
@@ -122,7 +122,7 @@ export function useStaggerItemsVisibility({
 
     // For unmount mode, we start with the initial state and animate to the final state
     // For visibleProp and visibilityStyle mode animations after first render, we start from the opposite state
-    if (mode === 'unmount') {
+    if (hideMode === 'unmount') {
       // Unmount mode: already initialized correctly, start animation
     } else {
       // VisibleProp and visibilityStyle modes: start from the opposite of the final state
@@ -178,7 +178,7 @@ export function useStaggerItemsVisibility({
     onMotionFinish,
     requestAnimationFrame,
     cancelAnimationFrame,
-    mode,
+    hideMode,
   ]);
 
   return { itemsVisibility };
