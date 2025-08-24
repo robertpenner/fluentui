@@ -3,6 +3,7 @@ import { BaseAtomParams } from '../types';
 
 interface FadeAtomParams extends BaseAtomParams {
   fromOpacity?: number;
+  fill?: 'none' | 'forwards' | 'backwards' | 'both';
 }
 
 /**
@@ -10,7 +11,9 @@ interface FadeAtomParams extends BaseAtomParams {
  * @param direction - The functional direction of the motion: 'enter' or 'exit'.
  * @param duration - The duration of the motion in milliseconds.
  * @param easing - The easing curve for the motion. Defaults to `motionTokens.curveLinear`.
- * @param fromValue - The starting opacity value. Defaults to 0.
+ * @param delay - Time (ms) to delay the animation. Defaults to 0.
+ * @param fromOpacity - The starting opacity value. Defaults to 0.
+ * @param fill - Defines how values are applied before and after execution. Defaults to 'both'.
  * @returns A motion atom object with opacity keyframes and the supplied duration and easing.
  */
 export const fadeAtom = ({
@@ -19,6 +22,7 @@ export const fadeAtom = ({
   easing = motionTokens.curveLinear,
   delay = 0,
   fromOpacity = 0,
+  fill = 'both',
 }: FadeAtomParams): AtomMotion => {
   const keyframes = [{ opacity: fromOpacity }, { opacity: 1 }];
   if (direction === 'exit') {
@@ -29,5 +33,6 @@ export const fadeAtom = ({
     duration,
     easing,
     delay,
+    fill,
   };
 };
