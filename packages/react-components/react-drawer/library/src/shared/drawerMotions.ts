@@ -1,4 +1,4 @@
-import { createPresenceComponent, motionTokens } from '@fluentui/react-motion';
+import { createPresenceComponent, motionTokens, PresenceMotionFn } from '@fluentui/react-motion';
 import { tokens } from '@fluentui/react-theme';
 import { ProviderContextValue_unstable as FluentProviderContextValue } from '@fluentui/react-shared-contexts';
 
@@ -112,22 +112,37 @@ export const OverlayDrawerMotion = createPresenceComponent<DrawerMotionParams>((
 });
 
 /**
+ * Creates a fade motion for backdrop with the specified duration and linear easing.
+ * This is equivalent to using Fade from @fluentui/react-motion-components-preview
+ * but optimized for the backdrop use case with curveLinear easing.
  * @internal
  */
-export const OverlaySurfaceBackdropMotion = createPresenceComponent(({ size }: OverlayDrawerSurfaceMotionParams) => {
-  const keyframes = [{ opacity: 0 }, { opacity: 1 }];
+export const createBackdropFadeMotion: PresenceMotionFn<OverlayDrawerSurfaceMotionParams> = ({ size }) => {
   const duration = durations[size];
 
-  return {
-    enter: {
+  // Create fade atoms similar to how Fade component works internally
+  const fadeAtom = (direction: 'enter' | 'exit') => {
+    const keyframes = [{ opacity: 0 }, { opacity: 1 }];
+    if (direction === 'exit') {
+      keyframes.reverse();
+    }
+    return {
       keyframes,
-      easing: motionTokens.curveLinear,
       duration,
-    },
-    exit: {
-      keyframes: [...keyframes].reverse(),
       easing: motionTokens.curveLinear,
-      duration,
-    },
+      // Applying opacity backwards and forwards in time is important
+      // to avoid a bug where a delayed animation is not hidden when it should be.
+      fill: 'both' as FillMode,
+    };
   };
-});
+
+  return {
+    enter: fadeAtom('enter'),
+    exit: fadeAtom('exit'),
+  };
+};
+
+/**
+ * @internal
+ */
+export const OverlaySurfaceBackdropMotion = createPresenceComponent(createBackdropFadeMotion);
