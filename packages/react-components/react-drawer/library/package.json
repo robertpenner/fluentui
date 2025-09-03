@@ -23,6 +23,7 @@
     "@fluentui/react-dialog": "^9.15.0",
     "@fluentui/react-jsx-runtime": "^9.1.6",
     "@fluentui/react-motion": "^9.10.3",
+    "@fluentui/react-motion-components-preview": "*",
     "@fluentui/react-portal": "^9.8.1",
     "@fluentui/react-shared-contexts": "^9.25.0",
     "@fluentui/react-tabster": "^9.26.4",

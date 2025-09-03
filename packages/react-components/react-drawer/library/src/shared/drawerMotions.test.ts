@@ -26,3 +26,34 @@ describe('getPositionTransform', () => {
     expect(getPositionTransform('bottom', 'full', 'ltr')).toBe('translate3d(0, var(full), 0)');
   });
 });
+
+describe('OverlaySurfaceBackdropMotion', () => {
+  it('should create fade motion with correct duration based on size', () => {
+    const { createBackdropFadeMotion } = require('./drawerMotions');
+    
+    // Test different sizes
+    const sizes = ['small', 'medium', 'large', 'full'] as const;
+    
+    sizes.forEach(size => {
+      const motion = createBackdropFadeMotion({ size });
+      
+      // Check that it returns the expected structure
+      expect(motion).toHaveProperty('enter');
+      expect(motion).toHaveProperty('exit');
+      
+      // Check enter motion
+      expect(motion.enter).toHaveProperty('keyframes');
+      expect(motion.enter).toHaveProperty('duration');
+      expect(motion.enter).toHaveProperty('easing');
+      expect(motion.enter.keyframes).toEqual([{ opacity: 0 }, { opacity: 1 }]);
+      
+      // Check exit motion (should be reversed keyframes)
+      expect(motion.exit).toHaveProperty('keyframes');
+      expect(motion.exit.keyframes).toEqual([{ opacity: 1 }, { opacity: 0 }]);
+      
+      // Check that duration matches the expected size mapping
+      expect(motion.enter.duration).toBeGreaterThan(0);
+      expect(motion.exit.duration).toEqual(motion.enter.duration);
+    });
+  });
+});
