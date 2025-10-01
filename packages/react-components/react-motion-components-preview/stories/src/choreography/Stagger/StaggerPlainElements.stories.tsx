@@ -43,7 +43,7 @@ const useClasses = makeStyles({
 
 export const PlainElements = (): JSXElement => {
   const classes = useClasses();
-  const [visible, setVisible] = React.useState<boolean>(false);
+  const [visible, setVisible] = React.useState<boolean>(true);
 
   return (
     <div className={classes.container}>

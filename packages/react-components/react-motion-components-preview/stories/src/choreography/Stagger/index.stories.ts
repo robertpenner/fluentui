@@ -2,10 +2,10 @@ import { Stagger } from '@fluentui/react-motion-components-preview';
 import StaggerDescription from './StaggerDescription.md';
 
 // Basic examples - show simple features first
-export { Default } from './StaggerDefault.stories';
+export { Presence } from './StaggerPresence.stories';
+export { PlainElements } from './StaggerPlainElements.stories';
 export { Reversed } from './StaggerReversed.stories';
 export { ItemDelay } from './StaggerItemDelay.stories';
-export { PlainElements } from './StaggerPlainElements.stories';
 export { OneWayIn } from './StaggerOneWayIn.stories';
 export { Text } from './StaggerText.stories';
 

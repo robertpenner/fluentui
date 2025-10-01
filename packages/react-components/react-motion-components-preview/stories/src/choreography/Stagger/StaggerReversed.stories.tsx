@@ -43,7 +43,7 @@ const useClasses = makeStyles({
 
 export const Reversed = (): JSXElement => {
   const classes = useClasses();
-  const [visible, setVisible] = React.useState<boolean>(false);
+  const [visible, setVisible] = React.useState<boolean>(true);
 
   return (
     <div className={classes.container}>
@@ -60,7 +60,12 @@ export const Reversed = (): JSXElement => {
           {/* Create a list of items, each wrapped with a presence transition */}
           {Array.from({ length: 8 }, (_, i) => (
             <Slide key={`stagger-item-${i}`}>
-              <div className={classes.item}>{i + 1}</div>
+              {/* Outer div protects the inner div from Slide's opacity animation */}
+              <div>
+                <div className={classes.item} style={{ opacity: 1 - 0.1 * i }}>
+                  {i + 1}
+                </div>
+              </div>
             </Slide>
           ))}
         </Stagger>

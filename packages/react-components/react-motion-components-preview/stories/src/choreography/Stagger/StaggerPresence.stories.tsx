@@ -1,5 +1,5 @@
 import * as React from 'react';
-import StaggerDefaultDescription from './StaggerDefault.stories.md';
+import StaggerPresenceDescription from './StaggerPresence.stories.md';
 import { Field, makeStyles, tokens, Button, JSXElement } from '@fluentui/react-components';
 import { Stagger, Slide } from '@fluentui/react-motion-components-preview';
 
@@ -41,9 +41,9 @@ const useClasses = makeStyles({
   },
 });
 
-export const Default = (): JSXElement => {
+export const Presence = (): JSXElement => {
   const classes = useClasses();
-  const [visible, setVisible] = React.useState<boolean>(false);
+  const [visible, setVisible] = React.useState<boolean>(true);
 
   return (
     <div className={classes.container}>
@@ -60,7 +60,12 @@ export const Default = (): JSXElement => {
           {/* Create a list of items, each wrapped with a presence transition */}
           {Array.from({ length: 8 }, (_, i) => (
             <Slide key={`stagger-item-${i}`}>
-              <div className={classes.item}>{i + 1}</div>
+              {/* Outer div protects the inner div from Slide's opacity animation */}
+              <div>
+                <div className={classes.item} style={{ opacity: 1 - 0.1 * i }}>
+                  {i + 1}
+                </div>
+              </div>
             </Slide>
           ))}
         </Stagger>
@@ -69,10 +74,10 @@ export const Default = (): JSXElement => {
   );
 };
 
-Default.parameters = {
+Presence.parameters = {
   docs: {
     description: {
-      story: StaggerDefaultDescription,
+      story: StaggerPresenceDescription,
     },
   },
 };
