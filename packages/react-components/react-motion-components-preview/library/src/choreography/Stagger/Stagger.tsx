@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import { useStaggerItemsVisibility } from './useStaggerItemsVisibility';
 import {

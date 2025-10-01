@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import { useAnimationFrame } from '@fluentui/react-utilities';
 import type { StaggerProps } from './stagger-types';
