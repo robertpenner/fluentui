@@ -20,7 +20,7 @@ export type BlurParams = BasePresenceParams & AnimateOpacity & {
 export const Collapse: PresenceComponent<CollapseParams>;
 
 // @public
-export const CollapseDelayed: PresenceComponent<CollapseDelayedParams>;
+export const CollapseDelayed: PresenceComponent<CollapseParams>;
 
 // @public
 export type CollapseDelayedParams = Omit<CollapseParams, 'duration' | 'exitDuration'> & {
@@ -34,6 +34,8 @@ export type CollapseDelayedParams = Omit<CollapseParams, 'duration' | 'exitDurat
 export type CollapseParams = BasePresenceParams & AnimateOpacity & {
     orientation?: CollapseOrientation;
     fromSize?: string;
+    opacityDelay?: number;
+    exitOpacityDelay?: number;
 };
 
 // @public (undocumented)
