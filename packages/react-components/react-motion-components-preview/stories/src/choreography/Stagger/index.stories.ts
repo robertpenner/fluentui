@@ -1,16 +1,23 @@
 import { Stagger } from '@fluentui/react-motion-components-preview';
 import StaggerDescription from './StaggerDescription.md';
 
+// Basic examples - show simple features first
 export { Default } from './StaggerDefault.stories';
 export { Reversed } from './StaggerReversed.stories';
-export { Text } from './StaggerText.stories';
 export { ItemDelay } from './StaggerItemDelay.stories';
 export { PlainElements } from './StaggerPlainElements.stories';
-export { ModeComparison } from './StaggerModeComparison.stories';
 export { OneWayIn } from './StaggerOneWayIn.stories';
+export { Text } from './StaggerText.stories';
+
+// Real-world examples
 export { ExpandableContainer } from './StaggerExpandableContainer.stories';
-export { StaggerSpinners } from './StaggerSpinners.stories';
 export { BouncingDots } from './StaggerBouncingDots.stories';
+export { StaggerSpinners } from './StaggerSpinners.stories';
+
+// Advanced configuration - power user features at the end
+export { HideMode } from './StaggerHideMode.stories';
+export { DelayMode } from './StaggerDelayMode.stories';
+export { ModeComparison } from './StaggerModeComparison.stories';
 
 export default {
   title: 'Motion/Choreography (preview)/Stagger',

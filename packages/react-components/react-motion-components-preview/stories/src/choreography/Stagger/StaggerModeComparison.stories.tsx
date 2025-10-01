@@ -1,7 +1,19 @@
 import * as React from 'react';
 import StaggerModeComparisonDescription from './StaggerModeComparison.stories.md';
-import { makeStyles, tokens, Button, Avatar, Checkbox, motionTokens, JSXElement } from '@fluentui/react-components';
+import {
+  makeStyles,
+  tokens,
+  Button,
+  Avatar,
+  Dropdown,
+  Option,
+  motionTokens,
+  JSXElement,
+} from '@fluentui/react-components';
 import { Scale, Stagger } from '@fluentui/react-motion-components-preview';
+
+type StaggerHideMode = 'visibleProp' | 'visibilityStyle' | 'unmount';
+type StaggerDelayMode = 'timing' | 'delayProp';
 
 const avatarData = [
   { initials: 'DR', color: 'dark-red', name: 'darkRed avatar' },
@@ -10,24 +22,6 @@ const avatarData = [
   { initials: 'PU', color: 'pumpkin', name: 'pumpkin avatar' },
   { initials: 'PE', color: 'peach', name: 'peach avatar' },
   { initials: 'MA', color: 'marigold', name: 'marigold avatar' },
-  { initials: 'GO', color: 'gold', name: 'gold avatar' },
-  { initials: 'BS', color: 'brass', name: 'brass avatar' },
-  { initials: 'BR', color: 'brown', name: 'brown avatar' },
-  { initials: 'FO', color: 'forest', name: 'forest avatar' },
-  { initials: 'SE', color: 'seafoam', name: 'seafoam avatar' },
-  { initials: 'DG', color: 'dark-green', name: 'darkGreen avatar' },
-  { initials: 'LT', color: 'light-teal', name: 'lightTeal avatar' },
-  { initials: 'TE', color: 'teal', name: 'teal avatar' },
-  { initials: 'ST', color: 'steel', name: 'steel avatar' },
-  { initials: 'BL', color: 'blue', name: 'blue avatar' },
-  { initials: 'RB', color: 'royal-blue', name: 'royalBlue avatar' },
-  { initials: 'CO', color: 'cornflower', name: 'cornflower avatar' },
-  { initials: 'NA', color: 'navy', name: 'navy avatar' },
-  { initials: 'LA', color: 'lavender', name: 'lavender avatar' },
-  { initials: 'PU', color: 'purple', name: 'purple avatar' },
-  { initials: 'GR', color: 'grape', name: 'grape avatar' },
-  { initials: 'LI', color: 'lilac', name: 'lilac avatar' },
-  { initials: 'PI', color: 'pink', name: 'pink avatar' },
 ] as const;
 
 const renderAvatars = () => {
@@ -64,11 +58,11 @@ const useClasses = makeStyles({
     padding: tokens.spacingVerticalM,
     border: `${tokens.strokeWidthThin} solid ${tokens.colorNeutralStroke2}`,
     borderRadius: tokens.borderRadiusSmall,
+    backgroundColor: tokens.colorNeutralBackground2,
+    flexWrap: 'wrap',
   },
-  comparison: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: tokens.spacingHorizontalXL,
+  dropdown: {
+    minWidth: '160px',
   },
   section: {
     display: 'flex',
@@ -76,25 +70,73 @@ const useClasses = makeStyles({
     gap: tokens.spacingVerticalM,
   },
   sectionTitle: {
-    fontSize: tokens.fontSizeBase300,
+    fontSize: tokens.fontSizeBase400,
     fontWeight: tokens.fontWeightSemibold,
     color: tokens.colorNeutralForeground1,
+    marginBottom: tokens.spacingVerticalS,
   },
   items: {
     display: 'flex',
     flexWrap: 'wrap',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: tokens.spacingHorizontalS,
-    padding: tokens.spacingVerticalM,
+    padding: tokens.spacingVerticalL,
     border: `${tokens.strokeWidthThin} dashed ${tokens.colorNeutralStroke2}`,
     borderRadius: tokens.borderRadiusSmall,
-    minHeight: '120px',
+    minHeight: '100px',
+    position: 'relative',
+  },
+  modeInfo: {
+    display: 'flex',
+    gap: tokens.spacingHorizontalS,
+    alignItems: 'center',
+    marginBottom: tokens.spacingVerticalS,
+  },
+  badge: {
+    fontSize: tokens.fontSizeBase100,
+    fontWeight: tokens.fontWeightMedium,
+    padding: `${tokens.spacingVerticalXXS} ${tokens.spacingHorizontalXS}`,
+    borderRadius: tokens.borderRadiusSmall,
+  },
+  hideModeBadge: {
+    color: tokens.colorBrandForeground1,
+    backgroundColor: tokens.colorBrandBackground2,
+  },
+  delayModeBadge: {
+    color: tokens.colorPalettePurpleForeground2,
+    backgroundColor: tokens.colorPalettePurpleBackground2,
+  },
+  performanceBadge: {
+    color: tokens.colorPaletteGreenForeground1,
+    backgroundColor: tokens.colorPaletteGreenBackground2,
+  },
+  warningBadge: {
+    color: tokens.colorPaletteYellowForeground1,
+    backgroundColor: tokens.colorPaletteYellowBackground2,
   },
   description: {
     fontSize: tokens.fontSizeBase200,
     color: tokens.colorNeutralForeground3,
   },
 });
+
+const getPerformanceRating = (hideMode: StaggerHideMode, delayMode: StaggerDelayMode) => {
+  if (delayMode === 'delayProp') return 'Best Performance';
+  if (hideMode === 'visibilityStyle' && delayMode === 'timing') return 'Good Performance';
+  return 'Standard Performance';
+};
+
+const getDescription = (hideMode: StaggerHideMode, delayMode: StaggerDelayMode) => {
+  const combinations = {
+    'visibleProp-delayProp': 'Optimal for presence components - native timing, component animations',
+    'visibleProp-timing': 'Presence components with JavaScript timing control',
+    'visibilityStyle-delayProp': 'Layout preservation with native timing (bypasses component animations)',
+    'visibilityStyle-timing': 'Standard DOM elements with stable layout',
+    'unmount-delayProp': 'Optimal for one-way animations - native timing, layout reflow',
+    'unmount-timing': 'One-way animations with JavaScript timing control',
+  };
+  return combinations[`${hideMode}-${delayMode}` as keyof typeof combinations] || 'Custom combination';
+};
 
 // Overshoots the end point, then settles back to it.
 const curveOvershootFirmOut =
@@ -103,8 +145,16 @@ const curveOvershootFirmOut =
 export const ModeComparison = (): JSXElement => {
   const classes = useClasses();
   const [visible, setVisible] = React.useState(false);
-  const [reversed, setReversed] = React.useState(false);
+  const [hideMode, setHideMode] = React.useState<StaggerHideMode>('visibleProp');
+  const [delayMode, setDelayMode] = React.useState<StaggerDelayMode>('delayProp');
   const itemDelay = 100;
+
+  const performanceRating = getPerformanceRating(hideMode, delayMode);
+  const description = getDescription(hideMode, delayMode);
+
+  // Choose appropriate content based on selected modes
+  const content =
+    hideMode === 'visibleProp' || delayMode === 'delayProp' ? renderAvatarsWithTransition() : renderAvatars();
 
   return (
     <div className={classes.container}>
@@ -112,36 +162,57 @@ export const ModeComparison = (): JSXElement => {
         <Button onClick={() => setVisible(!visible)} appearance="primary">
           {visible ? 'Hide' : 'Show'} Avatars
         </Button>
-        <Checkbox checked={reversed} onChange={(_, data) => setReversed(data.checked === true)} label="Reversed" />
+
+        <Dropdown
+          className={classes.dropdown}
+          placeholder="Hide Mode"
+          value={hideMode}
+          onOptionSelect={(_, data) => setHideMode(data.optionValue as StaggerHideMode)}
+        >
+          <Option value="visibleProp">visibleProp</Option>
+          <Option value="visibilityStyle">visibilityStyle</Option>
+          <Option value="unmount">unmount</Option>
+        </Dropdown>
+
+        <Dropdown
+          className={classes.dropdown}
+          placeholder="Delay Mode"
+          value={delayMode}
+          onOptionSelect={(_, data) => setDelayMode(data.optionValue as StaggerDelayMode)}
+        >
+          <Option value="delayProp">delayProp</Option>
+          <Option value="timing">timing</Option>
+        </Dropdown>
       </div>
 
-      <div className={classes.comparison}>
-        <div className={classes.section}>
-          <div className={classes.sectionTitle}>visibleProp mode</div>
-          <div className={classes.items}>
-            <Stagger visible={visible} hideMode="visibleProp" itemDelay={itemDelay} reversed={reversed}>
-              {renderAvatarsWithTransition()}
-            </Stagger>
+      <div className={classes.section}>
+        <div className={classes.sectionTitle}>
+          Current Configuration: {hideMode} + {delayMode}
+        </div>
+
+        <div className={classes.modeInfo}>
+          <div className={`${classes.badge} ${classes.hideModeBadge}`}>hideMode: {hideMode}</div>
+          <div className={`${classes.badge} ${classes.delayModeBadge}`}>delayMode: {delayMode}</div>
+          <div
+            className={`${classes.badge} ${
+              performanceRating === 'Best Performance'
+                ? classes.performanceBadge
+                : performanceRating === 'Good Performance'
+                ? classes.warningBadge
+                : classes.warningBadge
+            }`}
+          >
+            {performanceRating}
           </div>
         </div>
 
-        <div className={classes.section}>
-          <div className={classes.sectionTitle}>visibilityStyle mode</div>
-          <div className={classes.items}>
-            <Stagger visible={visible} hideMode="visibilityStyle" itemDelay={itemDelay} reversed={reversed}>
-              {renderAvatars()}
-            </Stagger>
-          </div>
+        <div className={classes.items}>
+          <Stagger visible={visible} hideMode={hideMode} delayMode={delayMode} itemDelay={itemDelay}>
+            {content}
+          </Stagger>
         </div>
 
-        <div className={classes.section}>
-          <div className={classes.sectionTitle}>unmount mode</div>
-          <div className={classes.items}>
-            <Stagger visible={visible} hideMode="unmount" itemDelay={itemDelay} reversed={reversed}>
-              {renderAvatars()}
-            </Stagger>
-          </div>
-        </div>
+        <div className={classes.description}>{description}</div>
       </div>
     </div>
   );
