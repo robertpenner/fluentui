@@ -102,7 +102,7 @@ export const ExpandableContainer = () => {
   const [expanded, setExpanded] = React.useState(false);
   const [staggerVisible, setStaggerVisible] = React.useState(false);
   const [totalItems, setTotalItems] = React.useState(8);
-  // const [isDraggingSlider, setIsDraggingSlider] = React.useState(false); // Commented out to test Option C fix
+  const [isDraggingSlider, setIsDraggingSlider] = React.useState(false); // Commented out to test Option C fix
 
   const itemData = React.useMemo(
     () =>
@@ -121,6 +121,8 @@ export const ExpandableContainer = () => {
     if (!expanded) {
       // "See more": First expand container via Collapse, then show items via Stagger
       setExpanded(true);
+      // TODO: in Collapse, rename delay/exitDelay to opacityDelay/exitOpacityDelay,
+      // and make delay/exitDelay apply to the start (i.e. delay the Collapse as a whole, when size expands first)
       setTimeout(() => {
         setStaggerVisible(true);
       }, COLLAPSE_EXPAND_DELAY); // Wait for Collapse expansion to start
@@ -148,11 +150,10 @@ export const ExpandableContainer = () => {
           step={1}
           value={totalItems}
           onChange={(_, data) => setTotalItems(data.value)}
-          // Commented out dragging detection to test Option C fix
-          // onMouseDown={() => setIsDraggingSlider(true)}
-          // onMouseUp={() => setIsDraggingSlider(false)}
-          // onTouchStart={() => setIsDraggingSlider(true)}
-          // onTouchEnd={() => setIsDraggingSlider(false)}
+          onMouseDown={() => setIsDraggingSlider(true)}
+          onMouseUp={() => setIsDraggingSlider(false)}
+          onTouchStart={() => setIsDraggingSlider(true)}
+          onTouchEnd={() => setIsDraggingSlider(false)}
         />
       </div>
 
@@ -188,8 +189,7 @@ export const ExpandableContainer = () => {
             {/* Items that animate via Stagger */}
             <Stagger
               visible={staggerVisible}
-              itemDelay={STAGGER_ITEM_DELAY} // Using normal delay to test Option C fix
-              // itemDelay={isDraggingSlider ? 0 : STAGGER_ITEM_DELAY} // Commented out dragging logic
+              itemDelay={isDraggingSlider ? 0 : STAGGER_ITEM_DELAY}
               reversed={!staggerVisible}
             >
               {staggerItems.map(item => (
