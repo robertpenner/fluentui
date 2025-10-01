@@ -2,6 +2,10 @@ import * as React from 'react';
 import StaggerExpandableContainerDescription from './StaggerExpandableContainer.stories.md';
 import { makeStyles, tokens, Button, motionTokens, Persona, Slider, Label } from '@fluentui/react-components';
 import { Stagger, Slide, Collapse } from '@fluentui/react-motion-components-preview';
+// Timing constants for coordinated Collapse + Stagger choreography:
+// - COLLAPSE_EXPAND_DELAY: Time to wait for container expansion before stagger items appear
+// - STAGGER_EXIT_DELAY: Time to wait for stagger items to exit before container collapses
+// - STAGGER_ITEM_DELAY: Time between each staggered item animation
 const VISIBLE_ITEMS_COUNT = 3;
 const COLLAPSE_EXPAND_DELAY = 200;
 const STAGGER_EXIT_DELAY = 250;
@@ -119,20 +123,17 @@ export const ExpandableContainer = () => {
 
   const handleToggle = () => {
     if (!expanded) {
-      // "See more": First expand container via Collapse, then show items via Stagger
+      // "See more": Expand container via Collapse, with delayed stagger items
+      // The Collapse container will expand immediately, then after COLLAPSE_EXPAND_DELAY (200ms),
+      // the Stagger items will animate in with staggered timing
       setExpanded(true);
-      // TODO: in Collapse, rename delay/exitDelay to opacityDelay/exitOpacityDelay,
-      // and make delay/exitDelay apply to the start (i.e. delay the Collapse as a whole, when size expands first)
-      setTimeout(() => {
-        setStaggerVisible(true);
-      }, COLLAPSE_EXPAND_DELAY); // Wait for Collapse expansion to start
+      setStaggerVisible(true);
     } else {
-      // "See less": First hide extra items via Stagger (reversed), then contract container via Collapse
+      // "See less": Hide extra items via Stagger (reversed), then contract container via Collapse
+      // The Stagger items will animate out immediately, then after STAGGER_EXIT_DELAY (250ms),
+      // the Collapse container will contract
       setStaggerVisible(false);
-      setTimeout(() => {
-        setExpanded(false);
-        // Don't set staggerVisible to true here since we want them hidden when collapsed
-      }, STAGGER_EXIT_DELAY); // Wait for Stagger exit animation
+      setExpanded(false);
     }
   };
 
@@ -157,12 +158,18 @@ export const ExpandableContainer = () => {
         />
       </div>
 
+      {/*
+        Collapse handles the container size animation with coordinated timing:
+        - On expand: size increases immediately, no opacity animation (animateOpacity={false})
+        - On collapse: waits STAGGER_EXIT_DELAY (250ms) for stagger items to exit, then contracts
+      */}
       <Collapse
         visible={expanded}
         duration={COLLAPSE_DURATION}
         easing={motionTokens.curveEasyEase}
         fromSize={COLLAPSED_HEIGHT}
         animateOpacity={false}
+        exitDelay={STAGGER_EXIT_DELAY}
       >
         <div className={classes.listContainer}>
           <div className={classes.list}>
@@ -186,14 +193,19 @@ export const ExpandableContainer = () => {
               </div>
             ))}
 
-            {/* Items that animate via Stagger */}
+            {/*
+              Stagger manages the choreographed animation of additional items:
+              - Each Slide has delay={COLLAPSE_EXPAND_DELAY} to wait for container expansion
+              - Items stagger in/out with STAGGER_ITEM_DELAY (100ms) between each
+              - On exit, items animate out immediately (no delay on exit)
+            */}
             <Stagger
               visible={staggerVisible}
               itemDelay={isDraggingSlider ? 0 : STAGGER_ITEM_DELAY}
               reversed={!staggerVisible}
             >
               {staggerItems.map(item => (
-                <Slide key={item.id}>
+                <Slide key={item.id} delay={COLLAPSE_EXPAND_DELAY}>
                   <div className={classes.item}>
                     <Persona
                       name={item.name}
