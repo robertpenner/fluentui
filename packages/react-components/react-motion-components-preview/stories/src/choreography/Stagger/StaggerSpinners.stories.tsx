@@ -118,38 +118,41 @@ const useClasses = makeStyles({
 });
 
 // Motion components for continuous animations
-const SpinMotion = createMotionComponent<{ duration?: number; spins?: number }>(({ duration = 4000, spins = 2 }) => [
-  {
-    keyframes: [
-      { easing: motionTokens.curveEasyEase },
-      { offset: 0.2, rotate: `-60deg`, easing: motionTokens.curveEasyEase },
-      { offset: 0.9, rotate: `${360 * spins}deg` },
-      { rotate: `${360 * spins}deg` },
-    ],
-    duration,
-    iterations: Infinity,
-    // direction: 'alternate',
-    // composite: 'add',
-  },
-  // {
-  //   keyframes: [
-  //     { offset: 0.2, borderWidth: '4px', easing: motionTokens.curveEasyEase },
-  //     { offset: 0.55, borderWidth: '6px', easing: motionTokens.curveEasyEase },
-  //     { offset: 0.9, borderWidth: '4px' },
-  //   ],
-  //   duration,
-  //   iterations: Infinity,
-  // },
-  // {
-  //   keyframes: [
-  //     { offset: 0.2, scale: 1, easing: motionTokens.curveEasyEase },
-  //     { offset: 0.55, scale: 0.8, easing: motionTokens.curveEasyEase },
-  //     { offset: 0.9, scale: 1 },
-  //   ],
-  //   duration,
-  //   iterations: Infinity,
-  // },
-]);
+const SpinMotion = createMotionComponent<{ duration?: number; spins?: number; delay?: number }>(
+  ({ duration = 4000, spins = 2, delay = 0 }) => [
+    {
+      keyframes: [
+        { easing: motionTokens.curveEasyEase },
+        { offset: 0.2, rotate: `-60deg`, easing: motionTokens.curveEasyEase },
+        { offset: 0.9, rotate: `${360 * spins}deg` },
+        { rotate: `${360 * spins}deg` },
+      ],
+      duration,
+      delay,
+      iterations: Infinity,
+      // direction: 'alternate',
+      // composite: 'add',
+    },
+    // {
+    //   keyframes: [
+    //     { offset: 0.2, borderWidth: '4px', easing: motionTokens.curveEasyEase },
+    //     { offset: 0.55, borderWidth: '6px', easing: motionTokens.curveEasyEase },
+    //     { offset: 0.9, borderWidth: '4px' },
+    //   ],
+    //   duration,
+    //   iterations: Infinity,
+    // },
+    // {
+    //   keyframes: [
+    //     { offset: 0.2, scale: 1, easing: motionTokens.curveEasyEase },
+    //     { offset: 0.55, scale: 0.8, easing: motionTokens.curveEasyEase },
+    //     { offset: 0.9, scale: 1 },
+    //   ],
+    //   duration,
+    //   iterations: Infinity,
+    // },
+  ],
+);
 
 const ScaleMotion = createMotionComponent({
   keyframes: [{ transform: 'scaleY(0.3)' }, { transform: 'scaleY(1)' }, { transform: 'scaleY(0.3)' }],
@@ -213,14 +216,14 @@ export const StaggerSpinners = () => {
         <h3 className={classes.spinnerTitle}>Nested Arcs Spinner</h3>
         <div className={classes.spinnerContainer}>
           <div className={classes.arcSpinner}>
-            <Stagger.In delayMode="timing" itemDelay={60}>
-              <SpinMotion>
+            <Stagger.In itemDelay={80}>
+              <SpinMotion key="1">
                 <div className={`${classes.arc} ${classes.arc3}`} />
               </SpinMotion>
-              <SpinMotion>
+              <SpinMotion key="2">
                 <div className={`${classes.arc} ${classes.arc2}`} />
               </SpinMotion>
-              <SpinMotion>
+              <SpinMotion key="3">
                 <div className={`${classes.arc} ${classes.arc1}`} />
               </SpinMotion>
             </Stagger.In>
