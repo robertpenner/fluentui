@@ -33,7 +33,7 @@ export function isMotionComponent(element: React.ReactElement): boolean {
 }
 
 /**
- * Checks if a React element is a presence motion component by looking for the MOTION_DEFINITION symbol.
+ * Checks if a React element is a presence motion component by looking for the PRESENCE_MOTION_DEFINITION symbol.
  * This symbol is added internally by createPresenceComponent and provides reliable detection.
  *
  * **Presence components** (like Fade, Scale, Slide) are guaranteed to support both `visible` and `delay` props.
@@ -45,9 +45,9 @@ export function isPresenceComponent(element: React.ReactElement): boolean {
     return false;
   }
 
-  // Check if the component has the MOTION_DEFINITION symbol (internal to createPresenceComponent)
+  // Check if the component has the PRESENCE_MOTION_DEFINITION symbol (internal to createPresenceComponent)
   const symbols = Object.getOwnPropertySymbols(element.type);
-  return symbols.some(sym => sym.description === 'MOTION_DEFINITION');
+  return symbols.some(sym => sym.description === 'PRESENCE_MOTION_DEFINITION');
 }
 
 /**
