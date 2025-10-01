@@ -121,8 +121,12 @@ const useClasses = makeStyles({
 });
 
 const getPerformanceRating = (hideMode: StaggerHideMode, delayMode: StaggerDelayMode) => {
-  if (delayMode === 'delayProp') return 'Best Performance';
-  if (hideMode === 'visibilityStyle' && delayMode === 'timing') return 'Good Performance';
+  if (delayMode === 'delayProp') {
+    return 'Best Performance';
+  }
+  if (hideMode === 'visibilityStyle' && delayMode === 'timing') {
+    return 'Good Performance';
+  }
   return 'Standard Performance';
 };
 
