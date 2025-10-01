@@ -1,6 +1,6 @@
 import * as React from 'react';
 import StaggerModeComparisonDescription from './StaggerModeComparison.stories.md';
-import { makeStyles, tokens, Button, Avatar, Checkbox, motionTokens } from '@fluentui/react-components';
+import { makeStyles, tokens, Button, Avatar, Checkbox, motionTokens, JSXElement } from '@fluentui/react-components';
 import { Scale, Stagger } from '@fluentui/react-motion-components-preview';
 
 const avatarData = [
@@ -100,7 +100,7 @@ const useClasses = makeStyles({
 const curveOvershootFirmOut =
   'linear(0, 0.453 7.8%, 0.803 16.1%, 1.048 24.9%, 1.132 29.5%, 1.194 34.4%, 1.227 38.4%, 1.245 42.5%, 1.25 46.9%, 1.242 51.7%, 1.2 60.5%, 1.038 84.9%, 1.009 92.5%, 1)';
 
-export const ModeComparison = () => {
+export const ModeComparison = (): JSXElement => {
   const classes = useClasses();
   const [visible, setVisible] = React.useState(false);
   const [reversed, setReversed] = React.useState(false);

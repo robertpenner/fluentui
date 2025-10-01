@@ -1,6 +1,6 @@
 import * as React from 'react';
 import StaggerSpinnersDescription from './StaggerSpinners.stories.md';
-import { makeStyles, tokens, motionTokens, createMotionComponent } from '@fluentui/react-components';
+import { makeStyles, tokens, motionTokens, createMotionComponent, JSXElement } from '@fluentui/react-components';
 import { Stagger } from '@fluentui/react-motion-components-preview';
 
 const useClasses = makeStyles({
@@ -206,7 +206,7 @@ const OrbitMotion = createMotionComponent(({ element }) => {
   };
 });
 
-export const StaggerSpinners = () => {
+export const StaggerSpinners = (): JSXElement => {
   const classes = useClasses();
 
   return (

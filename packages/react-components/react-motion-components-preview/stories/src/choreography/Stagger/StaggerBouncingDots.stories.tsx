@@ -1,6 +1,14 @@
 import * as React from 'react';
 import StaggerBouncingDotsDescription from './StaggerBouncingDots.stories.md';
-import { makeStyles, tokens, motionTokens, createMotionComponent, Slider, Label } from '@fluentui/react-components';
+import {
+  makeStyles,
+  tokens,
+  motionTokens,
+  createMotionComponent,
+  Slider,
+  Label,
+  JSXElement,
+} from '@fluentui/react-components';
 import { Stagger } from '@fluentui/react-motion-components-preview';
 
 const useClasses = makeStyles({
@@ -85,7 +93,7 @@ const BounceMotion = createMotionComponent<{ delay?: number; duration?: number }
   iterations: Infinity,
 }));
 
-export const BouncingDots = () => {
+export const BouncingDots = (): JSXElement => {
   const classes = useClasses();
   const [animationKey, setAnimationKey] = React.useState<number>(0);
 

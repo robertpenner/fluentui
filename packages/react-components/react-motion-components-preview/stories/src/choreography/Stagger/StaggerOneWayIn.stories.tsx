@@ -10,6 +10,7 @@ import {
   makeStyles,
   motionTokens,
   tokens,
+  JSXElement,
 } from '@fluentui/react-components';
 import { Stagger, CollapseRelaxed } from '@fluentui/react-motion-components-preview';
 import { MoreHorizontal20Regular } from '@fluentui/react-icons';
@@ -79,7 +80,7 @@ const users = [
   },
 ];
 
-export const OneWayIn = () => {
+export const OneWayIn = (): JSXElement => {
   const classes = useClasses();
   const [animationKey, setAnimationKey] = React.useState<number>(0);
 

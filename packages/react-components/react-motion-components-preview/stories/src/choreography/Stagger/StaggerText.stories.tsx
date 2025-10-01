@@ -1,7 +1,7 @@
 import * as React from 'react';
 import StaggerTextDescription from './StaggerText.stories.md';
-import { Field, makeStyles, tokens, Button, createPresenceComponent, motionTokens } from '@fluentui/react-components';
-import { Stagger, Slide, Scale } from '@fluentui/react-motion-components-preview';
+import { Field, makeStyles, tokens, Button, motionTokens, JSXElement } from '@fluentui/react-components';
+import { Stagger, Scale } from '@fluentui/react-motion-components-preview';
 
 const useClasses = makeStyles({
   container: {
@@ -63,7 +63,7 @@ const useClasses = makeStyles({
 
 // const ZoomTransition = createPresenceComponent({})
 
-export const Text = () => {
+export const Text = (): JSXElement => {
   const classes = useClasses();
   const [visible, setVisible] = React.useState<boolean>(!false);
   const fromScale = visible ? 3 : 0;

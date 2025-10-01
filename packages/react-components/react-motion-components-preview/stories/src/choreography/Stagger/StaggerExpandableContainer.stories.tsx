@@ -1,6 +1,15 @@
 import * as React from 'react';
 import StaggerExpandableContainerDescription from './StaggerExpandableContainer.stories.md';
-import { makeStyles, tokens, Button, motionTokens, Persona, Slider, Label } from '@fluentui/react-components';
+import {
+  makeStyles,
+  tokens,
+  Button,
+  motionTokens,
+  Persona,
+  Slider,
+  Label,
+  JSXElement,
+} from '@fluentui/react-components';
 import { Stagger, Slide, Collapse } from '@fluentui/react-motion-components-preview';
 // Timing constants for coordinated Collapse + Stagger choreography:
 // - COLLAPSE_EXPAND_DELAY: Time to wait for container expansion before stagger items appear
@@ -101,7 +110,7 @@ const useClasses = makeStyles({
   },
 });
 
-export const ExpandableContainer = () => {
+export const ExpandableContainer = (): JSXElement => {
   const classes = useClasses();
   const [expanded, setExpanded] = React.useState(false);
   const [staggerVisible, setStaggerVisible] = React.useState(false);

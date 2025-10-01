@@ -1,6 +1,6 @@
 import * as React from 'react';
 import StaggerPlainElementsDescription from './StaggerPlainElements.stories.md';
-import { Field, makeStyles, tokens, Button } from '@fluentui/react-components';
+import { Field, makeStyles, tokens, Button, JSXElement } from '@fluentui/react-components';
 import { Stagger } from '@fluentui/react-motion-components-preview';
 
 const useClasses = makeStyles({
@@ -41,7 +41,7 @@ const useClasses = makeStyles({
   },
 });
 
-export const PlainElements = () => {
+export const PlainElements = (): JSXElement => {
   const classes = useClasses();
   const [visible, setVisible] = React.useState<boolean>(false);
 
