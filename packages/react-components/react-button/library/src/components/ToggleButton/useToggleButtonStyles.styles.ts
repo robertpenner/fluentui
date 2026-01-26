@@ -14,6 +14,14 @@ export const toggleButtonClassNames: SlotClassNames<ButtonSlots> = {
   icon: 'fui-ToggleButton__icon',
 };
 
+const useRootAppearanceStyles = makeStyles({
+  // Appearance variations that apply regardless of checked state
+  outline: {
+    // Add padding to transition properties so it animates smoothly with border changes
+    transitionProperty: 'background, border, color, padding',
+  },
+});
+
 const useRootCheckedStyles = makeStyles({
   // Base styles
   base: {
@@ -75,6 +83,15 @@ const useRootCheckedStyles = makeStyles({
     backgroundColor: tokens.colorTransparentBackgroundSelected,
     ...shorthands.borderColor(tokens.colorNeutralStroke1),
     ...shorthands.borderWidth(tokens.strokeWidthThicker),
+    // Reduce padding by 2px to compensate for the 2px border increase (from 1px to 3px)
+    // This keeps the overall button size constant when toggled
+    paddingTop: 'calc(5px - 2px)',
+    paddingRight: 'calc(12px - 2px)',
+    paddingBottom: 'calc(5px - 2px)',
+    paddingLeft: 'calc(12px - 2px)',
+    // Explicitly set transition properties to ensure padding transitions match border
+    transitionDuration: tokens.durationFaster,
+    transitionTimingFunction: tokens.curveEasyEase,
 
     ':hover': {
       backgroundColor: tokens.colorTransparentBackgroundHover,
@@ -252,6 +269,7 @@ const usePrimaryHighContrastStyles = makeStyles({
 export const useToggleButtonStyles_unstable = (state: ToggleButtonState): ToggleButtonState => {
   'use no memo';
 
+  const rootAppearanceStyles = useRootAppearanceStyles();
   const rootCheckedStyles = useRootCheckedStyles();
   const rootDisabledStyles = useRootDisabledStyles();
   const iconCheckedStyles = useIconCheckedStyles();
@@ -261,6 +279,9 @@ export const useToggleButtonStyles_unstable = (state: ToggleButtonState): Toggle
 
   state.root.className = mergeClasses(
     toggleButtonClassNames.root,
+
+    // Appearance base styles (applies to both checked and unchecked)
+    appearance && rootAppearanceStyles[appearance],
 
     // Primary high contrast styles
     appearance === 'primary' && primaryHighContrastStyles.base,
