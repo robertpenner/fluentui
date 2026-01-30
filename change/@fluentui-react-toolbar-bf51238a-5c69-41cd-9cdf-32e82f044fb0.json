@@ -1,7 +1,0 @@
-{
-  "type": "patch",
-  "comment": "fix: ToolbarRadioButton should respect \"size\" prop",
-  "packageName": "@fluentui/react-toolbar",
-  "email": "olfedias@microsoft.com",
-  "dependentChangeType": "patch"
-}
