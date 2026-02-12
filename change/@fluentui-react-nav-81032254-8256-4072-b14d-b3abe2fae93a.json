@@ -1,7 +1,0 @@
-{
-  "type": "patch",
-  "comment": "fix: update NavSubItemGroup motion handling and fix styles",
-  "packageName": "@fluentui/react-nav",
-  "email": "dmytrokirpa@microsoft.com",
-  "dependentChangeType": "patch"
-}
