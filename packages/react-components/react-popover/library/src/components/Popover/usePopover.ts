@@ -8,7 +8,6 @@ import {
   useOnScrollOutside,
   elementContains,
   useTimeout,
-  isHTMLElement,
 } from '@fluentui/react-utilities';
 import { useFluent_unstable as useFluent } from '@fluentui/react-shared-contexts';
 import {
@@ -16,7 +15,6 @@ import {
   resolvePositioningShorthand,
   mergeArrowOffset,
   usePositioningMouseTarget,
-  PositioningProps,
 } from '@fluentui/react-positioning';
 import { useFocusFinders, useActivateModal } from '@fluentui/react-tabster';
 import { arrowHeights } from '../PopoverSurface/index';
@@ -29,7 +27,7 @@ import type {
 } from './Popover.types';
 import { popoverSurfaceBorderRadius } from './constants';
 import { createPresenceComponent, presenceMotionSlot, motionTokens } from '@fluentui/react-motion';
-import { fadeAtom, scaleAtom, slideAtom } from '@fluentui/react-motion-components-preview';
+import { fadeAtom, slideAtom } from '@fluentui/react-motion-components-preview';
 
 /**
  * Returns the slide animation distances for a given Floating UI placement and main axis distance.
@@ -54,27 +52,30 @@ function getPlacementSlideDistances(placement: string, mainAxis: number): { x: n
   return { x, y };
 }
 
-const slideDistanceVarX = '--fui-positioning-slide-distance-x';
-const slideDistanceVarY = '--fui-positioning-slide-distance-y';
 const duration = motionTokens.durationSlower;
 const easing = motionTokens.curveDecelerateMid;
 
-const PopoverSurfaceMotion = createPresenceComponent<{ mainAxis: number }>(({ mainAxis = 50 }) => ({
-  enter: [
-    fadeAtom({ duration, easing, direction: 'enter' }),
-    {
-      ...slideAtom({
-        duration,
-        easing,
-        direction: 'enter',
-        outX: `var(${slideDistanceVarX}, 0)`,
-        outY: `var(${slideDistanceVarY}, 0)`,
-      }),
-      composite: 'accumulate',
-    },
-  ],
-  exit: [],
-}));
+const PopoverSurfaceMotion = createPresenceComponent<{ mainAxis: number }>(({ element, mainAxis = 10 }) => {
+  const placement = element.getAttribute('data-popper-placement') ?? 'top';
+  const { x, y } = getPlacementSlideDistances(placement, mainAxis);
+
+  return {
+    enter: [
+      fadeAtom({ duration, easing, direction: 'enter' }),
+      {
+        ...slideAtom({
+          duration,
+          easing,
+          direction: 'enter',
+          outX: `${x}px`,
+          outY: `${y}px`,
+        }),
+        composite: 'accumulate',
+      },
+    ],
+    exit: [],
+  };
+});
 
 /**
  * Create the state required to render Popover.
@@ -89,64 +90,14 @@ export const usePopover_unstable = (props: PopoverProps): PopoverState => {
   const positioning = resolvePositioningShorthand(props.positioning);
   const withArrow = props.withArrow && !positioning.coverTarget;
 
-  const { targetDocument } = useFluent();
-  const targetWindow = targetDocument?.defaultView;
-
-  const handlePositionEnd: NonNullable<PositioningProps['onPositioningEnd']> = useEventCallback(e => {
-    console.log('onPositioningEnd', e);
-    positioning.onPositioningEnd?.(e);
-
-    const mainAxis = 10;
-
-    const element = e.target;
-    const placement = e.detail.placement;
-
-    if (!isHTMLElement(element)) {
-      return;
-    }
-
-    const { x, y } = getPlacementSlideDistances(placement, mainAxis);
-
-    element.style.setProperty(slideDistanceVarX, `${x}px`);
-    element.style.setProperty(slideDistanceVarY, `${y}px`);
-  });
-
   const state = usePopoverBase_unstable({
     ...props,
     positioning: {
       ...positioning,
-      onPositioningEnd: handlePositionEnd,
       // Update the offset with the arrow size only when it's available
       ...(withArrow ? { offset: mergeArrowOffset(positioning.offset, arrowHeights[size]) } : {}),
     },
   });
-
-  React.useEffect(() => {
-    if (state.open) {
-      const registerProperty =
-        targetWindow?.CSS?.registerProperty ??
-        (() => {
-          // No-op if registerProperty is not supported
-        });
-
-      try {
-        registerProperty({
-          name: slideDistanceVarX,
-          syntax: '<length>',
-          inherits: false,
-          initialValue: '0px',
-        });
-        registerProperty({
-          name: slideDistanceVarY,
-          syntax: '<length>',
-          inherits: false,
-          initialValue: '0px',
-        });
-      } catch (e) {
-        // Ignore errors from registerProperty, which can occur if the properties are already registered
-      }
-    }
-  }, [state.open, targetWindow]);
 
   return {
     appearance,
