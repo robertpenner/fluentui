@@ -8,6 +8,7 @@ import {
   useOnScrollOutside,
   elementContains,
   useTimeout,
+  isHTMLElement,
 } from '@fluentui/react-utilities';
 import { useFluent_unstable as useFluent } from '@fluentui/react-shared-contexts';
 import {
@@ -15,6 +16,7 @@ import {
   resolvePositioningShorthand,
   mergeArrowOffset,
   usePositioningMouseTarget,
+  PositioningProps,
 } from '@fluentui/react-positioning';
 import { useFocusFinders, useActivateModal } from '@fluentui/react-tabster';
 import { arrowHeights } from '../PopoverSurface/index';
@@ -26,6 +28,31 @@ import type {
   PopoverState,
 } from './Popover.types';
 import { popoverSurfaceBorderRadius } from './constants';
+import { createPresenceComponent, presenceMotionSlot, motionTokens } from '@fluentui/react-motion';
+
+const slideDistanceVarX = '--fui-positioning-slide-distance-x';
+const slideDistanceVarY = '--fui-positioning-slide-distance-y';
+
+const PopoverSurfaceMotion = createPresenceComponent<{ mainAxis: number }>(({ mainAxis = 50 }) => ({
+  enter: [
+    {
+      keyframes: [{ opacity: 0 }, { opacity: 1 }],
+      duration: motionTokens.durationSlower,
+      easing: motionTokens.curveDecelerateMid,
+      composite: 'replace',
+    },
+    {
+      keyframes: [
+        { transform: `translate3d(var(${slideDistanceVarX}), var(${slideDistanceVarY}), 0)` },
+        { transform: 'translate3d(0, 0, 0)' },
+      ],
+      duration: motionTokens.durationSlower,
+      easing: motionTokens.curveDecelerateMid,
+      composite: 'accumulate',
+    },
+  ],
+  exit: [],
+}));
 
 /**
  * Create the state required to render Popover.
@@ -40,19 +67,96 @@ export const usePopover_unstable = (props: PopoverProps): PopoverState => {
   const positioning = resolvePositioningShorthand(props.positioning);
   const withArrow = props.withArrow && !positioning.coverTarget;
 
+  const { targetDocument } = useFluent();
+  const targetWindow = targetDocument?.defaultView;
+
+  const handlePositionEnd: NonNullable<PositioningProps['onPositioningEnd']> = useEventCallback(e => {
+    console.log('onPositioningEnd', e);
+    positioning.onPositioningEnd?.(e);
+
+    const mainAxis = 10;
+
+    const element = e.target;
+    const placement = e.detail.placement;
+
+    if (!isHTMLElement(element)) {
+      return;
+    }
+
+    let slideDistanceX = 0;
+    let slideDistanceY = mainAxis;
+
+    const firstChars = placement.slice(0, 3);
+
+    switch (firstChars) {
+      case 'rig':
+        slideDistanceX = -mainAxis;
+        slideDistanceY = 0;
+        break;
+
+      case 'bot':
+        slideDistanceX = 0;
+        slideDistanceY = -mainAxis;
+        break;
+
+      case 'lef':
+        slideDistanceX = mainAxis;
+        slideDistanceY = 0;
+        break;
+    }
+
+    element.style.setProperty(slideDistanceVarX, `${slideDistanceX}px`);
+    element.style.setProperty(slideDistanceVarY, `${slideDistanceY}px`);
+  });
   const state = usePopoverBase_unstable({
     ...props,
     positioning: {
       ...positioning,
+      onPositioningEnd: handlePositionEnd,
       // Update the offset with the arrow size only when it's available
       ...(withArrow ? { offset: mergeArrowOffset(positioning.offset, arrowHeights[size]) } : {}),
     },
   });
 
+  React.useEffect(() => {
+    if (state.open) {
+      const registerProperty =
+        targetWindow?.CSS?.registerProperty ??
+        (() => {
+          // No-op if registerProperty is not supported
+        });
+
+      try {
+        registerProperty({
+          name: slideDistanceVarX,
+          syntax: '<length>',
+          inherits: false,
+          initialValue: '0px',
+        });
+        registerProperty({
+          name: slideDistanceVarY,
+          syntax: '<length>',
+          inherits: false,
+          initialValue: '0px',
+        });
+      } catch (e) {
+        // Ignore errors from registerProperty, which can occur if the properties are already registered
+      }
+    }
+  }, [state.open, targetWindow]);
+
   return {
     appearance,
     size,
     ...state,
+    surfaceMotion: presenceMotionSlot(props.surfaceMotion, {
+      elementType: PopoverSurfaceMotion,
+      defaultProps: {
+        visible: state.open,
+        appear: true,
+        unmountOnExit: true,
+      },
+    }),
   };
 };
 

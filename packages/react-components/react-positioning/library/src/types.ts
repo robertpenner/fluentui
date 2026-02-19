@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { OnPositioningEndEvent } from './createPositionManager';
 
 export type PositioningRect = {
   width: number;
@@ -201,7 +202,7 @@ export interface PositioningOptions {
    *
    * It's also possible to listen to the custom DOM event `fui-positioningend`
    */
-  onPositioningEnd?: () => void;
+  onPositioningEnd?: (e: OnPositioningEndEvent) => void;
 
   /**
    * Disables the resize observer that updates position on target or dimension change

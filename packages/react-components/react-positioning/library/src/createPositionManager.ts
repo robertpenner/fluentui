@@ -44,6 +44,11 @@ interface PositionManagerOptions {
   disableUpdateOnResize?: boolean;
 }
 
+export type OnPositioningEndEventDetail = {
+  placement: Placement;
+}
+export type OnPositioningEndEvent = CustomEvent<OnPositioningEndEventDetail>;
+
 /**
  * @internal
  * @returns manager that handles positioning out of the react lifecycle
@@ -135,7 +140,13 @@ export function createPositionManager(options: PositionManagerOptions): Position
           useTransform,
         });
 
-        container.dispatchEvent(new CustomEvent(POSITIONING_END_EVENT));
+        container.dispatchEvent(
+          new CustomEvent<OnPositioningEndEventDetail>(POSITIONING_END_EVENT, {
+            detail: {
+              placement: computedPlacement,
+            },
+          }),
+        );
       })
       .catch(err => {
         // https://github.com/floating-ui/floating-ui/issues/1845
