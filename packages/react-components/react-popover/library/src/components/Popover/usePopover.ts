@@ -29,25 +29,47 @@ import type {
 } from './Popover.types';
 import { popoverSurfaceBorderRadius } from './constants';
 import { createPresenceComponent, presenceMotionSlot, motionTokens } from '@fluentui/react-motion';
+import { fadeAtom, scaleAtom, slideAtom } from '@fluentui/react-motion-components-preview';
+
+/**
+ * Returns the slide animation distances for a given Floating UI placement and main axis distance.
+ * The element slides in from the direction it is positioned relative to the target.
+ */
+function getPlacementSlideDistances(placement: string, mainAxis: number): { x: number; y: number } {
+  const side = placement.split('-')[0];
+  let x = 0;
+  let y = mainAxis;
+
+  if (side === 'right') {
+    x = -mainAxis;
+    y = 0;
+  } else if (side === 'bottom') {
+    x = 0;
+    y = -mainAxis;
+  } else if (side === 'left') {
+    x = mainAxis;
+    y = 0;
+  }
+
+  return { x, y };
+}
 
 const slideDistanceVarX = '--fui-positioning-slide-distance-x';
 const slideDistanceVarY = '--fui-positioning-slide-distance-y';
+const duration = motionTokens.durationSlower;
+const easing = motionTokens.curveDecelerateMid;
 
 const PopoverSurfaceMotion = createPresenceComponent<{ mainAxis: number }>(({ mainAxis = 50 }) => ({
   enter: [
+    fadeAtom({ duration, easing, direction: 'enter' }),
     {
-      keyframes: [{ opacity: 0 }, { opacity: 1 }],
-      duration: motionTokens.durationSlower,
-      easing: motionTokens.curveDecelerateMid,
-      composite: 'replace',
-    },
-    {
-      keyframes: [
-        { transform: `translate3d(var(${slideDistanceVarX}), var(${slideDistanceVarY}), 0)` },
-        { transform: 'translate3d(0, 0, 0)' },
-      ],
-      duration: motionTokens.durationSlower,
-      easing: motionTokens.curveDecelerateMid,
+      ...slideAtom({
+        duration,
+        easing,
+        direction: 'enter',
+        outX: `var(${slideDistanceVarX}, 0)`,
+        outY: `var(${slideDistanceVarY}, 0)`,
+      }),
       composite: 'accumulate',
     },
   ],
@@ -83,31 +105,12 @@ export const usePopover_unstable = (props: PopoverProps): PopoverState => {
       return;
     }
 
-    let slideDistanceX = 0;
-    let slideDistanceY = mainAxis;
+    const { x, y } = getPlacementSlideDistances(placement, mainAxis);
 
-    const firstChars = placement.slice(0, 3);
-
-    switch (firstChars) {
-      case 'rig':
-        slideDistanceX = -mainAxis;
-        slideDistanceY = 0;
-        break;
-
-      case 'bot':
-        slideDistanceX = 0;
-        slideDistanceY = -mainAxis;
-        break;
-
-      case 'lef':
-        slideDistanceX = mainAxis;
-        slideDistanceY = 0;
-        break;
-    }
-
-    element.style.setProperty(slideDistanceVarX, `${slideDistanceX}px`);
-    element.style.setProperty(slideDistanceVarY, `${slideDistanceY}px`);
+    element.style.setProperty(slideDistanceVarX, `${x}px`);
+    element.style.setProperty(slideDistanceVarY, `${y}px`);
   });
+
   const state = usePopoverBase_unstable({
     ...props,
     positioning: {
