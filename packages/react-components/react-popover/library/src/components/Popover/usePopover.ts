@@ -15,6 +15,7 @@ import {
   resolvePositioningShorthand,
   mergeArrowOffset,
   usePositioningMouseTarget,
+  PositioningProps,
 } from '@fluentui/react-positioning';
 import { useFocusFinders, useActivateModal } from '@fluentui/react-tabster';
 import { arrowHeights } from '../PopoverSurface/index';
@@ -55,27 +56,28 @@ function getPlacementSlideDistances(placement: string, mainAxis: number): { x: n
 const duration = motionTokens.durationSlower;
 const easing = motionTokens.curveDecelerateMid;
 
-const PopoverSurfaceMotion = createPresenceComponent<{ mainAxis: number }>(({ element, mainAxis = 10 }) => {
-  const placement = element.getAttribute('data-popper-placement') ?? 'top';
-  const { x, y } = getPlacementSlideDistances(placement, mainAxis);
+const PopoverSurfaceMotion = createPresenceComponent<{ mainAxis: number; placement: string }>(
+  ({ mainAxis = 10, placement = 'top' }) => {
+    const { x, y } = getPlacementSlideDistances(placement, mainAxis);
 
-  return {
-    enter: [
-      fadeAtom({ duration, easing, direction: 'enter' }),
-      {
-        ...slideAtom({
-          duration,
-          easing,
-          direction: 'enter',
-          outX: `${x}px`,
-          outY: `${y}px`,
-        }),
-        composite: 'accumulate',
-      },
-    ],
-    exit: [],
-  };
-});
+    return {
+      enter: [
+        fadeAtom({ duration, easing, direction: 'enter' }),
+        {
+          ...slideAtom({
+            duration,
+            easing,
+            direction: 'enter',
+            outX: `${x}px`,
+            outY: `${y}px`,
+          }),
+          composite: 'accumulate',
+        },
+      ],
+      exit: [],
+    };
+  },
+);
 
 /**
  * Create the state required to render Popover.
@@ -90,10 +92,18 @@ export const usePopover_unstable = (props: PopoverProps): PopoverState => {
   const positioning = resolvePositioningShorthand(props.positioning);
   const withArrow = props.withArrow && !positioning.coverTarget;
 
+  const [placement, setPlacement] = React.useState('top');
+
+  const handlePositionEnd: NonNullable<PositioningProps['onPositioningEnd']> = useEventCallback(e => {
+    positioning.onPositioningEnd?.(e);
+    setPlacement(e.detail.placement);
+  });
+
   const state = usePopoverBase_unstable({
     ...props,
     positioning: {
       ...positioning,
+      onPositioningEnd: handlePositionEnd,
       // Update the offset with the arrow size only when it's available
       ...(withArrow ? { offset: mergeArrowOffset(positioning.offset, arrowHeights[size]) } : {}),
     },
@@ -109,6 +119,7 @@ export const usePopover_unstable = (props: PopoverProps): PopoverState => {
         visible: state.open,
         appear: true,
         unmountOnExit: true,
+        placement,
       },
     }),
   };
