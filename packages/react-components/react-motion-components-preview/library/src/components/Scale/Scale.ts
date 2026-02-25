@@ -69,27 +69,29 @@ export const ScaleRelaxed = createPresenceComponentVariant(Scale, {
   exitDuration: motionTokens.durationGentle,
 });
 
-// New variant specced by Jeremy Frye
-// Enter spec: https://app.motionspec.io/dev/Lw7ntnDrJVpZtKEGmuPT
-// Exit spec: https://app.motionspec.io/dev/ASC8HF9cAidojBEQz38w
-//
-// ENTER timeline (total: 300ms, each █/· = 10ms):
-//
-//        0ms  50   100  150  200  250  300ms
-//        ├────┼────┼────┼────┼────┼────┤
-// Scale  ██████████████████████████████  (0 → 300ms, curveDecelerateMin)
-// Fade   ·····██████████·················  (50 → 150ms, curveLinear)
-//             ↑         ↑
-//            50ms      150ms
-//
-// EXIT timeline (total: 300ms, each █/· = 10ms):
-//
-//        0ms  50   100  150  200  250  300ms
-//        ├────┼────┼────┼────┼────┼────┤
-// Scale  ██████████████████████████████  (0 → 300ms, curveDecelerateMin)
-// Fade   ····················██████████  (200 → 300ms, curveLinear)
-//                             ↑        ↑
-//                            200ms    300ms
+/*
+New variant specced by Jeremy Frye
+Enter spec: https://app.motionspec.io/dev/Lw7ntnDrJVpZtKEGmuPT
+Exit spec: https://app.motionspec.io/dev/ASC8HF9cAidojBEQz38w
+
+ENTER timeline
+
+       0ms  50   100  150  200  250  300ms
+       ├────┼────┼────┼────┼────┼────┤
+Scale  ██████████████████████████████  (0 → 300ms, curveDecelerateMin)
+Fade   ·····██████████···············  (50 → 150ms, curveLinear)
+            ↑         ↑
+           50ms      150ms
+
+EXIT timeline
+
+       0ms  50   100  150  200  250  300ms
+       ├────┼────┼────┼────┼────┼────┤
+Scale  ██████████████████████████████  (0 → 300ms, curveDecelerateMin)
+Fade   ····················██████████  (200 → 300ms, curveLinear)
+                           ↑         ↑
+                          200ms     300ms
+*/
 
 const scaleJeremyAtoms = {
   enter: [
