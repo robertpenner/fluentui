@@ -1,4 +1,13 @@
-import { Field, makeStyles, tokens, Switch, PresenceComponentProps } from '@fluentui/react-components';
+import {
+  Card,
+  CardHeader,
+  Field,
+  makeStyles,
+  tokens,
+  Switch,
+  Text,
+  PresenceComponentProps,
+} from '@fluentui/react-components';
 import { Collapse } from '@fluentui/react-motion-components-preview';
 import * as React from 'react';
 import type { JSXElement } from '@fluentui/react-components';
@@ -11,7 +20,11 @@ const useClasses = makeStyles({
   },
   card: {
     gridArea: 'card',
-    padding: '10px',
+    padding: '20px',
+  },
+  cardContent: {
+    maxHeight: '300px',
+    overflow: 'hidden',
   },
   controls: {
     display: 'flex',
@@ -49,9 +62,19 @@ export const Default = (props: PresenceComponentProps): JSXElement => {
       </div>
 
       <Collapse visible={visible}>
-        <div className={classes.card}>
-          <LoremIpsum />
-        </div>
+        <Card className={classes.card}>
+          <CardHeader
+            header={
+              <Text as="h3" style={{ margin: 0 }} weight="semibold">
+                Lorem Ipsum
+              </Text>
+            }
+          />
+          {/* Wrapper div needed because Collapse controls maxHeight on its child to animate height */}
+          <div className={classes.cardContent}>
+            <LoremIpsum />
+          </div>
+        </Card>
       </Collapse>
     </div>
   );
