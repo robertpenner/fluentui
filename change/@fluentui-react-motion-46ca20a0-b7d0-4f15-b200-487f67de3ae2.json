@@ -1,0 +1,7 @@
+{
+  "type": "patch",
+  "comment": "refactor: validate motion tokens with stricter types",
+  "packageName": "@fluentui/react-motion",
+  "email": "robertpenner@microsoft.com",
+  "dependentChangeType": "patch"
+}
