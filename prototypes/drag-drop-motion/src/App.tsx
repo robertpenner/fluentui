@@ -5,9 +5,9 @@ import { createMotionComponent } from '@fluentui/react-motion';
 // 10% scale increase while dragging
 const draggingScale = 1.1;
 
-// 3D tilt effect parameters
-const maxTilt = 15; // max rotation in degrees
-const tiltReference = 300; // drag distance (px) that produces max tilt
+// 2D rotation effect parameters
+const maxRotation = 6; // max rotation in degrees
+const rotationReference = 300; // horizontal drag distance (px) that produces max rotation
 const clampUnit = (v: number) => Math.min(Math.max(v, -1), 1);
 
 //// GRAB EASING
@@ -32,6 +32,10 @@ const curveCompressAnticipateExpandOvershoot3 = `linear(0.000, -0.01459 1%, -0.0
 // https://robertpenner.com/fuse/#head_type=power-back&tail_type=power-back&join=0.198&head_anticipation=0&head_exponent=2&tail_overshoot=10&tail_exponent=3&duration=500
 const curveOvershoot1 = `linear(0.000, 0.0009351 1%, 0.003740 2%, 0.008416 3%, 0.01496 4%, 0.02338 5%, 0.03366 6%, 0.04582 7%, 0.05985 8%, 0.07574 9%, 0.09351 10%, 0.1131 11%, 0.1347 12%, 0.1580 13%, 0.1833 14%, 0.2104 15%, 0.2394 16%, 0.2702 17%, 0.3030 18%, 0.3376 19%, 0.4102 21%, 0.4452 22%, 0.4790 23%, 0.5116 24%, 0.5430 25%, 0.5733 26%, 0.6024 27%, 0.6304 28%, 0.6573 29%, 0.6832 30%, 0.7079 31%, 0.7317 32%, 0.7761 34%, 0.8166 36%, 0.8534 38%, 0.8866 40%, 0.9163 42%, 0.9428 44%, 0.9661 46%, 0.9865 48%, 1.004 50%, 1.019 52%, 1.032 54%, 1.042 56%, 1.050 58%, 1.056 60%, 1.060 62%, 1.062 64%, 1.063 66%, 1.062 69%, 1.058 72%, 1.053 75%, 1.043 79%, 1.021 87%, 1.011 91%, 1.005 94%, 1.001 97%, 1.000)`;
 
+//// RELEASE-SLIDE-ROTATION EASING
+// https://robertpenner.com/fuse/#head_type=power-back&tail_type=power-back&join=0.498&head_anticipation=15&head_exponent=3.06&tail_overshoot=10&tail_exponent=3&duration=2000
+const curveOvershoot2 = `linear(0.000, -0.001307 2%, -0.005114 4%, -0.01101 6%, -0.02271 9%, -0.04965 15%, -0.05762 17%, -0.06412 19%, -0.06854 21%, -0.07030 23%, -0.06879 25%, -0.06661 26%, -0.06339 27%, -0.05905 28%, -0.05351 29%, -0.04669 30%, -0.03851 31%, -0.02890 32%, -0.01778 33%, -0.005074 34%, 0.009301 35%, 0.02542 36%, 0.04337 37%, 0.06321 38%, 0.08504 39%, 0.1089 40%, 0.1350 41%, 0.1632 42%, 0.1938 43%, 0.2267 44%, 0.2621 45%, 0.3000 46%, 0.3406 47%, 0.3838 48%, 0.4298 49%, 0.5265 51%, 0.5718 52%, 0.6145 53%, 0.6547 54%, 0.6925 55%, 0.7280 56%, 0.7612 57%, 0.7922 58%, 0.8211 59%, 0.8478 60%, 0.8726 61%, 0.8954 62%, 0.9164 63%, 0.9356 64%, 0.9530 65%, 0.9688 66%, 0.9829 67%, 0.9956 68%, 1.007 69%, 1.017 70%, 1.025 71%, 1.032 72%, 1.038 73%, 1.043 74%, 1.050 76%, 1.053 78%, 1.053 80%, 1.050 82%, 1.045 84%, 1.036 87%, 1.017 92%, 1.008 95%, 1.003 97%, 1.000 99%, 1.000)`;
+
 //// DROP-BOUNCE EASING
 
 // https://robertpenner.com/fuse/#head_type=power-back&tail_type=bounce&join=0.501&head_anticipation=0&head_exponent=2.05&bounces=4&decay=95&duration=1200
@@ -51,7 +55,7 @@ const GrabMotion = createMotionComponent(() => ({
  * DropMotion: a three-atom animation parameterised by the drag offset.
  *   Atom 1 — slide from (dragX, dragY) back to origin at a constant 110% scale
  *   Atom 2 — scale from 110% → 100%
- *   Atom 3 — 3D tilt proportional to drag offset, settling back to flat
+ *   Atom 3 — 2D rotation proportional to horizontal drag offset, settling back to 0°
  */
 const DropMotion = createMotionComponent<{ dragX: number; dragY: number }>(({ dragX, dragY }) => {
   const dragDistance = Math.sqrt(dragX * dragX + dragY * dragY);
@@ -59,18 +63,11 @@ const DropMotion = createMotionComponent<{ dragX: number; dragY: number }>(({ dr
   console.log('### slideDuration', slideDuration);
   const dropDurationOverlap = 300;
 
-  // 3D tilt: card leans into its direction of travel (back toward origin).
-  // Positive rotateX tilts top into screen; positive rotateY tilts right edge into screen.
-  // Card slides in direction opposite to (dragX, dragY), so:
-  //   dragY > 0 → slides up   → top into screen    → rotateX > 0
-  //   dragX < 0 → slides right → right edge into screen → rotateY > 0
-  const tiltX = clampUnit(dragY / tiltReference) * maxTilt;
-  const tiltY = clampUnit(-dragX / tiltReference) * maxTilt;
-
-  // Combine rotateX + rotateY into a single axis+angle for the CSS `rotate` property.
-  const tiltAngle = Math.hypot(tiltX, tiltY);
-  const ax = tiltAngle > 0 ? tiltX / tiltAngle : 1;
-  const ay = tiltAngle > 0 ? tiltY / tiltAngle : 0;
+  // 2D rotation proportional to horizontal drag offset.
+  // Card slides in the opposite direction to dragX, so:
+  //   dragX > 0 → card slides left → rotates clockwise (positive angle)
+  //   dragX < 0 → card slides right → rotates counter-clockwise (negative angle)
+  const rotation = -clampUnit(dragX / rotationReference) * maxRotation;
 
   return [
     {
@@ -93,9 +90,16 @@ const DropMotion = createMotionComponent<{ dragX: number; dragY: number }>(({ dr
       fill: 'forwards',
     },
     {
-      keyframes: [{ rotate: `${ax} ${ay} 0 ${tiltAngle}deg` }, { rotate: `${ax} ${ay} 0 0deg` }],
+      keyframes: [
+        { rotate: '0deg,', easing: 'ease-in-out' },
+        { rotate: `${rotation}deg`, easing: 'ease-in-out' },
+        ,
+        { rotate: `${-rotation / 2}deg`, easing: 'ease-in-out' },
+        { rotate: '0deg' },
+      ],
       duration: slideDuration,
-      easing: curveOvershoot1,
+      // easing: curveOvershoot2,
+      // easing: 'linear',
       fill: 'both',
     },
   ];
@@ -132,7 +136,6 @@ const useStyles = makeStyles({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    perspective: '800px',
     transition: `background-color 400ms ease-out, outline-color 400ms ease-out`,
   },
   gridCellCardHome: {
@@ -142,7 +145,6 @@ const useStyles = makeStyles({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    perspective: '800px',
   },
   gridCellCenter: {
     width: CARD_WIDTH,
@@ -154,7 +156,6 @@ const useStyles = makeStyles({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    perspective: '800px',
     transition: `background-color 200ms ease-out, outline-color 200ms ease-out`,
   },
   card: {
