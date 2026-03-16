@@ -59,9 +59,9 @@ const useStyles = makeStyles({
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: '100vh',
+    boxSizing: 'border-box',
     backgroundColor: tokens.colorNeutralBackground4,
-    padding: '40px',
-    gap: '24px',
+    padding: '10px',
   },
   grid: {
     display: 'grid',
