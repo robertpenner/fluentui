@@ -21,7 +21,8 @@ const curveGravity1 = `linear(0.000, 0.001355 2%, 0.005611 4%, 0.01288 6%, 0.023
  */
 const DropMotion = createMotionComponent<{ dragX: number; dragY: number }>(({ dragX, dragY }) => {
   const dragDistance = Math.sqrt(dragX * dragX + dragY * dragY);
-  const slideDuration = Math.max(dragDistance * 2, 500); // 2ms per pixel, with a minimum of 500ms;
+  const slideDuration = Math.max(dragDistance * 3, 400); // 3ms per pixel, with a minimum of 400ms;
+  console.log('### slideDuration', slideDuration);
   const dropDurationOverlap = 300;
   return [
     {
@@ -46,6 +47,11 @@ const DropMotion = createMotionComponent<{ dragX: number; dragY: number }>(({ dr
   ];
 });
 
+const CARD_WIDTH = '340px';
+const GRID_GAP = '20px';
+const GRID_COLUMNS = 3;
+const GRID_ROWS = 3;
+
 const useStyles = makeStyles({
   root: {
     display: 'flex',
@@ -57,13 +63,30 @@ const useStyles = makeStyles({
     padding: '40px',
     gap: '24px',
   },
+  grid: {
+    display: 'grid',
+    gridTemplateColumns: `repeat(${GRID_COLUMNS}, ${CARD_WIDTH})`,
+    gridAutoRows: '1fr',
+    gap: GRID_GAP,
+  },
+  gridCell: {
+    width: CARD_WIDTH,
+    borderRadius: tokens.borderRadiusMedium,
+    border: `1px dashed ${tokens.colorNeutralStroke2}`,
+    backgroundColor: tokens.colorNeutralBackground3,
+  },
+  gridCellCenter: {
+    width: CARD_WIDTH,
+    borderRadius: tokens.borderRadiusMedium,
+    backgroundColor: tokens.colorNeutralBackground6,
+  },
   card: {
-    width: '340px',
+    width: CARD_WIDTH,
     boxShadow: tokens.shadow2,
     userSelect: 'none',
   },
   cardDragging: {
-    width: '340px',
+    width: CARD_WIDTH,
     cursor: 'grabbing',
     boxShadow: tokens.shadow8,
     userSelect: 'none',
@@ -72,7 +95,7 @@ const useStyles = makeStyles({
     },
   },
   cardIdle: {
-    width: '340px',
+    width: CARD_WIDTH,
     cursor: 'grab',
     userSelect: 'none',
     ':active': {
@@ -204,22 +227,35 @@ export const App: React.FC = () => {
         }
       : undefined;
 
+  const cardCell =
+    drag.phase === 'dropping' ? (
+      <DropMotion key={drag.key} dragX={drag.x} dragY={drag.y} onMotionFinish={handleMotionFinish}>
+        <div>
+          <TaskCard className={styles.card} onMouseDown={handleMouseDown} />
+        </div>
+      </DropMotion>
+    ) : (
+      <div style={cardStyle}>
+        <TaskCard
+          className={drag.phase === 'dragging' ? styles.cardDragging : styles.cardIdle}
+          onMouseDown={handleMouseDown}
+        />
+      </div>
+    );
+
+  const cells = Array.from({ length: GRID_COLUMNS * GRID_ROWS }, (_, i) =>
+    i === Math.floor((GRID_COLUMNS * GRID_ROWS) / 2) ? (
+      <div key={i} className={styles.gridCellCenter}>
+        {cardCell}
+      </div>
+    ) : (
+      <div key={i} className={styles.gridCell} />
+    ),
+  );
+
   return (
     <div className={styles.root}>
-      {drag.phase === 'dropping' ? (
-        <DropMotion key={drag.key} dragX={drag.x} dragY={drag.y} onMotionFinish={handleMotionFinish}>
-          <div>
-            <TaskCard className={styles.card} onMouseDown={handleMouseDown} />
-          </div>
-        </DropMotion>
-      ) : (
-        <div style={cardStyle}>
-          <TaskCard
-            className={drag.phase === 'dragging' ? styles.cardDragging : styles.cardIdle}
-            onMouseDown={handleMouseDown}
-          />
-        </div>
-      )}
+      <div className={styles.grid}>{cells}</div>
     </div>
   );
 };
