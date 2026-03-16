@@ -1,4 +1,4 @@
-import { motionTokens } from '@fluentui/react-motion';
+import { motionTokens, type MotionImperativeRef } from '@fluentui/react-motion';
 import { Slide } from '@fluentui/react-motion-components-preview';
 import * as React from 'react';
 import { AnimationDirection } from '../Calendar';
@@ -9,6 +9,8 @@ export const DirectionalSlide: React.FC<{
   easing?: string;
   animationDirection?: AnimationDirection;
   animateBackwards?: boolean;
+  /** When provided, replays the slide animation when the value changes (without remounting). */
+  navigationKey?: string | number;
   children: JSXElement;
 }> = ({
   // Using durationSlower (400ms) as the closest token to the original 367ms
@@ -16,8 +18,19 @@ export const DirectionalSlide: React.FC<{
   easing = motionTokens.curveDecelerateMax,
   animationDirection = AnimationDirection.Vertical,
   animateBackwards = false,
+  navigationKey,
   children,
 }) => {
+  const imperativeRef = React.useRef<MotionImperativeRef>(undefined);
+  const prevKeyRef = React.useRef(navigationKey);
+
+  React.useEffect(() => {
+    if (navigationKey !== undefined && prevKeyRef.current !== navigationKey) {
+      prevKeyRef.current = navigationKey;
+      imperativeRef.current?.setPlayState('running');
+    }
+  }, [navigationKey]);
+
   let outX = '0px';
   let outY = '0px';
   const distance = animateBackwards ? '-20px' : '20px';
@@ -28,7 +41,7 @@ export const DirectionalSlide: React.FC<{
     outY = distance;
   }
   return (
-    <Slide.In duration={duration} easing={easing} outX={outX} outY={outY}>
+    <Slide.In imperativeRef={imperativeRef} duration={duration} easing={easing} outX={outX} outY={outY}>
       {children}
     </Slide.In>
   );
