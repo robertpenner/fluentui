@@ -67,11 +67,17 @@ const useStyles = makeStyles({
     cursor: 'grabbing',
     boxShadow: tokens.shadow8,
     userSelect: 'none',
+    ':active': {
+      backgroundColor: tokens.colorNeutralBackground1Hover,
+    },
   },
   cardIdle: {
     width: '340px',
     cursor: 'grab',
     userSelect: 'none',
+    ':active': {
+      backgroundColor: tokens.colorNeutralBackground1Hover,
+    },
   },
   badges: {
     display: 'flex',
