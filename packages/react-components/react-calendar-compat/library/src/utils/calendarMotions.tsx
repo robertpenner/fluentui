@@ -13,8 +13,7 @@ export const DirectionalSlide: React.FC<{
   navigationKey?: string | number;
   children: JSXElement;
 }> = ({
-  // Using durationSlower (400ms) as the closest token to the original 367ms
-  duration = motionTokens.durationSlower,
+  duration = motionTokens.durationSlower, // 400 ms
   easing = motionTokens.curveDecelerateMax,
   animationDirection = AnimationDirection.Vertical,
   animateBackwards = false,
