@@ -60,15 +60,18 @@ const useStyles = makeStyles({
   card: {
     width: '340px',
     boxShadow: tokens.shadow2,
+    userSelect: 'none',
   },
   cardDragging: {
     width: '340px',
     cursor: 'grabbing',
     boxShadow: tokens.shadow8,
+    userSelect: 'none',
   },
   cardIdle: {
     width: '340px',
     cursor: 'grab',
+    userSelect: 'none',
   },
   badges: {
     display: 'flex',
