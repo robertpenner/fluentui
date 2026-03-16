@@ -5,6 +5,11 @@ import { createMotionComponent } from '@fluentui/react-motion';
 // 10% scale increase while dragging
 const draggingScale = 1.1;
 
+// 3D tilt effect parameters
+const maxTilt = 15; // max rotation in degrees
+const tiltReference = 300; // drag distance (px) that produces max tilt
+const clampUnit = (v: number) => Math.min(Math.max(v, -1), 1);
+
 //// GRAB EASING
 
 // https://robertpenner.com/fuse/#head_type=power-back&tail_type=power-back&join=0.401&head_anticipation=15&head_exponent=2.02&tail_overshoot=0&tail_exponent=3&duration=700
@@ -43,15 +48,30 @@ const GrabMotion = createMotionComponent(() => ({
 }));
 
 /**
- * DropMotion: a two-phase animation parameterised by the drag offset.
- *   Phase 1 — slide from (dragX, dragY) back to origin at a constant 110% scale
- *   Phase 2 — scale from 110% → 100%
+ * DropMotion: a three-atom animation parameterised by the drag offset.
+ *   Atom 1 — slide from (dragX, dragY) back to origin at a constant 110% scale
+ *   Atom 2 — scale from 110% → 100%
+ *   Atom 3 — 3D tilt proportional to drag offset, settling back to flat
  */
 const DropMotion = createMotionComponent<{ dragX: number; dragY: number }>(({ dragX, dragY }) => {
   const dragDistance = Math.sqrt(dragX * dragX + dragY * dragY);
   const slideDuration = Math.max(dragDistance * 3, 400); // 3ms per pixel, with a minimum of 400ms;
   console.log('### slideDuration', slideDuration);
   const dropDurationOverlap = 300;
+
+  // 3D tilt: card leans into its direction of travel (back toward origin).
+  // Positive rotateX tilts top into screen; positive rotateY tilts right edge into screen.
+  // Card slides in direction opposite to (dragX, dragY), so:
+  //   dragY > 0 → slides up   → top into screen    → rotateX > 0
+  //   dragX < 0 → slides right → right edge into screen → rotateY > 0
+  const tiltX = clampUnit(dragY / tiltReference) * maxTilt;
+  const tiltY = clampUnit(-dragX / tiltReference) * maxTilt;
+
+  // Combine rotateX + rotateY into a single axis+angle for the CSS `rotate` property.
+  const tiltAngle = Math.hypot(tiltX, tiltY);
+  const ax = tiltAngle > 0 ? tiltX / tiltAngle : 1;
+  const ay = tiltAngle > 0 ? tiltY / tiltAngle : 0;
+
   return [
     {
       keyframes: [
@@ -71,6 +91,12 @@ const DropMotion = createMotionComponent<{ dragX: number; dragY: number }>(({ dr
       duration: 800,
       easing: curveGravityBounce1,
       fill: 'forwards',
+    },
+    {
+      keyframes: [{ rotate: `${ax} ${ay} 0 ${tiltAngle}deg` }, { rotate: `${ax} ${ay} 0 0deg` }],
+      duration: slideDuration,
+      easing: curveOvershoot1,
+      fill: 'both',
     },
   ];
 });
@@ -106,6 +132,7 @@ const useStyles = makeStyles({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    perspective: '800px',
     transition: `background-color 400ms ease-out, outline-color 400ms ease-out`,
   },
   gridCellCardHome: {
@@ -115,6 +142,7 @@ const useStyles = makeStyles({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    perspective: '800px',
   },
   gridCellCenter: {
     width: CARD_WIDTH,
@@ -126,6 +154,7 @@ const useStyles = makeStyles({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    perspective: '800px',
     transition: `background-color 200ms ease-out, outline-color 200ms ease-out`,
   },
   card: {
