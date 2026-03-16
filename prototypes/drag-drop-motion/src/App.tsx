@@ -49,7 +49,7 @@ const DropMotion = createMotionComponent<{ dragX: number; dragY: number }>(({ dr
 
 const CARD_WIDTH = '340px';
 const GRID_GAP = '20px';
-const GRID_COLUMNS = 3;
+const GRID_COLUMNS = 1;
 const GRID_ROWS = 3;
 
 const useStyles = makeStyles({
@@ -311,7 +311,7 @@ export const App: React.FC = () => {
   const cells = Array.from({ length: GRID_COLUMNS * GRID_ROWS }, (_, i) => {
     const isCardCell = i === cardIndex;
     const isTarget = drag.phase === 'dragging' && i === targetIndex;
-    const cellClass = isTarget ? styles.gridCellCenter : isCardCell ? undefined : styles.gridCell;
+    const cellClass = isTarget ? styles.gridCellCenter : styles.gridCell;
 
     return (
       <div
