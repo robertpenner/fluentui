@@ -23,34 +23,39 @@ const curveGravity1 = `linear(0.000, 0.001824 2%, 0.007296 4%, 0.01642 6%, 0.029
  * Each atom targets a different CSS property and they are played
  * as a composite sequence via the Web Animations API.
  */
-const DropMotion = createMotionComponent([
-  // Phase 1: horizontal slide (200px → 0) while holding 110% scale
-  // {
-  //   keyframes: [{ scale: 1.1 }],
-  //   duration: 400,
-  //   easing: 'linear',
-  //   fill: 'forwards',
-  // },
-  {
-    delay: 200,
-    keyframes: [
-      { translate: '100px 50px', scale: draggingScale },
-      { translate: '0x', scale: draggingScale },
-    ],
-    duration: 500,
-    easing: curveOvershoot2,
-    fill: 'both',
-  },
-  // Phase 2: scale down from 110% → 100% (delayed until phase 1 completes)
-  {
-    delay: 200 + 400 - 150, // start at the same time as phase 1 but with a negative delay to overlap
-    keyframes: [{ scale: draggingScale }, { scale: 1 }],
-    duration: 500,
-    // easing: 'ease-in-out',
-    easing: curveGravity1,
-    fill: 'forwards',
-  },
-]);
+const DropMotion = createMotionComponent(() => {
+  return [
+    // Phase 1: horizontal slide (200px → 0) while holding 110% scale
+    // {
+    //   keyframes: [{ scale: 1.1 }],
+    //   duration: 400,
+    //   easing: 'linear',
+    //   fill: 'forwards',
+    // },
+    {
+      delay: 200,
+      keyframes: [
+        { translate: '100px 50px', scale: draggingScale, boxShadow: tokens.shadow8 },
+        { translate: '0x', scale: draggingScale, boxShadow: tokens.shadow8 },
+      ],
+      duration: 500,
+      easing: curveOvershoot2,
+      fill: 'both',
+    },
+    // Phase 2: scale down from 110% → 100% (delayed until phase 1 completes)
+    {
+      delay: 200 + 400 - 150, // start at the same time as phase 1 but with a negative delay to overlap
+      keyframes: [
+        { scale: draggingScale, boxShadow: tokens.shadow8 },
+        { scale: 1, boxShadow: tokens.shadow2 },
+      ],
+      duration: 500,
+      // easing: 'ease-in-out',
+      easing: curveGravity1,
+      fill: 'forwards',
+    },
+  ];
+});
 
 const useStyles = makeStyles({
   root: {
@@ -65,7 +70,7 @@ const useStyles = makeStyles({
   },
   card: {
     width: '340px',
-    boxShadow: tokens.shadow8,
+    // boxShadow: tokens.shadow2,
   },
   badges: {
     display: 'flex',
@@ -114,7 +119,7 @@ const useStyles = makeStyles({
 const TaskCard: React.FC<{ className?: string }> = ({ className }) => {
   const styles = useStyles();
   return (
-    <Card className={className ?? styles.card}>
+    <Card className={className ?? styles.card} appearance="outline">
       <div className={styles.badges}>
         <Badge appearance="filled" color="danger" shape="rounded">
           Design Team
@@ -158,7 +163,9 @@ export const App: React.FC = () => {
           </div>
         </DropMotion>
       ) : (
-        <TaskCard />
+        <div>
+          <TaskCard />
+        </div>
       )}
     </div>
   );
