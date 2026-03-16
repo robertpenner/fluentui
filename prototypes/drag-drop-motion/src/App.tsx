@@ -183,35 +183,100 @@ type DragState =
   | { phase: 'dragging'; x: number; y: number }
   | { phase: 'dropping'; x: number; y: number; key: number };
 
+const CENTER_CELL = Math.floor((GRID_COLUMNS * GRID_ROWS) / 2);
+
 export const App: React.FC = () => {
   const styles = useStyles();
   const [drag, setDrag] = useState<DragState>({ phase: 'idle' });
+  const [cardIndex, setCardIndex] = useState(CENTER_CELL);
+  const [targetIndex, setTargetIndex] = useState(CENTER_CELL);
+  const targetIndexRef = useRef(CENTER_CELL);
   const dragStartRef = useRef({ mouseX: 0, mouseY: 0 });
   const dropCounter = useRef(0);
+  const cellRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    dragStartRef.current = { mouseX: e.clientX, mouseY: e.clientY };
-    setDrag({ phase: 'dragging', x: 0, y: 0 });
+  const findClosestCell = useCallback(
+    (cardCenterX: number, cardCenterY: number) => {
+      let closest = cardIndex;
+      let minDist = Infinity;
+      for (let i = 0; i < GRID_COLUMNS * GRID_ROWS; i++) {
+        const el = cellRefs.current[i];
+        if (!el) continue;
+        const rect = el.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dist = Math.hypot(cardCenterX - cx, cardCenterY - cy);
+        if (dist < minDist) {
+          minDist = dist;
+          closest = i;
+        }
+      }
+      return closest;
+    },
+    [cardIndex],
+  );
 
-    const handleMouseMove = (ev: MouseEvent) => {
-      const dx = ev.clientX - dragStartRef.current.mouseX;
-      const dy = ev.clientY - dragStartRef.current.mouseY;
-      setDrag({ phase: 'dragging', x: dx, y: dy });
-    };
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      dragStartRef.current = { mouseX: e.clientX, mouseY: e.clientY };
+      targetIndexRef.current = cardIndex;
+      setTargetIndex(cardIndex);
+      setDrag({ phase: 'dragging', x: 0, y: 0 });
 
-    const handleMouseUp = (ev: MouseEvent) => {
-      const dx = ev.clientX - dragStartRef.current.mouseX;
-      const dy = ev.clientY - dragStartRef.current.mouseY;
-      dropCounter.current += 1;
-      setDrag({ phase: 'dropping', x: dx, y: dy, key: dropCounter.current });
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-    };
+      const handleMouseMove = (ev: MouseEvent) => {
+        const dx = ev.clientX - dragStartRef.current.mouseX;
+        const dy = ev.clientY - dragStartRef.current.mouseY;
+        setDrag({ phase: 'dragging', x: dx, y: dy });
 
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
-  }, []);
+        const cardEl = cellRefs.current[cardIndex];
+        if (cardEl) {
+          const rect = cardEl.getBoundingClientRect();
+          const cardCenterX = rect.left + rect.width / 2 + dx;
+          const cardCenterY = rect.top + rect.height / 2 + dy;
+          setTargetIndex(prev => {
+            const next = findClosestCell(cardCenterX, cardCenterY);
+            if (prev !== next) {
+              targetIndexRef.current = next;
+              return next;
+            }
+            return prev;
+          });
+        }
+      };
+
+      const handleMouseUp = (ev: MouseEvent) => {
+        const dx = ev.clientX - dragStartRef.current.mouseX;
+        const dy = ev.clientY - dragStartRef.current.mouseY;
+
+        // Compute offset from the card's current visual position to the target cell,
+        // so the animation starts where the card is and ends in the target cell.
+        const sourceEl = cellRefs.current[cardIndex];
+        const currentTarget = targetIndexRef.current;
+        const targetEl = cellRefs.current[currentTarget];
+        let dropX = dx;
+        let dropY = dy;
+        if (sourceEl && targetEl) {
+          const sourceRect = sourceEl.getBoundingClientRect();
+          const targetRect = targetEl.getBoundingClientRect();
+          const cellOffsetX = sourceRect.left - targetRect.left;
+          const cellOffsetY = sourceRect.top - targetRect.top;
+          dropX = dx + cellOffsetX;
+          dropY = dy + cellOffsetY;
+        }
+
+        dropCounter.current += 1;
+        setCardIndex(currentTarget);
+        setDrag({ phase: 'dropping', x: dropX, y: dropY, key: dropCounter.current });
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mouseup', handleMouseUp);
+      };
+
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    },
+    [cardIndex, findClosestCell],
+  );
 
   const handleMotionFinish = useCallback(() => {
     setDrag({ phase: 'idle' });
@@ -243,15 +308,23 @@ export const App: React.FC = () => {
       </div>
     );
 
-  const cells = Array.from({ length: GRID_COLUMNS * GRID_ROWS }, (_, i) =>
-    i === Math.floor((GRID_COLUMNS * GRID_ROWS) / 2) ? (
-      <div key={i} className={styles.gridCellCenter}>
-        {cardCell}
+  const cells = Array.from({ length: GRID_COLUMNS * GRID_ROWS }, (_, i) => {
+    const isCardCell = i === cardIndex;
+    const isTarget = drag.phase === 'dragging' && i === targetIndex;
+    const cellClass = isTarget ? styles.gridCellCenter : isCardCell ? undefined : styles.gridCell;
+
+    return (
+      <div
+        key={i}
+        ref={el => {
+          cellRefs.current[i] = el;
+        }}
+        className={cellClass}
+      >
+        {isCardCell ? cardCell : null}
       </div>
-    ) : (
-      <div key={i} className={styles.gridCell} />
-    ),
-  );
+    );
+  });
 
   return (
     <div className={styles.root}>
