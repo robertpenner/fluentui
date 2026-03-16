@@ -100,12 +100,20 @@ const useStyles = makeStyles({
   gridCell: {
     width: CARD_WIDTH,
     borderRadius: tokens.borderRadiusMedium,
-    border: `1px dashed ${tokens.colorNeutralStroke2}`,
+    border: `2px dashed ${tokens.colorNeutralStroke2}`,
+    backgroundColor: tokens.colorNeutralBackground3,
+  },
+  gridCellCardHome: {
+    width: CARD_WIDTH,
+    borderRadius: tokens.borderRadiusMedium,
+    border: `2px solid transparent`,
     backgroundColor: tokens.colorNeutralBackground3,
   },
   gridCellCenter: {
     width: CARD_WIDTH,
     borderRadius: tokens.borderRadiusMedium,
+    // transparent border to prevent layout shift when card moves in
+    border: `2px solid ${tokens.colorNeutralBackground7}`,
     backgroundColor: tokens.colorNeutralBackground6,
   },
   card: {
@@ -366,7 +374,8 @@ export const App: React.FC = () => {
   const cells = Array.from({ length: GRID_COLUMNS * GRID_ROWS }, (_, i) => {
     const isCardCell = i === cardIndex;
     const isTarget = (drag.phase === 'dragging' || drag.phase === 'grabbing') && i === targetIndex;
-    const cellClass = isTarget ? styles.gridCellCenter : styles.gridCell;
+    const isCardHome = isCardCell && drag.phase === 'idle';
+    const cellClass = isTarget ? styles.gridCellCenter : isCardHome ? styles.gridCellCardHome : styles.gridCell;
 
     return (
       <div
