@@ -51,6 +51,12 @@ export type MotionComponentProps = {
    */
   // eslint-disable-next-line @nx/workspace-consistent-callback-type -- EventHandler<T> does not support "null"
   onMotionStart?: (ev: null) => void;
+
+  /**
+   * When provided, the motion replays each time this value changes.
+   * This allows retriggering the animation without remounting the component.
+   */
+  triggerKey?: string | number;
 };
 
 export type MotionComponent<MotionParams extends Record<string, MotionParam> = {}> = React.FC<
@@ -76,6 +82,7 @@ export function createMotionComponent<MotionParams extends Record<string, Motion
       onMotionFinish: onMotionFinishProp,
       onMotionStart: onMotionStartProp,
       onMotionCancel: onMotionCancelProp,
+      triggerKey,
       ..._rest
     } = props;
     const params = _rest as Exclude<typeof props, MotionComponentProps>;
@@ -128,7 +135,8 @@ export function createMotionComponent<MotionParams extends Record<string, Motion
           handle.cancel();
         };
       }
-    }, [animateAtoms, childRef, handleRef, isReducedMotion, onMotionFinish, onMotionStart, onMotionCancel]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- triggerKey is intentionally included to replay the animation
+    }, [animateAtoms, childRef, handleRef, isReducedMotion, onMotionFinish, onMotionStart, onMotionCancel, triggerKey]);
 
     return child;
   };
