@@ -203,7 +203,7 @@ export const App: React.FC = () => {
       {drag.phase === 'dropping' ? (
         <DropMotion key={drag.key} dragX={drag.x} dragY={drag.y} onMotionFinish={handleMotionFinish}>
           <div>
-            <TaskCard className={styles.card} />
+            <TaskCard className={styles.card} onMouseDown={handleMouseDown} />
           </div>
         </DropMotion>
       ) : (
