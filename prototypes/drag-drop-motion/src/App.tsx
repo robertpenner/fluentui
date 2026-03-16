@@ -106,6 +106,7 @@ const useStyles = makeStyles({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    transition: `background-color 400ms ease-out, outline-color 400ms ease-out`,
   },
   gridCellCardHome: {
     width: CARD_WIDTH,
@@ -120,10 +121,12 @@ const useStyles = makeStyles({
     borderRadius: tokens.borderRadiusMedium,
     outline: `2px solid ${tokens.colorNeutralBackground7}`,
     outlineOffset: '-2px',
-    backgroundColor: tokens.colorNeutralBackground6,
+    // backgroundColor: tokens.colorNeutralBackground7Pressed,
+    backgroundColor: '#d6d6d699',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    transition: `background-color 200ms ease-out, outline-color 200ms ease-out`,
   },
   card: {
     width: CARD_WIDTH,
