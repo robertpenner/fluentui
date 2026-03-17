@@ -1,17 +1,21 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { Card, Caption1, Badge, Checkbox, Text, makeStyles, tokens, Button } from '@fluentui/react-components';
-import { createMotionComponent } from '@fluentui/react-motion';
+import { createMotionComponent, AtomMotion } from '@fluentui/react-motion';
 
-// 10% scale increase while dragging
-const draggingScale = 1.1;
-
-// Custom drag shadow: tighter blur-to-offset ratio than tokens for a physically cohesive lifted look
-const shadowDragging = '0 0 2px rgba(0,0,0,0.10), 8px 12px 8px rgba(0,0,0,0.14)';
-
-// 2D rotation effect parameters
-const maxRotation = 6; // max rotation in degrees
-const rotationReference = 300; // horizontal drag distance (px) that produces max rotation
 const clampUnit = (v: number) => Math.min(Math.max(v, -1), 1);
+
+//// MOTION STYLE CONFIG
+
+type MotionStyle = {
+  name: string;
+  draggingScale: number;
+  draggingOpacity: number;
+  shadowDragging: string;
+  grab: { duration: number; easing: string };
+  slide: { easing: string; pixelDurationFactor: number; minDuration: number };
+  bounce: { easing: string; duration: number; overlapWithSlide: number };
+  rotation: { enabled: boolean; maxAngle: number; referenceDistance: number; easing?: string };
+};
 
 //// GRAB EASING
 
@@ -44,68 +48,104 @@ const curveOvershoot2 = `linear(0.000, -0.001307 2%, -0.005114 4%, -0.01101 6%, 
 // https://robertpenner.com/fuse/#head_type=power-back&tail_type=bounce&join=0.501&head_anticipation=0&head_exponent=2.05&bounces=4&decay=95&duration=1200
 const curveGravityBounce1 = `linear(0.000, 0.001355 2%, 0.005611 4%, 0.01288 6%, 0.02324 8%, 0.03671 10%, 0.05335 12%, 0.07318 14%, 0.09622 16%, 0.1225 18%, 0.1520 20%, 0.1848 22%, 0.2209 24%, 0.2603 26%, 0.3030 28%, 0.3491 30%, 0.3985 32%, 0.4512 34%, 0.5073 36%, 0.5667 38%, 0.6296 40%, 0.6958 42%, 0.7654 44%, 0.8385 46%, 0.9149 48%, 0.9947 50%, 0.9792 51%, 0.9574 52%, 0.9378 53%, 0.9203 54%, 0.9051 55%, 0.8920 56%, 0.8811 57%, 0.8724 58%, 0.8659 59%, 0.8616 60%, 0.8595 61%, 0.8596 62%, 0.8618 63%, 0.8663 64%, 0.8729 65%, 0.8817 66%, 0.8928 67%, 0.9060 68%, 0.9213 69%, 0.9389 70%, 0.9587 71%, 0.9807 72%, 0.9971 73%, 0.9836 74%, 0.9722 75%, 0.9631 76%, 0.9561 77%, 0.9513 78%, 0.9487 79%, 0.9483 80%, 0.9500 81%, 0.9540 82%, 0.9601 83%, 0.9685 84%, 0.9790 85%, 0.9917 86%, 0.9963 87%, 0.9892 88%, 0.9843 89%, 0.9815 90%, 0.9810 91%, 0.9826 92%, 0.9864 93%, 0.9925 94%, 0.9996 95%, 0.9953 96%, 0.9932 97%, 0.9933 98%, 0.9955 99%, 1.000)`;
 
+//// MOTION STYLES
+
+const gravityStyle: MotionStyle = {
+  name: 'gravity',
+  draggingScale: 1.1,
+  draggingOpacity: 0.5,
+  shadowDragging: '0 0 2px rgba(0,0,0,0.10), 8px 12px 8px rgba(0,0,0,0.14)',
+  grab: { duration: 600, easing: curveCompressAnticipateExpandSmooth2 },
+  slide: { easing: curveOvershoot1, pixelDurationFactor: 3, minDuration: 400 },
+  bounce: { easing: curveGravityBounce1, duration: 800, overlapWithSlide: 300 },
+  rotation: { enabled: true, maxAngle: 6, referenceDistance: 300 },
+};
+
+const selectedStyle: MotionStyle = gravityStyle;
+
 const GrabMotion = createMotionComponent(() => ({
   keyframes: [
     { scale: 1, boxShadow: tokens.shadow2, opacity: 1 },
-    { scale: draggingScale, boxShadow: shadowDragging, opacity: 0.5 },
+    {
+      scale: selectedStyle.draggingScale,
+      boxShadow: selectedStyle.shadowDragging,
+      opacity: selectedStyle.draggingOpacity,
+    },
   ],
-  duration: 600,
-  easing: curveCompressAnticipateExpandSmooth2,
+  duration: selectedStyle.grab.duration,
+  easing: selectedStyle.grab.easing,
   fill: 'forwards',
 }));
 
 /**
  * DropMotion: a three-atom animation parameterised by the drag offset.
- *   Atom 1 — slide from (dragX, dragY) back to origin at a constant 110% scale
- *   Atom 2 — scale from 110% → 100%
+ *   Atom 1 — slide from (dragX, dragY) back to origin at a constant scaled size
+ *   Atom 2 — scale from dragging → resting
  *   Atom 3 — 2D rotation proportional to horizontal drag offset, settling back to 0°
  */
 const DropMotion = createMotionComponent<{ dragX: number; dragY: number }>(({ dragX, dragY }) => {
   const dragDistance = Math.sqrt(dragX * dragX + dragY * dragY);
-  const slideDuration = Math.max(dragDistance * 3, 400); // 3ms per pixel, with a minimum of 400ms;
-  console.log('### slideDuration', slideDuration);
-  const dropDurationOverlap = 300;
+  const slideDuration = Math.max(
+    dragDistance * selectedStyle.slide.pixelDurationFactor,
+    selectedStyle.slide.minDuration,
+  );
 
-  // 2D rotation proportional to horizontal drag offset.
-  // Card slides in the opposite direction to dragX, so:
-  //   dragX > 0 → card slides left → rotates clockwise (positive angle)
-  //   dragX < 0 → card slides right → rotates counter-clockwise (negative angle)
-  const rotation = -clampUnit(dragX / rotationReference) * maxRotation;
-
-  return [
+  const atoms: AtomMotion[] = [
     {
       keyframes: [
-        { translate: `${dragX}px ${dragY}px`, scale: draggingScale, boxShadow: shadowDragging, opacity: 0.5 },
-        { translate: '0px 0px', scale: draggingScale, boxShadow: shadowDragging, opacity: 0.5 },
+        {
+          translate: `${dragX}px ${dragY}px`,
+          scale: selectedStyle.draggingScale,
+          boxShadow: selectedStyle.shadowDragging,
+          opacity: selectedStyle.draggingOpacity,
+        },
+        {
+          translate: '0px 0px',
+          scale: selectedStyle.draggingScale,
+          boxShadow: selectedStyle.shadowDragging,
+          opacity: selectedStyle.draggingOpacity,
+        },
       ],
       duration: slideDuration,
-      easing: curveOvershoot1,
-      fill: 'both',
+      easing: selectedStyle.slide.easing,
+      fill: 'both' as const,
     },
     {
-      delay: slideDuration - dropDurationOverlap,
+      delay: slideDuration - selectedStyle.bounce.overlapWithSlide,
       keyframes: [
-        { scale: draggingScale, boxShadow: shadowDragging, opacity: 0.5 },
+        {
+          scale: selectedStyle.draggingScale,
+          boxShadow: selectedStyle.shadowDragging,
+          opacity: selectedStyle.draggingOpacity,
+        },
         { scale: 1, boxShadow: tokens.shadow2, opacity: 1 },
       ],
-      duration: 800,
-      easing: curveGravityBounce1,
-      fill: 'forwards',
+      duration: selectedStyle.bounce.duration,
+      easing: selectedStyle.bounce.easing,
+      fill: 'forwards' as const,
     },
-    {
+  ];
+
+  if (selectedStyle.rotation.enabled) {
+    // 2D rotation proportional to horizontal drag offset.
+    // Card slides in the opposite direction to dragX, so:
+    //   dragX > 0 → card slides left → rotates clockwise (positive angle)
+    //   dragX < 0 → card slides right → rotates counter-clockwise (negative angle)
+    const rotation = -clampUnit(dragX / selectedStyle.rotation.referenceDistance) * selectedStyle.rotation.maxAngle;
+    atoms.push({
       keyframes: [
-        { rotate: '0deg,', easing: 'ease-in-out' },
+        { rotate: '0deg', easing: 'ease-in-out' },
         { rotate: `${rotation}deg`, easing: 'ease-in-out' },
-        ,
         { rotate: `${-rotation / 3}deg`, easing: 'ease-in-out' },
         { rotate: '0deg' },
       ],
       duration: slideDuration,
-      // easing: curveOvershoot2,
-      // easing: 'linear',
-      fill: 'both',
-    },
-  ];
+      ...(selectedStyle.rotation.easing ? { easing: selectedStyle.rotation.easing } : {}),
+      fill: 'both' as const,
+    });
+  }
+
+  return atoms;
 });
 
 const CARD_WIDTH = '340px';
@@ -174,7 +214,7 @@ const useStyles = makeStyles({
   cardDragging: {
     width: CARD_WIDTH,
     cursor: 'grabbing',
-    boxShadow: shadowDragging,
+    boxShadow: selectedStyle.shadowDragging,
     userSelect: 'none',
     touchAction: 'none',
     ':active': {
@@ -382,9 +422,9 @@ export const App: React.FC = () => {
     drag.phase === 'dragging'
       ? {
           translate: `${drag.x}px ${drag.y}px`,
-          scale: `${draggingScale}`,
-          boxShadow: shadowDragging,
-          opacity: 0.5,
+          scale: `${selectedStyle.draggingScale}`,
+          boxShadow: selectedStyle.shadowDragging,
+          opacity: selectedStyle.draggingOpacity,
           userSelect: 'none',
         }
       : drag.phase === 'grabbing'
