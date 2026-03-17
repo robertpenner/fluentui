@@ -5,6 +5,9 @@ import { createMotionComponent } from '@fluentui/react-motion';
 // 10% scale increase while dragging
 const draggingScale = 1.1;
 
+// Custom drag shadow: tighter blur-to-offset ratio than tokens for a physically cohesive lifted look
+const shadowDragging = '0 0 2px rgba(0,0,0,0.10), 8px 12px 8px rgba(0,0,0,0.14)';
+
 // 2D rotation effect parameters
 const maxRotation = 6; // max rotation in degrees
 const rotationReference = 300; // horizontal drag distance (px) that produces max rotation
@@ -44,7 +47,7 @@ const curveGravityBounce1 = `linear(0.000, 0.001355 2%, 0.005611 4%, 0.01288 6%,
 const GrabMotion = createMotionComponent(() => ({
   keyframes: [
     { scale: 1, boxShadow: tokens.shadow2, opacity: 1 },
-    { scale: draggingScale, boxShadow: tokens.shadow8, opacity: 0.5 },
+    { scale: draggingScale, boxShadow: shadowDragging, opacity: 0.5 },
   ],
   duration: 600,
   easing: curveCompressAnticipateExpandSmooth2,
@@ -72,8 +75,8 @@ const DropMotion = createMotionComponent<{ dragX: number; dragY: number }>(({ dr
   return [
     {
       keyframes: [
-        { translate: `${dragX}px ${dragY}px`, scale: draggingScale, boxShadow: tokens.shadow8, opacity: 0.5 },
-        { translate: '0px 0px', scale: draggingScale, boxShadow: tokens.shadow8, opacity: 0.5 },
+        { translate: `${dragX}px ${dragY}px`, scale: draggingScale, boxShadow: shadowDragging, opacity: 0.5 },
+        { translate: '0px 0px', scale: draggingScale, boxShadow: shadowDragging, opacity: 0.5 },
       ],
       duration: slideDuration,
       easing: curveOvershoot1,
@@ -82,7 +85,7 @@ const DropMotion = createMotionComponent<{ dragX: number; dragY: number }>(({ dr
     {
       delay: slideDuration - dropDurationOverlap,
       keyframes: [
-        { scale: draggingScale, boxShadow: tokens.shadow8, opacity: 0.5 },
+        { scale: draggingScale, boxShadow: shadowDragging, opacity: 0.5 },
         { scale: 1, boxShadow: tokens.shadow2, opacity: 1 },
       ],
       duration: 800,
@@ -171,7 +174,7 @@ const useStyles = makeStyles({
   cardDragging: {
     width: CARD_WIDTH,
     cursor: 'grabbing',
-    boxShadow: tokens.shadow8,
+    boxShadow: shadowDragging,
     userSelect: 'none',
     touchAction: 'none',
     ':active': {
@@ -380,7 +383,7 @@ export const App: React.FC = () => {
       ? {
           translate: `${drag.x}px ${drag.y}px`,
           scale: `${draggingScale}`,
-          boxShadow: tokens.shadow8,
+          boxShadow: shadowDragging,
           opacity: 0.5,
           userSelect: 'none',
         }
