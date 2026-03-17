@@ -94,7 +94,7 @@ const DropMotion = createMotionComponent<{ dragX: number; dragY: number }>(({ dr
         { rotate: '0deg,', easing: 'ease-in-out' },
         { rotate: `${rotation}deg`, easing: 'ease-in-out' },
         ,
-        { rotate: `${-rotation / 2}deg`, easing: 'ease-in-out' },
+        { rotate: `${-rotation / 3}deg`, easing: 'ease-in-out' },
         { rotate: '0deg' },
       ],
       duration: slideDuration,
