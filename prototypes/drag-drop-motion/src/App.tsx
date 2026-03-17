@@ -6,16 +6,28 @@ const clampUnit = (v: number) => Math.min(Math.max(v, -1), 1);
 
 //// MOTION STYLE CONFIG
 
+type DragParams = { dragX: number; dragY: number };
+type DynamicDuration<P = DragParams> = number | ((params: P) => number);
+
 type MotionStyle = {
   name: string;
   draggingScale: number;
   draggingOpacity: number;
   shadowDragging: string;
   grab: { duration: number; easing: string };
-  slide: { easing: string; pixelDurationFactor: number; minDuration: number };
-  bounce: { easing: string; duration: number; overlapWithSlide: number };
-  rotation: { enabled: boolean; maxAngle: number; referenceDistance: number; easing?: string };
+  slide: { easing: string; duration: DynamicDuration<DragParams> };
+  bounce: { easing: string; duration: DynamicDuration<DragParams>; overlapWithSlide: number };
+  rotation: {
+    enabled: boolean;
+    maxAngle: number;
+    referenceDistance: number;
+    duration?: DynamicDuration<DragParams>;
+    easing?: string;
+  };
 };
+
+const resolveDuration = <Params,>(d: DynamicDuration<Params>, params: Params): number =>
+  typeof d === 'function' ? d(params) : d;
 
 //// GRAB EASING
 
@@ -56,7 +68,10 @@ const gravityStyle: MotionStyle = {
   draggingOpacity: 0.5,
   shadowDragging: '0 0 2px rgba(0,0,0,0.10), 8px 12px 8px rgba(0,0,0,0.14)',
   grab: { duration: 600, easing: curveCompressAnticipateExpandSmooth2 },
-  slide: { easing: curveOvershoot1, pixelDurationFactor: 3, minDuration: 400 },
+  slide: {
+    easing: curveOvershoot1,
+    duration: ({ dragX, dragY }) => Math.max(Math.sqrt(dragX * dragX + dragY * dragY) * 3, 400),
+  },
   bounce: { easing: curveGravityBounce1, duration: 800, overlapWithSlide: 300 },
   rotation: { enabled: true, maxAngle: 6, referenceDistance: 300 },
 };
@@ -84,11 +99,8 @@ const GrabMotion = createMotionComponent(() => ({
  *   Atom 3 — 2D rotation proportional to horizontal drag offset, settling back to 0°
  */
 const DropMotion = createMotionComponent<{ dragX: number; dragY: number }>(({ dragX, dragY }) => {
-  const dragDistance = Math.sqrt(dragX * dragX + dragY * dragY);
-  const slideDuration = Math.max(
-    dragDistance * selectedStyle.slide.pixelDurationFactor,
-    selectedStyle.slide.minDuration,
-  );
+  const params: DragParams = { dragX, dragY };
+  const slideDuration = resolveDuration(selectedStyle.slide.duration, params);
 
   const atoms: AtomMotion[] = [
     {
@@ -120,7 +132,7 @@ const DropMotion = createMotionComponent<{ dragX: number; dragY: number }>(({ dr
         },
         { scale: 1, boxShadow: tokens.shadow2, opacity: 1 },
       ],
-      duration: selectedStyle.bounce.duration,
+      duration: resolveDuration(selectedStyle.bounce.duration, params),
       easing: selectedStyle.bounce.easing,
       fill: 'forwards' as const,
     },
@@ -139,7 +151,10 @@ const DropMotion = createMotionComponent<{ dragX: number; dragY: number }>(({ dr
         { rotate: `${-rotation / 3}deg`, easing: 'ease-in-out' },
         { rotate: '0deg' },
       ],
-      duration: slideDuration,
+      duration:
+        selectedStyle.rotation.duration != null
+          ? resolveDuration(selectedStyle.rotation.duration, params)
+          : slideDuration,
       ...(selectedStyle.rotation.easing ? { easing: selectedStyle.rotation.easing } : {}),
       fill: 'both' as const,
     });
