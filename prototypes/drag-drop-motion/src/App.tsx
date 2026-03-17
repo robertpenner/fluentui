@@ -163,6 +163,7 @@ const useStyles = makeStyles({
     width: CARD_WIDTH,
     boxShadow: tokens.shadow2,
     userSelect: 'none',
+    touchAction: 'none',
     ':hover': {
       backgroundColor: tokens.colorNeutralBackground1,
     },
@@ -172,6 +173,7 @@ const useStyles = makeStyles({
     cursor: 'grabbing',
     boxShadow: tokens.shadow8,
     userSelect: 'none',
+    touchAction: 'none',
     ':active': {
       backgroundColor: tokens.colorNeutralBackground1Hover,
     },
@@ -180,6 +182,7 @@ const useStyles = makeStyles({
     width: CARD_WIDTH,
     cursor: 'grab',
     userSelect: 'none',
+    touchAction: 'none',
     ':active': {
       backgroundColor: tokens.colorNeutralBackground1Hover,
     },
@@ -228,13 +231,13 @@ const useStyles = makeStyles({
   },
 });
 
-const TaskCard: React.FC<{ className?: string; onMouseDown?: React.MouseEventHandler }> = ({
+const TaskCard: React.FC<{ className?: string; onPointerDown?: React.PointerEventHandler }> = ({
   className,
-  onMouseDown,
+  onPointerDown,
 }) => {
   const styles = useStyles();
   return (
-    <Card className={className ?? styles.card} appearance="filled" onMouseDown={onMouseDown}>
+    <Card className={className ?? styles.card} appearance="filled" onPointerDown={onPointerDown}>
       <div className={styles.badges}>
         <Badge appearance="filled" color="danger" shape="rounded">
           Design Team
@@ -300,16 +303,17 @@ export const App: React.FC = () => {
     [cardIndex],
   );
 
-  const handleMouseDown = useCallback(
-    (e: React.MouseEvent) => {
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent) => {
       e.preventDefault();
+      (e.target as Element).setPointerCapture(e.pointerId);
       dragStartRef.current = { mouseX: e.clientX, mouseY: e.clientY };
       targetIndexRef.current = cardIndex;
       setTargetIndex(cardIndex);
       grabCounter.current += 1;
       setDrag({ phase: 'grabbing', x: 0, y: 0, key: grabCounter.current });
 
-      const handleMouseMove = (ev: MouseEvent) => {
+      const handlePointerMove = (ev: PointerEvent) => {
         const dx = ev.clientX - dragStartRef.current.mouseX;
         const dy = ev.clientY - dragStartRef.current.mouseY;
         setDrag(prev => (prev.phase === 'grabbing' ? { ...prev, x: dx, y: dy } : { phase: 'dragging', x: dx, y: dy }));
@@ -330,7 +334,7 @@ export const App: React.FC = () => {
         }
       };
 
-      const handleMouseUp = (ev: MouseEvent) => {
+      const handlePointerUp = (ev: PointerEvent) => {
         const dx = ev.clientX - dragStartRef.current.mouseX;
         const dy = ev.clientY - dragStartRef.current.mouseY;
 
@@ -353,12 +357,12 @@ export const App: React.FC = () => {
         dropCounter.current += 1;
         setCardIndex(currentTarget);
         setDrag({ phase: 'dropping', x: dropX, y: dropY, key: dropCounter.current });
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('mouseup', handleMouseUp);
+        window.removeEventListener('pointermove', handlePointerMove);
+        window.removeEventListener('pointerup', handlePointerUp);
       };
 
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
+      window.addEventListener('pointermove', handlePointerMove);
+      window.addEventListener('pointerup', handlePointerUp);
     },
     [cardIndex, findClosestCell],
   );
@@ -392,7 +396,7 @@ export const App: React.FC = () => {
     cardCell = (
       <DropMotion key={drag.key} dragX={drag.x} dragY={drag.y} onMotionFinish={handleMotionFinish}>
         <div>
-          <TaskCard className={styles.card} onMouseDown={handleMouseDown} />
+          <TaskCard className={styles.card} onPointerDown={handlePointerDown} />
         </div>
       </DropMotion>
     );
@@ -401,7 +405,7 @@ export const App: React.FC = () => {
       <div style={cardStyle}>
         <GrabMotion key={drag.key} onMotionFinish={handleGrabFinish}>
           <div>
-            <TaskCard className={styles.cardDragging} onMouseDown={handleMouseDown} />
+            <TaskCard className={styles.cardDragging} onPointerDown={handlePointerDown} />
           </div>
         </GrabMotion>
       </div>
@@ -411,7 +415,7 @@ export const App: React.FC = () => {
       <div style={cardStyle}>
         <TaskCard
           className={drag.phase === 'dragging' ? styles.cardDragging : styles.cardIdle}
-          onMouseDown={handleMouseDown}
+          onPointerDown={handlePointerDown}
         />
       </div>
     );
