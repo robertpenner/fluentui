@@ -118,7 +118,7 @@ const useStyles = makeStyles({
     justifyContent: 'center',
     minHeight: '100vh',
     boxSizing: 'border-box',
-    backgroundColor: tokens.colorNeutralBackground5,
+    backgroundColor: tokens.colorPalettePlatinumBackground2,
     padding: '10px',
   },
   grid: {
@@ -152,7 +152,8 @@ const useStyles = makeStyles({
     outline: `2px solid ${tokens.colorNeutralBackground7}`,
     outlineOffset: '-2px',
     // backgroundColor: tokens.colorNeutralBackground7Pressed,
-    backgroundColor: '#d6d6d699',
+    // backgroundColor: '#d6d6d699',
+    backgroundColor: tokens.colorSubtleBackgroundInvertedHover,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
