@@ -162,6 +162,9 @@ const useStyles = makeStyles({
     width: CARD_WIDTH,
     boxShadow: tokens.shadow2,
     userSelect: 'none',
+    ':hover': {
+      backgroundColor: tokens.colorNeutralBackground1,
+    },
   },
   cardDragging: {
     width: CARD_WIDTH,
