@@ -4,28 +4,6 @@ import { createMotionComponent, AtomMotion } from '@fluentui/react-motion';
 
 const clampUnit = (v: number) => Math.min(Math.max(v, -1), 1);
 
-//// MOTION STYLE CONFIG
-
-type DragParams = { dragX: number; dragY: number };
-type DynamicDuration<P = DragParams> = number | ((params: P) => number);
-
-type MotionStyle = {
-  name: string;
-  draggingScale: number;
-  draggingOpacity: number;
-  shadowDragging: string;
-  grab: { duration: number; easing: string };
-  slide: { easing: string; duration: DynamicDuration<DragParams> };
-  bounce: { easing: string; duration: DynamicDuration<DragParams>; overlapWithSlide: number };
-  rotation: {
-    enabled: boolean;
-    maxAngle: number;
-    referenceDistance: number;
-    duration?: DynamicDuration<DragParams>;
-    easing?: string;
-  };
-};
-
 const resolveDuration = <Params,>(d: DynamicDuration<Params>, params: Params): number =>
   typeof d === 'function' ? d(params) : d;
 
@@ -60,14 +38,50 @@ const curveOvershoot2 = `linear(0.000, -0.001307 2%, -0.005114 4%, -0.01101 6%, 
 // https://robertpenner.com/fuse/#head_type=power-back&tail_type=bounce&join=0.501&head_anticipation=0&head_exponent=2.05&bounces=4&decay=95&duration=1200
 const curveGravityBounce1 = `linear(0.000, 0.001355 2%, 0.005611 4%, 0.01288 6%, 0.02324 8%, 0.03671 10%, 0.05335 12%, 0.07318 14%, 0.09622 16%, 0.1225 18%, 0.1520 20%, 0.1848 22%, 0.2209 24%, 0.2603 26%, 0.3030 28%, 0.3491 30%, 0.3985 32%, 0.4512 34%, 0.5073 36%, 0.5667 38%, 0.6296 40%, 0.6958 42%, 0.7654 44%, 0.8385 46%, 0.9149 48%, 0.9947 50%, 0.9792 51%, 0.9574 52%, 0.9378 53%, 0.9203 54%, 0.9051 55%, 0.8920 56%, 0.8811 57%, 0.8724 58%, 0.8659 59%, 0.8616 60%, 0.8595 61%, 0.8596 62%, 0.8618 63%, 0.8663 64%, 0.8729 65%, 0.8817 66%, 0.8928 67%, 0.9060 68%, 0.9213 69%, 0.9389 70%, 0.9587 71%, 0.9807 72%, 0.9971 73%, 0.9836 74%, 0.9722 75%, 0.9631 76%, 0.9561 77%, 0.9513 78%, 0.9487 79%, 0.9483 80%, 0.9500 81%, 0.9540 82%, 0.9601 83%, 0.9685 84%, 0.9790 85%, 0.9917 86%, 0.9963 87%, 0.9892 88%, 0.9843 89%, 0.9815 90%, 0.9810 91%, 0.9826 92%, 0.9864 93%, 0.9925 94%, 0.9996 95%, 0.9953 96%, 0.9932 97%, 0.9933 98%, 0.9955 99%, 1.000)`;
 
+//// MOTION STYLE CONFIG
+
+type DragParams = { dragX: number; dragY: number };
+type DynamicDuration<P = DragParams> = number | ((params: P) => number);
+
+type MotionStyle = {
+  name: string;
+  // draggingScale: number;
+  // draggingOpacity: number;
+  // shadowDragging: string;
+  grab: { duration: number; easing: string; keyframes: Keyframe[] };
+  slide: { easing: string; duration: DynamicDuration<DragParams> };
+  bounce: { easing: string; duration: DynamicDuration<DragParams>; overlapWithSlide: number };
+  rotation: {
+    enabled: boolean;
+    maxAngle: number;
+    referenceDistance: number;
+    duration?: DynamicDuration<DragParams>;
+    easing?: string;
+  };
+};
+
 //// MOTION STYLES
+
+const draggingScale = 1.1;
+const draggingOpacity = 0.5;
+const shadowDragging = '0 0 2px rgba(0,0,0,0.10), 8px 12px 8px rgba(0,0,0,0.14)';
+
+const gravityGrabKeyframes: Keyframe[] = [
+  { scale: 1, boxShadow: tokens.shadow2, opacity: 1 },
+  {
+    scale: draggingScale,
+    boxShadow: shadowDragging,
+    opacity: draggingOpacity,
+  },
+];
 
 const gravityStyle: MotionStyle = {
   name: 'gravity',
-  draggingScale: 1.1,
-  draggingOpacity: 0.5,
-  shadowDragging: '0 0 2px rgba(0,0,0,0.10), 8px 12px 8px rgba(0,0,0,0.14)',
-  grab: { duration: 600, easing: curveCompressAnticipateExpandSmooth2 },
+  grab: {
+    duration: 600,
+    easing: curveCompressAnticipateExpandSmooth2,
+    keyframes: gravityGrabKeyframes,
+  },
   slide: {
     easing: curveOvershoot1,
     duration: ({ dragX, dragY }) => Math.max(Math.sqrt(dragX * dragX + dragY * dragY) * 3, 400),
@@ -76,17 +90,50 @@ const gravityStyle: MotionStyle = {
   rotation: { enabled: true, maxAngle: 6, referenceDistance: 300 },
 };
 
-const selectedStyle: MotionStyle = gravityStyle;
+const curveMagnetLift1 = `linear(0.000, 0.0001017 29%, 0.0008841 36%, 0.002536 40%, 0.005226 43%, 0.008234 45%, 0.01272 47%, 0.01929 49%, 0.02879 51%, 0.03495 52%, 0.04229 53%, 0.05098 54%, 0.06125 55%, 0.07334 56%, 0.08754 57%, 0.1042 58%, 0.1236 59%, 0.1462 60%, 0.1725 61%, 0.2029 62%, 0.2382 63%, 0.2788 64%, 0.3255 65%, 0.3792 66%, 0.4408 67%, 0.5112 68%, 0.5915 69%, 0.6830 70%, 0.7871 71%, 0.9053 72%, 0.9788 73%, 0.9097 74%, 0.8514 75%, 0.8036 76%, 0.7666 77%, 0.7402 78%, 0.7244 79%, 0.7193 80%, 0.7248 81%, 0.7410 82%, 0.7678 83%, 0.8053 84%, 0.8534 85%, 0.9122 86%, 0.9816 87%, 0.9701 88%, 0.9400 89%, 0.9206 90%, 0.9118 91%, 0.9137 92%, 0.9262 93%, 0.9493 94%, 0.9832 95%, 0.9874 96%, 0.9746 97%, 0.9724 98%, 0.9809 99%, 1.000)`;
+
+// https://robertpenner.com/fuse/#head_type=power-back&tail_type=bounce&head_anticipation=0&head_exponent=0.2&bounces=3&decay=90&duration=700&tail_enabled=false
+const curveMagnetLift2 = `linear(0.000, 0.3981 1%, 0.4573 2%, 0.4959 3%, 0.5253 4%, 0.5493 5%, 0.5697 6%, 0.5875 7%, 0.6034 8%, 0.6178 9%, 0.6310 10%, 0.6544 12%, 0.6749 14%, 0.6931 16%, 0.7097 18%, 0.7319 21%, 0.7517 24%, 0.7696 27%, 0.7912 31%, 0.8106 35%, 0.8326 40%, 0.8524 45%, 0.8740 51%, 0.8968 58%, 0.9175 65%, 0.9390 73%, 0.9611 82%, 0.9835 92%, 1.000)`;
+
+// https://robertpenner.com/fuse/#head_type=power-back&tail_type=power-back&head_anticipation=0&head_exponent=3&tail_overshoot=10&tail_exponent=3&duration=200&head_enabled=false
+const curveMagnetLiftOvershoot1 = `linear(0.000, 0.06297 1%, 0.1240 2%, 0.1831 3%, 0.2404 4%, 0.2958 5%, 0.3494 6%, 0.4011 7%, 0.4511 8%, 0.4994 9%, 0.5459 10%, 0.5908 11%, 0.6339 12%, 0.6755 13%, 0.7154 14%, 0.7537 15%, 0.7905 16%, 0.8257 17%, 0.8594 18%, 0.8917 19%, 0.9224 20%, 0.9518 21%, 0.9797 22%, 1.006 23%, 1.032 24%, 1.055 25%, 1.078 26%, 1.099 27%, 1.119 28%, 1.138 29%, 1.156 30%, 1.172 31%, 1.188 32%, 1.202 33%, 1.215 34%, 1.227 35%, 1.238 36%, 1.257 38%, 1.273 40%, 1.284 42%, 1.293 44%, 1.298 46%, 1.300 48%, 1.299 50%, 1.296 52%, 1.290 54%, 1.283 56%, 1.273 58%, 1.262 60%, 1.242 63%, 1.220 66%, 1.187 70%, 1.117 78%, 1.084 82%, 1.062 85%, 1.041 88%, 1.030 90%, 1.019 92%, 1.011 94%, 1.005 96%, 1.001 98%, 1.000)`;
+
+// https://robertpenner.com/fuse/#head_type=power-back&tail_type=power-back&head_anticipation=0&head_exponent=3&tail_overshoot=50&tail_exponent=3.03&duration=200&head_enabled=false
+const curveMagnetLiftOvershoot2 = `linear(0.000, 0.07859 1%, 0.1546 2%, 0.2280 3%, 0.2990 4%, 0.3674 5%, 0.4334 6%, 0.4970 7%, 0.5582 8%, 0.6172 9%, 0.6738 10%, 0.7281 11%, 0.7803 12%, 0.8302 13%, 0.8780 14%, 0.9238 15%, 0.9674 16%, 1.009 17%, 1.049 18%, 1.086 19%, 1.122 20%, 1.156 21%, 1.188 22%, 1.218 23%, 1.247 24%, 1.273 25%, 1.298 26%, 1.322 27%, 1.343 28%, 1.363 29%, 1.382 30%, 1.399 31%, 1.415 32%, 1.429 33%, 1.442 34%, 1.453 35%, 1.463 36%, 1.472 37%, 1.479 38%, 1.486 39%, 1.491 40%, 1.495 41%, 1.497 42%, 1.499 43%, 1.500 45%, 1.496 47%, 1.489 49%, 1.479 51%, 1.466 53%, 1.450 55%, 1.432 57%, 1.412 59%, 1.390 61%, 1.354 64%, 1.315 67%, 1.208 75%, 1.169 78%, 1.131 81%, 1.108 83%, 1.086 85%, 1.067 87%, 1.049 89%, 1.033 91%, 1.021 93%, 1.011 95%, 1.004 97%, 1.000 99%, 1.000)`;
+
+const magnetVibratePx = 1;
+const magnetPressScale = 1.02;
+
+const magnetGrabKeyframes: Keyframe[] = [
+  { translate: '0px 0px', scale: magnetPressScale, offset: 0 },
+  { translate: `${magnetVibratePx}px`, scale: magnetPressScale, offset: 0.1 },
+  { translate: `-${magnetVibratePx}px`, scale: magnetPressScale, offset: 0.2 },
+  { translate: `${magnetVibratePx}px`, scale: magnetPressScale, offset: 0.3 },
+  { translate: `-${magnetVibratePx}px`, scale: magnetPressScale, offset: 0.4 },
+  { translate: `${magnetVibratePx}px`, scale: magnetPressScale, offset: 0.5 },
+  { translate: '0px 0px', scale: magnetPressScale, offset: 0.6 },
+  // { scale: 1, offset: 0.3, easing: curveMagnetLift2 },
+  // { scale: magnetPressScale, easing: 'ease-in', offset: 0.8 },
+  { scale: magnetPressScale, easing: curveMagnetLiftOvershoot2, offset: 0.8 },
+  { scale: draggingScale, opacity: draggingOpacity, offset: 1 },
+];
+
+const magnetStyle: MotionStyle = {
+  name: 'magnet',
+  grab: { duration: 250, easing: 'linear', keyframes: magnetGrabKeyframes },
+  slide: {
+    easing: curveOvershoot1,
+    duration: ({ dragX, dragY }) => Math.max(Math.sqrt(dragX * dragX + dragY * dragY) * 3, 400),
+  },
+  bounce: { easing: curveGravityBounce1, duration: 800, overlapWithSlide: 300 },
+  rotation: { enabled: true, maxAngle: 6, referenceDistance: 300 },
+};
+
+// const selectedStyle: MotionStyle = gravityStyle;
+const selectedStyle: MotionStyle = magnetStyle;
 
 const GrabMotion = createMotionComponent(() => ({
-  keyframes: [
-    { scale: 1, boxShadow: tokens.shadow2, opacity: 1 },
-    {
-      scale: selectedStyle.draggingScale,
-      boxShadow: selectedStyle.shadowDragging,
-      opacity: selectedStyle.draggingOpacity,
-    },
-  ],
+  keyframes: selectedStyle.grab.keyframes,
   duration: selectedStyle.grab.duration,
   easing: selectedStyle.grab.easing,
   fill: 'forwards',
@@ -107,15 +154,15 @@ const DropMotion = createMotionComponent<{ dragX: number; dragY: number }>(({ dr
       keyframes: [
         {
           translate: `${dragX}px ${dragY}px`,
-          scale: selectedStyle.draggingScale,
-          boxShadow: selectedStyle.shadowDragging,
-          opacity: selectedStyle.draggingOpacity,
+          scale: draggingScale,
+          boxShadow: shadowDragging,
+          opacity: draggingOpacity,
         },
         {
           translate: '0px 0px',
-          scale: selectedStyle.draggingScale,
-          boxShadow: selectedStyle.shadowDragging,
-          opacity: selectedStyle.draggingOpacity,
+          scale: draggingScale,
+          boxShadow: shadowDragging,
+          opacity: draggingOpacity,
         },
       ],
       duration: slideDuration,
@@ -126,9 +173,9 @@ const DropMotion = createMotionComponent<{ dragX: number; dragY: number }>(({ dr
       delay: slideDuration - selectedStyle.bounce.overlapWithSlide,
       keyframes: [
         {
-          scale: selectedStyle.draggingScale,
-          boxShadow: selectedStyle.shadowDragging,
-          opacity: selectedStyle.draggingOpacity,
+          scale: draggingScale,
+          boxShadow: shadowDragging,
+          opacity: draggingOpacity,
         },
         { scale: 1, boxShadow: tokens.shadow2, opacity: 1 },
       ],
@@ -229,7 +276,7 @@ const useStyles = makeStyles({
   cardDragging: {
     width: CARD_WIDTH,
     cursor: 'grabbing',
-    boxShadow: selectedStyle.shadowDragging,
+    boxShadow: shadowDragging,
     userSelect: 'none',
     touchAction: 'none',
     ':active': {
@@ -437,9 +484,9 @@ export const App: React.FC = () => {
     drag.phase === 'dragging'
       ? {
           translate: `${drag.x}px ${drag.y}px`,
-          scale: `${selectedStyle.draggingScale}`,
-          boxShadow: selectedStyle.shadowDragging,
-          opacity: selectedStyle.draggingOpacity,
+          scale: `${draggingScale}`,
+          boxShadow: shadowDragging,
+          opacity: draggingOpacity,
           userSelect: 'none',
         }
       : drag.phase === 'grabbing'
