@@ -54,10 +54,9 @@ const draggingOpacity = 0.7;
 const shadowDragging = '0 0 2px rgba(0,0,0,0.10), 8px 12px 8px rgba(0,0,0,0.14)';
 
 const gravityGrabKeyframes: Keyframe[] = [
-  { scale: 1, boxShadow: tokens.shadow2, opacity: 1 },
+  { scale: 1, opacity: 1 },
   {
     scale: draggingScale,
-    boxShadow: shadowDragging,
     opacity: draggingOpacity,
   },
 ];
@@ -82,12 +81,10 @@ const gravityStyle: MotionStyle = {
         keyframes: [
           {
             translate: `${dragX}px ${dragY}px`,
-            scale: draggingScale,
-            boxShadow: shadowDragging,
-            // opacity: draggingOpacity,
           },
-          // { translate: '0px 0px', scale: draggingScale, boxShadow: shadowDragging, opacity: draggingOpacity },
-          { translate: '0px 0px', scale: draggingScale, boxShadow: shadowDragging },
+          {
+            translate: '0px 0px',
+          },
         ],
         duration: slideDuration,
         easing: curveOvershoot1,
@@ -95,12 +92,7 @@ const gravityStyle: MotionStyle = {
       },
       {
         delay: slideDuration - bounceOverlap,
-        keyframes: [
-          // { scale: draggingScale, boxShadow: shadowDragging, opacity: draggingOpacity },
-          // { scale: 1, boxShadow: tokens.shadow2, opacity: 1 },
-          { scale: draggingScale, boxShadow: shadowDragging },
-          { scale: 1, boxShadow: tokens.shadow2 },
-        ],
+        keyframes: [{ scale: draggingScale }, { scale: 1 }],
         duration: 800,
         easing: curveGravityBounce1,
         fill: 'forwards',
@@ -185,8 +177,8 @@ const magnetStyle: MotionStyle = {
     return [
       {
         keyframes: [
-          { translate: `0px ${dragY}px`, scale: draggingScale, boxShadow: shadowDragging },
-          { translate: `0px 0px`, scale: draggingScale, boxShadow: shadowDragging },
+          { translate: `0px ${dragY}px`, scale: draggingScale },
+          { translate: `0px 0px`, scale: draggingScale },
         ],
         duration: slideYDuration,
         // easing: curvePower7Bounce2,
@@ -238,8 +230,8 @@ const magnetStyle: MotionStyle = {
         keyframes: [
           // { scale: draggingScale, opacity: draggingOpacity, offset: 0.7 },
           // { scale: 1, opacity: 1 },
-          { scale: draggingScale, boxShadow: shadowDragging, easing: 'ease-out', offset: 0.7 },
-          { scale: 1, boxShadow: tokens.shadow2 },
+          { scale: draggingScale, easing: 'ease-out', offset: 0.7 },
+          { scale: 1 },
         ],
         duration: slideXDuration,
         fill: 'forwards',
@@ -366,6 +358,9 @@ const useStyles = makeStyles({
       backgroundColor: tokens.colorNeutralBackground1,
       boxShadow: tokens.shadow2,
     },
+  },
+  dropWrapper: {
+    scale: `${draggingScale}`,
   },
   cardDragging: {
     width: CARD_WIDTH,
@@ -609,7 +604,7 @@ export const App: React.FC = () => {
         motionStyleId={selectedStyleId}
         onMotionFinish={handleMotionFinish}
       >
-        <div>
+        <div className={styles.dropWrapper}>
           <TaskCard className={styles.card} onPointerDown={handlePointerDown} />
         </div>
       </DropMotion>
