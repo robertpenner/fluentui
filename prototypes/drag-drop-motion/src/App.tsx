@@ -451,8 +451,8 @@ const TaskCard: React.FC<{ className?: string; onPointerDown?: React.PointerEven
 
 type DragState =
   | { phase: 'idle' }
-  | { phase: 'grabbing'; x: number; y: number; key: number }
-  | { phase: 'dragging'; x: number; y: number }
+  | { phase: 'grabbing'; key: number }
+  | { phase: 'dragging' }
   | { phase: 'dropping'; x: number; y: number; key: number };
 
 const CENTER_CELL = Math.floor((GRID_COLUMNS * GRID_ROWS) / 2);
@@ -465,6 +465,8 @@ export const App: React.FC = () => {
   const [targetIndex, setTargetIndex] = useState(CENTER_CELL);
   const targetIndexRef = useRef(CENTER_CELL);
   const dragStartRef = useRef({ mouseX: 0, mouseY: 0 });
+  const dragPosRef = useRef({ x: 0, y: 0 });
+  const cardWrapperRef = useRef<HTMLDivElement>(null);
   const grabCounter = useRef(0);
   const dropCounter = useRef(0);
   const cellRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -495,15 +497,19 @@ export const App: React.FC = () => {
       e.preventDefault();
       (e.target as Element).setPointerCapture(e.pointerId);
       dragStartRef.current = { mouseX: e.clientX, mouseY: e.clientY };
+      dragPosRef.current = { x: 0, y: 0 };
       targetIndexRef.current = cardIndex;
       setTargetIndex(cardIndex);
       grabCounter.current += 1;
-      setDrag({ phase: 'grabbing', x: 0, y: 0, key: grabCounter.current });
+      setDrag({ phase: 'grabbing', key: grabCounter.current });
 
       const handlePointerMove = (ev: PointerEvent) => {
         const dx = ev.clientX - dragStartRef.current.mouseX;
         const dy = ev.clientY - dragStartRef.current.mouseY;
-        setDrag(prev => (prev.phase === 'grabbing' ? { ...prev, x: dx, y: dy } : { phase: 'dragging', x: dx, y: dy }));
+        dragPosRef.current = { x: dx, y: dy };
+        if (cardWrapperRef.current) {
+          cardWrapperRef.current.style.translate = `${dx}px ${dy}px`;
+        }
 
         const cardEl = cellRefs.current[cardIndex];
         if (cardEl) {
@@ -555,7 +561,7 @@ export const App: React.FC = () => {
   );
 
   const handleGrabFinish = useCallback(() => {
-    setDrag(prev => (prev.phase === 'grabbing' ? { phase: 'dragging', x: prev.x, y: prev.y } : prev));
+    setDrag(prev => (prev.phase === 'grabbing' ? { phase: 'dragging' } : prev));
   }, []);
 
   const handleMotionFinish = useCallback(() => {
@@ -565,16 +571,18 @@ export const App: React.FC = () => {
   const cardStyle: React.CSSProperties | undefined =
     drag.phase === 'dragging'
       ? {
-          translate: `${drag.x}px ${drag.y}px`,
+          translate: `${dragPosRef.current.x}px ${dragPosRef.current.y}px`,
           scale: `${draggingScale}`,
           boxShadow: shadowDragging,
           opacity: draggingOpacity,
           userSelect: 'none',
+          willChange: 'translate',
         }
       : drag.phase === 'grabbing'
       ? {
-          translate: `${drag.x}px ${drag.y}px`,
+          translate: `${dragPosRef.current.x}px ${dragPosRef.current.y}px`,
           userSelect: 'none',
+          willChange: 'translate',
         }
       : undefined;
 
@@ -593,23 +601,21 @@ export const App: React.FC = () => {
         </div>
       </DropMotion>
     );
-  } else if (drag.phase === 'grabbing') {
-    cardCell = (
-      <div style={cardStyle}>
-        <GrabMotion key={drag.key} motionStyleId={selectedStyleId} onMotionFinish={handleGrabFinish}>
-          <div>
-            <TaskCard className={styles.cardDragging} onPointerDown={handlePointerDown} />
-          </div>
-        </GrabMotion>
-      </div>
-    );
   } else {
     cardCell = (
-      <div style={cardStyle}>
-        <TaskCard
-          className={drag.phase === 'dragging' ? styles.cardDragging : styles.cardIdle}
-          onPointerDown={handlePointerDown}
-        />
+      <div ref={cardWrapperRef} style={cardStyle}>
+        {drag.phase === 'grabbing' ? (
+          <GrabMotion key={drag.key} motionStyleId={selectedStyleId} onMotionFinish={handleGrabFinish}>
+            <div>
+              <TaskCard className={styles.cardDragging} onPointerDown={handlePointerDown} />
+            </div>
+          </GrabMotion>
+        ) : (
+          <TaskCard
+            className={drag.phase === 'dragging' ? styles.cardDragging : styles.cardIdle}
+            onPointerDown={handlePointerDown}
+          />
+        )}
       </div>
     );
   }
