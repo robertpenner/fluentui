@@ -351,6 +351,7 @@ const useStyles = makeStyles({
     touchAction: 'none',
     ':hover': {
       backgroundColor: tokens.colorNeutralBackground1,
+      boxShadow: tokens.shadow2,
     },
   },
   cardDragging: {
@@ -359,6 +360,10 @@ const useStyles = makeStyles({
     boxShadow: shadowDragging,
     userSelect: 'none',
     touchAction: 'none',
+    ':hover': {
+      backgroundColor: tokens.colorNeutralBackground1,
+      boxShadow: shadowDragging,
+    },
     ':active': {
       backgroundColor: tokens.colorNeutralBackground1Hover,
     },
@@ -368,6 +373,10 @@ const useStyles = makeStyles({
     cursor: 'grab',
     userSelect: 'none',
     touchAction: 'none',
+    ':hover': {
+      backgroundColor: tokens.colorNeutralBackground1,
+      boxShadow: tokens.shadow2,
+    },
     ':active': {
       backgroundColor: tokens.colorNeutralBackground1Hover,
     },
