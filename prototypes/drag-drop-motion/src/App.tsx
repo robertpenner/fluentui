@@ -164,75 +164,46 @@ const magnetStyle: MotionStyle = {
   grab: { duration: 350, easing: 'linear', keyframes: magnetGrabKeyframes },
 
   createDropAtoms: ({ dragX, dragY }) => {
-    // const slideDuration = Math.max(Math.hypot(dragX, dragY) * 3, 400);
-    // const slideYDuration = Math.max(Math.abs(dragY) * 4, 100);
     const slideYDuration = clamp(50 + dragY * dragY * 0.03, 100, 600);
     const slideXDuration = clamp(Math.abs(dragX) * 0.7, 200, 600);
-    // console.log('slideYDuration', slideYDuration);
-    // console.log('slideXDuration', slideXDuration);
     const rotation = clampUnit(dragX / 300) * 6;
     const settleRotation = Math.max(Math.sqrt(Math.abs(rotation) * 3), 1) * Math.sign(rotation);
-    // const phaseDelay = (slideYDuration + slideXDuration) / 5;
-    const phaseDelay = -100;
+
+    // Combined translate: Y-slide then X-slide in one atom.
+    const totalTranslateDuration = slideYDuration + slideXDuration;
+    const xStartOffset = slideYDuration / totalTranslateDuration;
+
+    // Combined rotate: tilt during Y-slide, then settle during X-slide.
+    const tiltDuration = slideYDuration * 0.4;
+    const totalRotateDuration = tiltDuration + slideXDuration;
+    const tiltFraction = tiltDuration / totalRotateDuration;
+
     return [
       {
         keyframes: [
-          { translate: `0px ${dragY}px`, scale: draggingScale },
-          { translate: `0px 0px`, scale: draggingScale },
+          { translate: `${dragX}px ${dragY}px`, offset: 0, easing: curveBezierHesitateGentle },
+          { translate: `${dragX}px 0px`, offset: xStartOffset, easing: curvePower5 },
+          { translate: '0px 0px', offset: 1 },
         ],
-        duration: slideYDuration,
-        // easing: curvePower7Bounce2,
-        easing: curveBezierHesitateGentle,
+        duration: totalTranslateDuration,
         fill: 'both',
-        composite: 'add',
       },
       {
         delay: slideYDuration * 0.6,
         keyframes: [
           { rotate: '0deg', offset: 0 },
-          { rotate: '0deg', offset: 0.2, easing: 'ease-in-out' },
-          { rotate: `${rotation}deg`, offset: 1 },
+          { rotate: '0deg', offset: 0.2 * tiltFraction, easing: 'ease-in-out' },
+          { rotate: `${rotation}deg`, offset: tiltFraction, easing: curvePower5 },
+          { rotate: `${settleRotation}deg`, offset: tiltFraction + (1 - tiltFraction) * 0.7 },
+          { rotate: `${-settleRotation * 0.75}deg`, offset: tiltFraction + (1 - tiltFraction) * 0.8 },
+          { rotate: '0deg', offset: 1 },
         ],
-        duration: slideYDuration * 0.5,
-        // easing: curvePower7Bounce2,
-        fill: 'forwards',
-        // composite: 'add',
-      },
-      {
-        delay: slideYDuration + phaseDelay,
-        keyframes: [
-          // { translate: `${dragX}px 0px`, rotate: `${rotation}deg` },
-          // { translate: `0px 0px`, rotate: `0deg` },
-          { translate: `${dragX}px 0px` },
-          { translate: `0px 0px` },
-        ],
-        duration: slideXDuration,
-        // easing: 'ease-in',
-        easing: curvePower5,
-        fill: 'both',
-        composite: 'add',
-      },
-      {
-        // delay: slideYDuration + phaseDelay,
-        delay: slideYDuration,
-        keyframes: [
-          { rotate: `${rotation}deg`, easing: curvePower5 },
-          { rotate: `${settleRotation}deg`, offset: 0.7 },
-          { rotate: `${-settleRotation * 0.75}deg`, offset: 0.8 },
-          { rotate: `0deg`, offset: 1 },
-        ],
-        duration: slideXDuration,
+        duration: totalRotateDuration,
         fill: 'forwards',
       },
       {
-        // delay: slideYDuration + phaseDelay,
         delay: slideYDuration,
-        keyframes: [
-          // { scale: draggingScale, opacity: draggingOpacity, offset: 0.7 },
-          // { scale: 1, opacity: 1 },
-          { scale: draggingScale, easing: 'ease-out', offset: 0.7 },
-          { scale: 1 },
-        ],
+        keyframes: [{ scale: draggingScale, easing: 'ease-out', offset: 0.7 }, { scale: 1 }],
         duration: slideXDuration,
         fill: 'forwards',
       },
@@ -362,6 +333,12 @@ const useStyles = makeStyles({
   dropWrapper: {
     scale: `${draggingScale}`,
   },
+  cardDropping: {
+    width: CARD_WIDTH,
+    boxShadow: shadowDragging,
+    userSelect: 'none',
+    touchAction: 'none',
+  },
   cardDragging: {
     width: CARD_WIDTH,
     cursor: 'grabbing',
@@ -378,6 +355,7 @@ const useStyles = makeStyles({
   },
   cardIdle: {
     width: CARD_WIDTH,
+    boxShadow: tokens.shadow2,
     cursor: 'grab',
     userSelect: 'none',
     touchAction: 'none',
@@ -605,7 +583,7 @@ export const App: React.FC = () => {
         onMotionFinish={handleMotionFinish}
       >
         <div className={styles.dropWrapper}>
-          <TaskCard className={styles.card} onPointerDown={handlePointerDown} />
+          <TaskCard className={styles.cardDropping} onPointerDown={handlePointerDown} />
         </div>
       </DropMotion>
     );
