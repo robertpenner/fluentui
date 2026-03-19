@@ -279,7 +279,7 @@ const springStyle: MotionStyle = {
   },
 };
 
-const motionStyles: Record<string, MotionStyle> = { gravity: gravityStyle, magnet: magnetStyle };
+const motionStyles: Record<string, MotionStyle> = { Gravity: gravityStyle, Magnet: magnetStyle };
 
 const GrabMotion = createMotionComponent<{ motionStyleId: string }>(({ motionStyleId }) => {
   const style = motionStyles[motionStyleId];
