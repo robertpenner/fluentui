@@ -2,6 +2,8 @@ import React, { useState, useRef, useCallback } from 'react';
 import { Card, Caption1, Badge, Checkbox, Text, makeStyles, tokens, Button } from '@fluentui/react-components';
 import { createMotionComponent, AtomMotion } from '@fluentui/react-motion';
 
+const clamp = (v: number, min: number, max: number) => Math.min(Math.max(v, min), max);
+
 const clampUnit = (v: number) => Math.min(Math.max(v, -1), 1);
 
 //// GRAB EASING
@@ -137,6 +139,12 @@ const curveBezierHesitateBounce2 = `linear(0.000, 0.02387 1%, 0.04441 2%, 0.0622
 // https://robertpenner.com/fuse/#head_type=bezier&tail_type=bounce&head_bezier_x1=0.24&head_bezier_y1=0.44&head_bezier_x2=0.99&head_bezier_y2=-0.28&bounces=2&decay=88&duration=500&show_heatmap=true&tail_enabled=false
 const curveBezierHesitate = `linear(0.000, 0.01721 1%, 0.03242 2%, 0.04596 3%, 0.05809 4%, 0.06900 5%, 0.08776 7%, 0.1032 9%, 0.1160 11%, 0.1266 13%, 0.1354 15%, 0.1458 18%, 0.1537 21%, 0.1594 24%, 0.1648 28%, 0.1687 33%, 0.1742 47%, 0.1773 52%, 0.1813 56%, 0.1874 60%, 0.1936 63%, 0.2017 66%, 0.2121 69%, 0.2205 71%, 0.2302 73%, 0.2416 75%, 0.2547 77%, 0.2699 79%, 0.2876 81%, 0.3082 83%, 0.3322 85%, 0.3457 86%, 0.3605 87%, 0.3766 88%, 0.3941 89%, 0.4134 90%, 0.4347 91%, 0.4584 92%, 0.4849 93%, 0.5148 94%, 0.5492 95%, 0.5894 96%, 0.6378 97%, 0.6991 98%, 0.7853 99%, 1.000)`;
 
+// https://robertpenner.com/fuse/#head_type=bezier&tail_type=bounce&head_bezier_x1=0.06&head_bezier_y1=0.41&head_bezier_x2=0.98&head_bezier_y2=0.16&bounces=2&decay=88&duration=500&show_heatmap=true&tail_enabled=false
+const curveBezierHesitateGentle = `linear(0.000, 0.04256 1%, 0.06766 2%, 0.08659 3%, 0.1021 4%, 0.1153 5%, 0.1269 6%, 0.1467 8%, 0.1632 10%, 0.1774 12%, 0.1959 15%, 0.2117 18%, 0.2302 22%, 0.2505 27%, 0.2795 35%, 0.3145 45%, 0.3368 51%, 0.3571 56%, 0.3748 60%, 0.3944 64%, 0.4163 68%, 0.4346 71%, 0.4548 74%, 0.4774 77%, 0.4940 79%, 0.5122 81%, 0.5321 83%, 0.5542 85%, 0.5788 87%, 0.6066 89%, 0.6220 90%, 0.6387 91%, 0.6567 92%, 0.6764 93%, 0.6983 94%, 0.7227 95%, 0.7506 96%, 0.7834 97%, 0.8238 98%, 0.8788 99%, 1.000)`;
+
+// https://robertpenner.com/fuse/#head_type=power-back&tail_type=bounce&head_anticipation=0&head_exponent=5.01&bounces=2&decay=88&duration=500&show_heatmap=true&tail_enabled=false
+const curvePower5 = `linear(0.000, 0.0002435 19%, 0.001416 27%, 0.003870 33%, 0.007847 38%, 0.01296 42%, 0.01831 45%, 0.02529 48%, 0.03427 51%, 0.04563 54%, 0.05475 56%, 0.06528 58%, 0.07736 60%, 0.09118 62%, 0.1069 64%, 0.1247 66%, 0.1448 68%, 0.1675 70%, 0.1929 72%, 0.2212 74%, 0.2529 76%, 0.2880 78%, 0.3269 80%, 0.3479 81%, 0.3700 82%, 0.3932 83%, 0.4175 84%, 0.4430 85%, 0.4697 86%, 0.4977 87%, 0.5271 88%, 0.5578 89%, 0.5899 90%, 0.6234 91%, 0.6585 92%, 0.6952 93%, 0.7335 94%, 0.7734 95%, 0.8150 96%, 0.8585 97%, 0.9037 98%, 0.9509 99%, 1.000)`;
+
 const magnetVibratePx = 1;
 const magnetPressScale = 1.02;
 
@@ -152,6 +160,7 @@ const magnetGrabKeyframes: Keyframe[] = [
   // { scale: 1, offset: 0.3, easing: curveMagnetLift2 },
   // { scale: magnetPressScale, easing: 'ease-in', offset: 0.8 },
   { scale: magnetPressScale, easing: curveMagnetLiftOvershoot2, offset: 0.8 },
+  // { scale: magnetPressScale, easing: 'ease-out', offset: 0.61 },
   { scale: draggingScale, opacity: draggingOpacity, offset: 1 },
 ];
 
@@ -161,33 +170,41 @@ const magnetStyle: MotionStyle = {
 
   createDropAtoms: ({ dragX, dragY }) => {
     // const slideDuration = Math.max(Math.hypot(dragX, dragY) * 3, 400);
-    const slideYDuration = Math.max(Math.abs(dragY) * 3, 300);
-    const slideXDuration = Math.max(Math.abs(dragX) * 3, 300) * 0.2;
-    // const phaseOverlap = (slideYDuration + slideXDuration) / 5;
-    const phaseOverlap = -150;
-    const rotation = clampUnit(dragX / 300) * 6 * 3;
+    // const slideYDuration = Math.max(Math.abs(dragY) * 4, 100);
+    const slideYDuration = clamp(50 + dragY * dragY * 0.02, 100, 500);
+    const slideXDuration = Math.max(Math.abs(dragX) * 0.5, 300);
+    console.log('slideYDuration', slideYDuration);
+    // console.log('slideXDuration', slideXDuration);
+    const rotation = clampUnit(dragX / 300) * 6;
+    const settleRotation = Math.max(Math.sqrt(Math.abs(rotation) * 3), 1) * Math.sign(rotation);
+    // const phaseDelay = (slideYDuration + slideXDuration) / 5;
+    const phaseDelay = -100;
     return [
       {
-        keyframes: [{ translate: `0px ${dragY}px` }, { translate: `0px 0px` }],
+        keyframes: [
+          { translate: `0px ${dragY}px`, scale: draggingScale },
+          { translate: `0px 0px`, scale: draggingScale },
+        ],
         duration: slideYDuration,
         // easing: curvePower7Bounce2,
-        easing: curveBezierHesitate,
+        easing: curveBezierHesitateGentle,
         fill: 'both',
         composite: 'add',
       },
       {
+        delay: slideYDuration * 0.6,
         keyframes: [
           { rotate: '0deg', offset: 0 },
-          { rotate: '0deg', offset: 0.9, easing: 'ease-in' },
+          { rotate: '0deg', offset: 0.2, easing: 'ease-in-out' },
           { rotate: `${rotation}deg`, offset: 1 },
         ],
-        duration: slideYDuration,
+        duration: slideYDuration * 0.5,
         // easing: curvePower7Bounce2,
-        // fill: 'forwards',
+        fill: 'forwards',
         // composite: 'add',
       },
       {
-        delay: slideYDuration - phaseOverlap,
+        delay: slideYDuration + phaseDelay,
         keyframes: [
           // { translate: `${dragX}px 0px`, rotate: `${rotation}deg` },
           // { translate: `0px 0px`, rotate: `0deg` },
@@ -195,17 +212,34 @@ const magnetStyle: MotionStyle = {
           { translate: `0px 0px` },
         ],
         duration: slideXDuration,
-        easing: 'ease-in',
+        // easing: 'ease-in',
+        easing: curvePower5,
         fill: 'both',
         composite: 'add',
       },
       {
-        delay: slideYDuration - phaseOverlap,
-        keyframes: [{ rotate: `${rotation}deg` }, { rotate: `0deg` }],
+        // delay: slideYDuration + phaseDelay,
+        delay: slideYDuration,
+        keyframes: [
+          { rotate: `${rotation}deg`, easing: curvePower5 },
+          { rotate: `${settleRotation}deg`, offset: 0.7 },
+          { rotate: `${-settleRotation * 0.75}deg`, offset: 0.8 },
+          { rotate: `0deg`, offset: 1 },
+        ],
         duration: slideXDuration,
-        easing: 'ease-out',
-        // fill: 'forwards',
-        // composite: 'add',
+        fill: 'forwards',
+      },
+      {
+        // delay: slideYDuration + phaseDelay,
+        delay: slideYDuration,
+        keyframes: [
+          // { scale: draggingScale, opacity: draggingOpacity, offset: 0.7 },
+          // { scale: 1, opacity: 1 },
+          { scale: draggingScale, easing: 'ease-out', offset: 0.7 },
+          { scale: 1 },
+        ],
+        duration: slideXDuration,
+        fill: 'forwards',
       },
     ];
   },
