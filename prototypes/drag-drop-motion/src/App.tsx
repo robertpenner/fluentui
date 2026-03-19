@@ -50,7 +50,7 @@ type MotionStyle = {
 //// MOTION STYLES
 
 const draggingScale = 1.1;
-const draggingOpacity = 0.5;
+const draggingOpacity = 0.7;
 const shadowDragging = '0 0 2px rgba(0,0,0,0.10), 8px 12px 8px rgba(0,0,0,0.14)';
 
 const gravityGrabKeyframes: Keyframe[] = [
@@ -84,9 +84,10 @@ const gravityStyle: MotionStyle = {
             translate: `${dragX}px ${dragY}px`,
             scale: draggingScale,
             boxShadow: shadowDragging,
-            opacity: draggingOpacity,
+            // opacity: draggingOpacity,
           },
-          { translate: '0px 0px', scale: draggingScale, boxShadow: shadowDragging, opacity: draggingOpacity },
+          // { translate: '0px 0px', scale: draggingScale, boxShadow: shadowDragging, opacity: draggingOpacity },
+          { translate: '0px 0px', scale: draggingScale, boxShadow: shadowDragging },
         ],
         duration: slideDuration,
         easing: curveOvershoot1,
@@ -95,8 +96,10 @@ const gravityStyle: MotionStyle = {
       {
         delay: slideDuration - bounceOverlap,
         keyframes: [
-          { scale: draggingScale, boxShadow: shadowDragging, opacity: draggingOpacity },
-          { scale: 1, boxShadow: tokens.shadow2, opacity: 1 },
+          // { scale: draggingScale, boxShadow: shadowDragging, opacity: draggingOpacity },
+          // { scale: 1, boxShadow: tokens.shadow2, opacity: 1 },
+          { scale: draggingScale, boxShadow: shadowDragging },
+          { scale: 1, boxShadow: tokens.shadow2 },
         ],
         duration: 800,
         easing: curveGravityBounce1,
@@ -171,9 +174,9 @@ const magnetStyle: MotionStyle = {
   createDropAtoms: ({ dragX, dragY }) => {
     // const slideDuration = Math.max(Math.hypot(dragX, dragY) * 3, 400);
     // const slideYDuration = Math.max(Math.abs(dragY) * 4, 100);
-    const slideYDuration = clamp(50 + dragY * dragY * 0.02, 100, 500);
-    const slideXDuration = Math.max(Math.abs(dragX) * 0.5, 300);
-    console.log('slideYDuration', slideYDuration);
+    const slideYDuration = clamp(50 + dragY * dragY * 0.03, 100, 600);
+    const slideXDuration = clamp(Math.abs(dragX) * 0.7, 200, 600);
+    // console.log('slideYDuration', slideYDuration);
     // console.log('slideXDuration', slideXDuration);
     const rotation = clampUnit(dragX / 300) * 6;
     const settleRotation = Math.max(Math.sqrt(Math.abs(rotation) * 3), 1) * Math.sign(rotation);
@@ -182,8 +185,8 @@ const magnetStyle: MotionStyle = {
     return [
       {
         keyframes: [
-          { translate: `0px ${dragY}px`, scale: draggingScale },
-          { translate: `0px 0px`, scale: draggingScale },
+          { translate: `0px ${dragY}px`, scale: draggingScale, boxShadow: shadowDragging },
+          { translate: `0px 0px`, scale: draggingScale, boxShadow: shadowDragging },
         ],
         duration: slideYDuration,
         // easing: curvePower7Bounce2,
@@ -235,8 +238,8 @@ const magnetStyle: MotionStyle = {
         keyframes: [
           // { scale: draggingScale, opacity: draggingOpacity, offset: 0.7 },
           // { scale: 1, opacity: 1 },
-          { scale: draggingScale, easing: 'ease-out', offset: 0.7 },
-          { scale: 1 },
+          { scale: draggingScale, boxShadow: shadowDragging, easing: 'ease-out', offset: 0.7 },
+          { scale: 1, boxShadow: tokens.shadow2 },
         ],
         duration: slideXDuration,
         fill: 'forwards',
