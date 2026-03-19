@@ -4,9 +4,6 @@ import { createMotionComponent, AtomMotion } from '@fluentui/react-motion';
 
 const clampUnit = (v: number) => Math.min(Math.max(v, -1), 1);
 
-const resolveDuration = <Params,>(d: DynamicDuration<Params>, params: Params): number =>
-  typeof d === 'function' ? d(params) : d;
-
 //// GRAB EASING
 
 // https://robertpenner.com/fuse/#head_type=power-back&tail_type=power-back&join=0.401&head_anticipation=15&head_exponent=2.02&tail_overshoot=0&tail_exponent=3&duration=700
@@ -41,23 +38,11 @@ const curveGravityBounce1 = `linear(0.000, 0.001355 2%, 0.005611 4%, 0.01288 6%,
 //// MOTION STYLE CONFIG
 
 type DragParams = { dragX: number; dragY: number };
-type DynamicDuration<P = DragParams> = number | ((params: P) => number);
 
 type MotionStyle = {
   name: string;
-  // draggingScale: number;
-  // draggingOpacity: number;
-  // shadowDragging: string;
   grab: { duration: number; easing: string; keyframes: Keyframe[] };
-  slide: { easing: string; duration: DynamicDuration<DragParams> };
-  bounce: { easing: string; duration: DynamicDuration<DragParams>; overlapWithSlide: number };
-  rotation: {
-    enabled: boolean;
-    maxAngle: number;
-    referenceDistance: number;
-    duration?: DynamicDuration<DragParams>;
-    easing?: string;
-  };
+  createDropAtoms: (params: DragParams) => AtomMotion[];
 };
 
 //// MOTION STYLES
@@ -82,12 +67,51 @@ const gravityStyle: MotionStyle = {
     easing: curveCompressAnticipateExpandSmooth2,
     keyframes: gravityGrabKeyframes,
   },
-  slide: {
-    easing: curveOvershoot1,
-    duration: ({ dragX, dragY }) => Math.max(Math.sqrt(dragX * dragX + dragY * dragY) * 3, 400),
+  createDropAtoms: ({ dragX, dragY }) => {
+    const slideDuration = Math.max(Math.sqrt(dragX * dragX + dragY * dragY) * 3, 400);
+    const bounceOverlap = 300;
+    // 2D rotation proportional to horizontal drag offset.
+    // Card slides in the opposite direction to dragX, so:
+    //   dragX > 0 → card slides left → rotates clockwise (positive angle)
+    //   dragX < 0 → card slides right → rotates counter-clockwise (negative angle)
+    const rotation = -clampUnit(dragX / 300) * 6;
+    return [
+      {
+        keyframes: [
+          {
+            translate: `${dragX}px ${dragY}px`,
+            scale: draggingScale,
+            boxShadow: shadowDragging,
+            opacity: draggingOpacity,
+          },
+          { translate: '0px 0px', scale: draggingScale, boxShadow: shadowDragging, opacity: draggingOpacity },
+        ],
+        duration: slideDuration,
+        easing: curveOvershoot1,
+        fill: 'both' as const,
+      },
+      {
+        delay: slideDuration - bounceOverlap,
+        keyframes: [
+          { scale: draggingScale, boxShadow: shadowDragging, opacity: draggingOpacity },
+          { scale: 1, boxShadow: tokens.shadow2, opacity: 1 },
+        ],
+        duration: 800,
+        easing: curveGravityBounce1,
+        fill: 'forwards' as const,
+      },
+      {
+        keyframes: [
+          { rotate: '0deg', easing: 'ease-in-out' },
+          { rotate: `${rotation}deg`, easing: 'ease-in-out' },
+          { rotate: `${-rotation / 3}deg`, easing: 'ease-in-out' },
+          { rotate: '0deg' },
+        ],
+        duration: slideDuration,
+        fill: 'both' as const,
+      },
+    ];
   },
-  bounce: { easing: curveGravityBounce1, duration: 800, overlapWithSlide: 300 },
-  rotation: { enabled: true, maxAngle: 6, referenceDistance: 300 },
 };
 
 const curveMagnetLift1 = `linear(0.000, 0.0001017 29%, 0.0008841 36%, 0.002536 40%, 0.005226 43%, 0.008234 45%, 0.01272 47%, 0.01929 49%, 0.02879 51%, 0.03495 52%, 0.04229 53%, 0.05098 54%, 0.06125 55%, 0.07334 56%, 0.08754 57%, 0.1042 58%, 0.1236 59%, 0.1462 60%, 0.1725 61%, 0.2029 62%, 0.2382 63%, 0.2788 64%, 0.3255 65%, 0.3792 66%, 0.4408 67%, 0.5112 68%, 0.5915 69%, 0.6830 70%, 0.7871 71%, 0.9053 72%, 0.9788 73%, 0.9097 74%, 0.8514 75%, 0.8036 76%, 0.7666 77%, 0.7402 78%, 0.7244 79%, 0.7193 80%, 0.7248 81%, 0.7410 82%, 0.7678 83%, 0.8053 84%, 0.8534 85%, 0.9122 86%, 0.9816 87%, 0.9701 88%, 0.9400 89%, 0.9206 90%, 0.9118 91%, 0.9137 92%, 0.9262 93%, 0.9493 94%, 0.9832 95%, 0.9874 96%, 0.9746 97%, 0.9724 98%, 0.9809 99%, 1.000)`;
@@ -106,12 +130,13 @@ const magnetPressScale = 1.02;
 
 const magnetGrabKeyframes: Keyframe[] = [
   { translate: '0px 0px', scale: magnetPressScale, offset: 0 },
-  { translate: `${magnetVibratePx}px`, scale: magnetPressScale, offset: 0.1 },
-  { translate: `-${magnetVibratePx}px`, scale: magnetPressScale, offset: 0.2 },
-  { translate: `${magnetVibratePx}px`, scale: magnetPressScale, offset: 0.3 },
-  { translate: `-${magnetVibratePx}px`, scale: magnetPressScale, offset: 0.4 },
-  { translate: `${magnetVibratePx}px`, scale: magnetPressScale, offset: 0.5 },
-  { translate: '0px 0px', scale: magnetPressScale, offset: 0.6 },
+  { translate: `${magnetVibratePx}px ${magnetVibratePx}px`, scale: magnetPressScale, offset: 0.1 },
+  { translate: `-${magnetVibratePx}px ${magnetVibratePx}px`, scale: magnetPressScale, offset: 0.2 },
+  { translate: `${magnetVibratePx}px -${magnetVibratePx}px`, scale: magnetPressScale, offset: 0.3 },
+  { translate: `-${magnetVibratePx}px -${magnetVibratePx}px`, scale: magnetPressScale, offset: 0.4 },
+  { translate: `${magnetVibratePx}px ${magnetVibratePx}px`, scale: magnetPressScale, offset: 0.5 },
+  // TODO: handle opacity better: fade out gently after the pickup
+  { translate: '0px 0px', scale: magnetPressScale, opacity: 1, offset: 0.6 },
   // { scale: 1, offset: 0.3, easing: curveMagnetLift2 },
   // { scale: magnetPressScale, easing: 'ease-in', offset: 0.8 },
   { scale: magnetPressScale, easing: curveMagnetLiftOvershoot2, offset: 0.8 },
@@ -120,13 +145,48 @@ const magnetGrabKeyframes: Keyframe[] = [
 
 const magnetStyle: MotionStyle = {
   name: 'magnet',
-  grab: { duration: 250, easing: 'linear', keyframes: magnetGrabKeyframes },
-  slide: {
-    easing: curveOvershoot1,
-    duration: ({ dragX, dragY }) => Math.max(Math.sqrt(dragX * dragX + dragY * dragY) * 3, 400),
+  grab: { duration: 350, easing: 'linear', keyframes: magnetGrabKeyframes },
+  createDropAtoms: ({ dragX, dragY }) => {
+    const slideDuration = Math.max(Math.sqrt(dragX * dragX + dragY * dragY) * 3, 400);
+    const bounceOverlap = 300;
+    const rotation = -clampUnit(dragX / 300) * 6;
+    return [
+      {
+        keyframes: [
+          {
+            translate: `${dragX}px ${dragY}px`,
+            scale: draggingScale,
+            boxShadow: shadowDragging,
+            opacity: draggingOpacity,
+          },
+          { translate: '0px 0px', scale: draggingScale, boxShadow: shadowDragging, opacity: draggingOpacity },
+        ],
+        duration: slideDuration,
+        easing: curveOvershoot1,
+        fill: 'both' as const,
+      },
+      {
+        delay: slideDuration - bounceOverlap,
+        keyframes: [
+          { scale: draggingScale, boxShadow: shadowDragging, opacity: draggingOpacity },
+          { scale: 1, boxShadow: tokens.shadow2, opacity: 1 },
+        ],
+        duration: 800,
+        easing: curveGravityBounce1,
+        fill: 'forwards' as const,
+      },
+      {
+        keyframes: [
+          { rotate: '0deg', easing: 'ease-in-out' },
+          { rotate: `${rotation}deg`, easing: 'ease-in-out' },
+          { rotate: `${-rotation / 3}deg`, easing: 'ease-in-out' },
+          { rotate: '0deg' },
+        ],
+        duration: slideDuration,
+        fill: 'both' as const,
+      },
+    ];
   },
-  bounce: { easing: curveGravityBounce1, duration: 800, overlapWithSlide: 300 },
-  rotation: { enabled: true, maxAngle: 6, referenceDistance: 300 },
 };
 
 // const selectedStyle: MotionStyle = gravityStyle;
@@ -139,76 +199,9 @@ const GrabMotion = createMotionComponent(() => ({
   fill: 'forwards',
 }));
 
-/**
- * DropMotion: a three-atom animation parameterised by the drag offset.
- *   Atom 1 — slide from (dragX, dragY) back to origin at a constant scaled size
- *   Atom 2 — scale from dragging → resting
- *   Atom 3 — 2D rotation proportional to horizontal drag offset, settling back to 0°
- */
-const DropMotion = createMotionComponent<{ dragX: number; dragY: number }>(({ dragX, dragY }) => {
-  const params: DragParams = { dragX, dragY };
-  const slideDuration = resolveDuration(selectedStyle.slide.duration, params);
-
-  const atoms: AtomMotion[] = [
-    {
-      keyframes: [
-        {
-          translate: `${dragX}px ${dragY}px`,
-          scale: draggingScale,
-          boxShadow: shadowDragging,
-          opacity: draggingOpacity,
-        },
-        {
-          translate: '0px 0px',
-          scale: draggingScale,
-          boxShadow: shadowDragging,
-          opacity: draggingOpacity,
-        },
-      ],
-      duration: slideDuration,
-      easing: selectedStyle.slide.easing,
-      fill: 'both' as const,
-    },
-    {
-      delay: slideDuration - selectedStyle.bounce.overlapWithSlide,
-      keyframes: [
-        {
-          scale: draggingScale,
-          boxShadow: shadowDragging,
-          opacity: draggingOpacity,
-        },
-        { scale: 1, boxShadow: tokens.shadow2, opacity: 1 },
-      ],
-      duration: resolveDuration(selectedStyle.bounce.duration, params),
-      easing: selectedStyle.bounce.easing,
-      fill: 'forwards' as const,
-    },
-  ];
-
-  if (selectedStyle.rotation.enabled) {
-    // 2D rotation proportional to horizontal drag offset.
-    // Card slides in the opposite direction to dragX, so:
-    //   dragX > 0 → card slides left → rotates clockwise (positive angle)
-    //   dragX < 0 → card slides right → rotates counter-clockwise (negative angle)
-    const rotation = -clampUnit(dragX / selectedStyle.rotation.referenceDistance) * selectedStyle.rotation.maxAngle;
-    atoms.push({
-      keyframes: [
-        { rotate: '0deg', easing: 'ease-in-out' },
-        { rotate: `${rotation}deg`, easing: 'ease-in-out' },
-        { rotate: `${-rotation / 3}deg`, easing: 'ease-in-out' },
-        { rotate: '0deg' },
-      ],
-      duration:
-        selectedStyle.rotation.duration != null
-          ? resolveDuration(selectedStyle.rotation.duration, params)
-          : slideDuration,
-      ...(selectedStyle.rotation.easing ? { easing: selectedStyle.rotation.easing } : {}),
-      fill: 'both' as const,
-    });
-  }
-
-  return atoms;
-});
+const DropMotion = createMotionComponent<{ dragX: number; dragY: number }>(({ dragX, dragY }) =>
+  selectedStyle.createDropAtoms({ dragX, dragY }),
+);
 
 const CARD_WIDTH = '340px';
 const GRID_GAP = '20px';
