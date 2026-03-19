@@ -153,9 +153,8 @@ const magnetGrabKeyframes: Keyframe[] = [
   // TODO: handle opacity better: fade out gently after the pickup
   { translate: '0px 0px', scale: magnetPressScale, opacity: 1, offset: 0.6 },
   // { scale: 1, offset: 0.3, easing: curveMagnetLift2 },
-  // { scale: magnetPressScale, easing: 'ease-in', offset: 0.8 },
-  { scale: magnetPressScale, easing: curveMagnetLiftOvershoot2, offset: 0.8 },
-  // { scale: magnetPressScale, easing: 'ease-out', offset: 0.61 },
+  // { scale: magnetPressScale, easing: curveMagnetLiftOvershoot2, offset: 0.8 },
+  { scale: magnetPressScale, easing: 'ease-out', offset: 0.61 },
   { scale: draggingScale, opacity: draggingOpacity, offset: 1 },
 ];
 
