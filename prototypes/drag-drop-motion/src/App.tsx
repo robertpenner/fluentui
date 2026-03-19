@@ -276,18 +276,23 @@ const springStyle: MotionStyle = {
   },
 };
 
-// const selectedStyle: MotionStyle = gravityStyle;
-const selectedStyle: MotionStyle = magnetStyle;
+const motionStyles: Record<string, MotionStyle> = { gravity: gravityStyle, magnet: magnetStyle };
 
-const GrabMotion = createMotionComponent(() => ({
-  keyframes: selectedStyle.grab.keyframes,
-  duration: selectedStyle.grab.duration,
-  easing: selectedStyle.grab.easing,
-  fill: 'forwards',
-}));
+const GrabMotion = createMotionComponent<{ motionStyleId: string }>(({ motionStyleId }) => {
+  const style = motionStyles[motionStyleId];
+  return {
+    keyframes: style.grab.keyframes,
+    duration: style.grab.duration,
+    easing: style.grab.easing,
+    fill: 'forwards',
+  };
+});
 
-const DropMotion = createMotionComponent<{ dragX: number; dragY: number }>(({ dragX, dragY }) =>
-  selectedStyle.createDropAtoms({ dragX, dragY }),
+const DropMotion = createMotionComponent<{ dragX: number; dragY: number; motionStyleId: string }>(
+  ({ dragX, dragY, motionStyleId }) => {
+    const style = motionStyles[motionStyleId];
+    return style.createDropAtoms({ dragX, dragY });
+  },
 );
 
 const CARD_WIDTH = '340px';
@@ -305,6 +310,11 @@ const useStyles = makeStyles({
     boxSizing: 'border-box',
     backgroundColor: tokens.colorPalettePlatinumBackground2,
     padding: '10px',
+    gap: '16px',
+  },
+  styleSelector: {
+    display: 'flex',
+    gap: '8px',
   },
   grid: {
     display: 'grid',
@@ -467,6 +477,7 @@ const CENTER_CELL = Math.floor((GRID_COLUMNS * GRID_ROWS) / 2);
 
 export const App: React.FC = () => {
   const styles = useStyles();
+  const [selectedStyleId, setSelectedStyleId] = useState(Object.keys(motionStyles)[0]);
   const [drag, setDrag] = useState<DragState>({ phase: 'idle' });
   const [cardIndex, setCardIndex] = useState(CENTER_CELL);
   const [targetIndex, setTargetIndex] = useState(CENTER_CELL);
@@ -588,7 +599,13 @@ export const App: React.FC = () => {
   let cardCell: React.ReactNode;
   if (drag.phase === 'dropping') {
     cardCell = (
-      <DropMotion key={drag.key} dragX={drag.x} dragY={drag.y} onMotionFinish={handleMotionFinish}>
+      <DropMotion
+        key={drag.key}
+        dragX={drag.x}
+        dragY={drag.y}
+        motionStyleId={selectedStyleId}
+        onMotionFinish={handleMotionFinish}
+      >
         <div>
           <TaskCard className={styles.card} onPointerDown={handlePointerDown} />
         </div>
@@ -597,7 +614,7 @@ export const App: React.FC = () => {
   } else if (drag.phase === 'grabbing') {
     cardCell = (
       <div style={cardStyle}>
-        <GrabMotion key={drag.key} onMotionFinish={handleGrabFinish}>
+        <GrabMotion key={drag.key} motionStyleId={selectedStyleId} onMotionFinish={handleGrabFinish}>
           <div>
             <TaskCard className={styles.cardDragging} onPointerDown={handlePointerDown} />
           </div>
@@ -637,6 +654,17 @@ export const App: React.FC = () => {
 
   return (
     <div className={styles.root}>
+      <div className={styles.styleSelector}>
+        {Object.keys(motionStyles).map(id => (
+          <Button
+            key={id}
+            appearance={selectedStyleId === id ? 'primary' : 'secondary'}
+            onClick={() => setSelectedStyleId(id)}
+          >
+            {id}
+          </Button>
+        ))}
+      </div>
       <div className={styles.grid}>{cells}</div>
     </div>
   );
