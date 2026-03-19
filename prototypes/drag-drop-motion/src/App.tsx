@@ -173,10 +173,17 @@ const magnetStyle: MotionStyle = {
     const totalTranslateDuration = slideYDuration + slideXDuration;
     const xStartOffset = slideYDuration / totalTranslateDuration;
 
-    // Combined rotate: tilt during Y-slide, then settle during X-slide.
-    const tiltDuration = slideYDuration * 0.4;
-    const totalRotateDuration = tiltDuration + slideXDuration;
-    const tiltFraction = tiltDuration / totalRotateDuration;
+    // Combined rotate: tilt during Y-slide, then wiggle on arrival at (0, 0).
+    const rotateDelay = slideYDuration * 0.6;
+    const tiltDuration = slideYDuration * 0.5;
+    // Time from rotate start to translate arrival at (0, 0).
+    const arrivalRel = slideYDuration * 0.4 + slideXDuration;
+    // Wiggle settles over 30% of slideXDuration after arrival.
+    const wiggleSettleDuration = 0.3 * slideXDuration;
+    const totalRotateDuration = arrivalRel + wiggleSettleDuration;
+    const tiltEndOffset = tiltDuration / totalRotateDuration;
+    const arrivalOffset = arrivalRel / totalRotateDuration;
+    const undershootOffset = (arrivalRel + 0.1 * slideXDuration) / totalRotateDuration;
 
     return [
       {
@@ -189,13 +196,13 @@ const magnetStyle: MotionStyle = {
         fill: 'both',
       },
       {
-        delay: slideYDuration * 0.6,
+        delay: rotateDelay,
         keyframes: [
           { rotate: '0deg', offset: 0 },
-          { rotate: '0deg', offset: 0.2 * tiltFraction, easing: 'ease-in-out' },
-          { rotate: `${rotation}deg`, offset: tiltFraction, easing: curvePower5 },
-          { rotate: `${settleRotation}deg`, offset: tiltFraction + (1 - tiltFraction) * 0.7 },
-          { rotate: `${-settleRotation * 0.75}deg`, offset: tiltFraction + (1 - tiltFraction) * 0.8 },
+          { rotate: '0deg', offset: 0.2 * tiltEndOffset, easing: 'ease-in-out' },
+          { rotate: `${rotation}deg`, offset: tiltEndOffset },
+          { rotate: `${settleRotation}deg`, offset: arrivalOffset },
+          { rotate: `${-settleRotation * 0.75}deg`, offset: undershootOffset },
           { rotate: '0deg', offset: 1 },
         ],
         duration: totalRotateDuration,
