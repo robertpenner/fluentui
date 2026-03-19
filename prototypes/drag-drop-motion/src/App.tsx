@@ -68,7 +68,7 @@ const gravityStyle: MotionStyle = {
     keyframes: gravityGrabKeyframes,
   },
   createDropAtoms: ({ dragX, dragY }) => {
-    const slideDuration = Math.max(Math.sqrt(dragX * dragX + dragY * dragY) * 3, 400);
+    const slideDuration = Math.max(Math.hypot(dragX, dragY) * 3, 400);
     const bounceOverlap = 300;
     // 2D rotation proportional to horizontal drag offset.
     // Card slides in the opposite direction to dragX, so:
@@ -147,7 +147,7 @@ const magnetStyle: MotionStyle = {
   name: 'magnet',
   grab: { duration: 350, easing: 'linear', keyframes: magnetGrabKeyframes },
   createDropAtoms: ({ dragX, dragY }) => {
-    const slideDuration = Math.max(Math.sqrt(dragX * dragX + dragY * dragY) * 3, 400);
+    const slideDuration = Math.max(Math.hypot(dragX, dragY) * 3, 400);
     const bounceOverlap = 300;
     const rotation = -clampUnit(dragX / 300) * 6;
     return [
