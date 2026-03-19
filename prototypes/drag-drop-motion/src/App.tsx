@@ -88,7 +88,7 @@ const gravityStyle: MotionStyle = {
         ],
         duration: slideDuration,
         easing: curveOvershoot1,
-        fill: 'both' as const,
+        fill: 'both',
       },
       {
         delay: slideDuration - bounceOverlap,
@@ -98,7 +98,7 @@ const gravityStyle: MotionStyle = {
         ],
         duration: 800,
         easing: curveGravityBounce1,
-        fill: 'forwards' as const,
+        fill: 'forwards',
       },
       {
         keyframes: [
@@ -108,7 +108,7 @@ const gravityStyle: MotionStyle = {
           { rotate: '0deg' },
         ],
         duration: slideDuration,
-        fill: 'both' as const,
+        fill: 'both',
       },
     ];
   },
@@ -124,6 +124,18 @@ const curveMagnetLiftOvershoot1 = `linear(0.000, 0.06297 1%, 0.1240 2%, 0.1831 3
 
 // https://robertpenner.com/fuse/#head_type=power-back&tail_type=power-back&head_anticipation=0&head_exponent=3&tail_overshoot=50&tail_exponent=3.03&duration=200&head_enabled=false
 const curveMagnetLiftOvershoot2 = `linear(0.000, 0.07859 1%, 0.1546 2%, 0.2280 3%, 0.2990 4%, 0.3674 5%, 0.4334 6%, 0.4970 7%, 0.5582 8%, 0.6172 9%, 0.6738 10%, 0.7281 11%, 0.7803 12%, 0.8302 13%, 0.8780 14%, 0.9238 15%, 0.9674 16%, 1.009 17%, 1.049 18%, 1.086 19%, 1.122 20%, 1.156 21%, 1.188 22%, 1.218 23%, 1.247 24%, 1.273 25%, 1.298 26%, 1.322 27%, 1.343 28%, 1.363 29%, 1.382 30%, 1.399 31%, 1.415 32%, 1.429 33%, 1.442 34%, 1.453 35%, 1.463 36%, 1.472 37%, 1.479 38%, 1.486 39%, 1.491 40%, 1.495 41%, 1.497 42%, 1.499 43%, 1.500 45%, 1.496 47%, 1.489 49%, 1.479 51%, 1.466 53%, 1.450 55%, 1.432 57%, 1.412 59%, 1.390 61%, 1.354 64%, 1.315 67%, 1.208 75%, 1.169 78%, 1.131 81%, 1.108 83%, 1.086 85%, 1.067 87%, 1.049 89%, 1.033 91%, 1.021 93%, 1.011 95%, 1.004 97%, 1.000 99%, 1.000)`;
+
+// https://robertpenner.com/fuse/#head_type=power-back&tail_type=spring&join=0.394&head_anticipation=0&head_exponent=5.05&bounces=4&decay=95&duration=500&show_heatmap=true
+const curvePower5Spring4 = `linear(0.000, 0.0002242 8%, 0.001738 12%, 0.003785 14%, 0.007428 16%, 0.01346 18%, 0.01769 19%, 0.02292 20%, 0.02933 21%, 0.03709 22%, 0.04643 23%, 0.05756 24%, 0.07074 25%, 0.08624 26%, 0.1043 27%, 0.1254 28%, 0.1497 29%, 0.1776 30%, 0.2096 31%, 0.2461 32%, 0.2875 33%, 0.3342 34%, 0.3869 35%, 0.4461 36%, 0.5123 37%, 0.5861 38%, 0.6683 39%, 0.9389 42%, 1.029 43%, 1.108 44%, 1.171 45%, 1.218 46%, 1.248 47%, 1.262 48%, 1.261 49%, 1.248 50%, 1.224 51%, 1.192 52%, 1.155 53%, 1.074 55%, 1.036 56%, 1.000 57%, 0.9693 58%, 0.9440 59%, 0.9247 60%, 0.9116 61%, 0.9045 62%, 0.9031 63%, 0.9066 64%, 0.9143 65%, 0.9252 66%, 0.9383 67%, 0.9822 70%, 0.9958 71%, 1.008 72%, 1.018 73%, 1.026 74%, 1.031 75%, 1.035 76%, 1.036 77%, 1.035 78%, 1.033 79%, 1.024 81%, 1.003 85%, 0.9946 87%, 0.9891 89%, 0.9869 91%, 0.9876 93%, 0.9923 96%, 1.000)`;
+
+// https://robertpenner.com/fuse/#head_type=power-back&tail_type=bounce&join=0.697&head_anticipation=0&head_exponent=7.06&bounces=2&decay=95&duration=300&show_heatmap=true
+const curvePower7Bounce2 = `linear(0.000, 0.0001483 20%, 0.001234 27%, 0.003273 31%, 0.006283 34%, 0.01141 37%, 0.01655 39%, 0.02356 41%, 0.03298 43%, 0.04546 45%, 0.05308 46%, 0.06179 47%, 0.07169 48%, 0.08293 49%, 0.09564 50%, 0.1100 51%, 0.1261 52%, 0.1443 53%, 0.1647 54%, 0.1874 55%, 0.2129 56%, 0.2412 57%, 0.2727 58%, 0.3077 59%, 0.3465 60%, 0.3893 61%, 0.4367 62%, 0.4889 63%, 0.5464 64%, 0.6096 65%, 0.6790 66%, 0.7551 67%, 0.8383 68%, 0.9293 69%, 0.9937 70%, 0.9725 71%, 0.9531 72%, 0.9356 73%, 0.9198 74%, 0.9060 75%, 0.8939 76%, 0.8837 77%, 0.8752 78%, 0.8687 79%, 0.8639 80%, 0.8610 81%, 0.8599 82%, 0.8607 83%, 0.8632 84%, 0.8676 85%, 0.8739 86%, 0.8819 87%, 0.8918 88%, 0.9036 89%, 0.9171 90%, 0.9325 91%, 0.9497 92%, 0.9688 93%, 0.9896 94%, 0.9976 95%, 0.9944 96%, 0.9930 97%, 0.9935 98%, 0.9959 99%, 1.000)`;
+
+// https://robertpenner.com/fuse/#head_type=bezier&tail_type=bounce&join=0.711&head_bezier_x1=0.24&head_bezier_y1=0.44&head_bezier_x2=0.87&head_bezier_y2=-0.21&bounces=2&decay=88&duration=500&show_heatmap=true
+const curveBezierHesitateBounce2 = `linear(0.000, 0.02387 1%, 0.04441 2%, 0.06224 3%, 0.07781 4%, 0.09147 5%, 0.1035 6%, 0.1141 7%, 0.1235 8%, 0.1391 10%, 0.1514 12%, 0.1610 14%, 0.1685 16%, 0.1769 19%, 0.1828 22%, 0.1954 31%, 0.2024 35%, 0.2097 38%, 0.2161 40%, 0.2239 42%, 0.2335 44%, 0.2451 46%, 0.2592 48%, 0.2761 50%, 0.2964 52%, 0.3080 53%, 0.3207 54%, 0.3346 55%, 0.3498 56%, 0.3665 57%, 0.3847 58%, 0.4048 59%, 0.4269 60%, 0.4512 61%, 0.4782 62%, 0.5081 63%, 0.5415 64%, 0.5790 65%, 0.6214 66%, 0.6700 67%, 0.7264 68%, 0.7933 69%, 0.8752 70%, 0.9812 71%, 0.9639 72%, 0.9254 73%, 0.8910 74%, 0.8606 75%, 0.8345 76%, 0.8124 77%, 0.7944 78%, 0.7806 79%, 0.7708 80%, 0.7652 81%, 0.7637 82%, 0.7664 83%, 0.7731 84%, 0.7840 85%, 0.7989 86%, 0.8180 87%, 0.8412 88%, 0.8686 89%, 0.9000 90%, 0.9356 91%, 0.9752 92%, 0.9939 93%, 0.9824 94%, 0.9751 95%, 0.9718 96%, 0.9727 97%, 0.9777 98%, 0.9868 99%, 1.000)`;
+
+// https://robertpenner.com/fuse/#head_type=bezier&tail_type=bounce&head_bezier_x1=0.24&head_bezier_y1=0.44&head_bezier_x2=0.99&head_bezier_y2=-0.28&bounces=2&decay=88&duration=500&show_heatmap=true&tail_enabled=false
+const curveBezierHesitate = `linear(0.000, 0.01721 1%, 0.03242 2%, 0.04596 3%, 0.05809 4%, 0.06900 5%, 0.08776 7%, 0.1032 9%, 0.1160 11%, 0.1266 13%, 0.1354 15%, 0.1458 18%, 0.1537 21%, 0.1594 24%, 0.1648 28%, 0.1687 33%, 0.1742 47%, 0.1773 52%, 0.1813 56%, 0.1874 60%, 0.1936 63%, 0.2017 66%, 0.2121 69%, 0.2205 71%, 0.2302 73%, 0.2416 75%, 0.2547 77%, 0.2699 79%, 0.2876 81%, 0.3082 83%, 0.3322 85%, 0.3457 86%, 0.3605 87%, 0.3766 88%, 0.3941 89%, 0.4134 90%, 0.4347 91%, 0.4584 92%, 0.4849 93%, 0.5148 94%, 0.5492 95%, 0.5894 96%, 0.6378 97%, 0.6991 98%, 0.7853 99%, 1.000)`;
 
 const magnetVibratePx = 1;
 const magnetPressScale = 1.02;
@@ -146,44 +158,85 @@ const magnetGrabKeyframes: Keyframe[] = [
 const magnetStyle: MotionStyle = {
   name: 'magnet',
   grab: { duration: 350, easing: 'linear', keyframes: magnetGrabKeyframes },
+
   createDropAtoms: ({ dragX, dragY }) => {
-    const slideDuration = Math.max(Math.hypot(dragX, dragY) * 3, 400);
-    const bounceOverlap = 300;
-    const rotation = -clampUnit(dragX / 300) * 6;
+    // const slideDuration = Math.max(Math.hypot(dragX, dragY) * 3, 400);
+    const slideYDuration = Math.max(Math.abs(dragY) * 3, 300);
+    const slideXDuration = Math.max(Math.abs(dragX) * 3, 300) * 0.2;
+    // const phaseOverlap = (slideYDuration + slideXDuration) / 5;
+    const phaseOverlap = -150;
+    const rotation = clampUnit(dragX / 300) * 6 * 3;
     return [
       {
+        keyframes: [{ translate: `0px ${dragY}px` }, { translate: `0px 0px` }],
+        duration: slideYDuration,
+        // easing: curvePower7Bounce2,
+        easing: curveBezierHesitate,
+        fill: 'both',
+        composite: 'add',
+      },
+      {
         keyframes: [
-          {
-            translate: `${dragX}px ${dragY}px`,
-            scale: draggingScale,
-            boxShadow: shadowDragging,
-            opacity: draggingOpacity,
-          },
-          { translate: '0px 0px', scale: draggingScale, boxShadow: shadowDragging, opacity: draggingOpacity },
+          { rotate: '0deg', offset: 0 },
+          { rotate: '0deg', offset: 0.9, easing: 'ease-in' },
+          { rotate: `${rotation}deg`, offset: 1 },
         ],
-        duration: slideDuration,
+        duration: slideYDuration,
+        // easing: curvePower7Bounce2,
+        // fill: 'forwards',
+        // composite: 'add',
+      },
+      {
+        delay: slideYDuration - phaseOverlap,
+        keyframes: [
+          // { translate: `${dragX}px 0px`, rotate: `${rotation}deg` },
+          // { translate: `0px 0px`, rotate: `0deg` },
+          { translate: `${dragX}px 0px` },
+          { translate: `0px 0px` },
+        ],
+        duration: slideXDuration,
+        easing: 'ease-in',
+        fill: 'both',
+        composite: 'add',
+      },
+      {
+        delay: slideYDuration - phaseOverlap,
+        keyframes: [{ rotate: `${rotation}deg` }, { rotate: `0deg` }],
+        duration: slideXDuration,
+        easing: 'ease-out',
+        // fill: 'forwards',
+        // composite: 'add',
+      },
+    ];
+  },
+};
+
+const springStyle: MotionStyle = {
+  name: 'spring',
+  // TODO: make the grab animation more spring-like (current easing is just a placeholder)
+  grab: { duration: 350, easing: 'linear', keyframes: magnetGrabKeyframes },
+
+  createDropAtoms: ({ dragX, dragY }) => {
+    // const slideDuration = Math.max(Math.hypot(dragX, dragY) * 3, 400);
+    const slideYDuration = Math.max(Math.abs(dragY) * 10, 300);
+    const slideXDuration = Math.max(Math.abs(dragX) * 3, 300);
+    const phaseOverlap = (slideYDuration + slideXDuration) / 5;
+    // const rotation = -clampUnit(dragX / 300) * 6;
+    return [
+      {
+        keyframes: [{ translate: `0px ${dragY}px` }, { translate: `0px 0px` }],
+        duration: slideYDuration,
+        easing: curvePower5Spring4,
+        fill: 'both',
+        composite: 'add',
+      },
+      {
+        delay: slideYDuration - phaseOverlap,
+        keyframes: [{ translate: `${dragX}px 0px` }, { translate: `0px 0px` }],
+        duration: slideXDuration,
         easing: curveOvershoot1,
-        fill: 'both' as const,
-      },
-      {
-        delay: slideDuration - bounceOverlap,
-        keyframes: [
-          { scale: draggingScale, boxShadow: shadowDragging, opacity: draggingOpacity },
-          { scale: 1, boxShadow: tokens.shadow2, opacity: 1 },
-        ],
-        duration: 800,
-        easing: curveGravityBounce1,
-        fill: 'forwards' as const,
-      },
-      {
-        keyframes: [
-          { rotate: '0deg', easing: 'ease-in-out' },
-          { rotate: `${rotation}deg`, easing: 'ease-in-out' },
-          { rotate: `${-rotation / 3}deg`, easing: 'ease-in-out' },
-          { rotate: '0deg' },
-        ],
-        duration: slideDuration,
-        fill: 'both' as const,
+        fill: 'both',
+        composite: 'add',
       },
     ];
   },
