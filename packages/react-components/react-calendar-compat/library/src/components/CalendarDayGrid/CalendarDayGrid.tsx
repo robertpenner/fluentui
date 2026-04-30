@@ -175,7 +175,7 @@ export const CalendarDayGrid: React.FunctionComponent<CalendarDayGridProps> = pr
     >
       <tbody>
         <CalendarMonthHeaderRow {...props} classNames={classNames} weeks={weeks} />
-        <DirectionalSlide key={'firstTransitionWeek_' + firstWeek[0].key} {...{ animationDirection, animateBackwards }}>
+        <DirectionalSlide replayKey={firstWeek[0].key} {...{ animationDirection, animateBackwards }}>
           <CalendarGridRow
             {...props}
             {...partialWeekProps}
@@ -187,7 +187,7 @@ export const CalendarDayGrid: React.FunctionComponent<CalendarDayGridProps> = pr
           />
         </DirectionalSlide>
         {weeks!.slice(1, weeks!.length - 1).map((week: DayInfo[], weekIndex: number) => (
-          <DirectionalSlide key={weekIndex + '_' + week[0].key} {...{ animationDirection, animateBackwards }}>
+          <DirectionalSlide key={weekIndex} replayKey={week[0].key} {...{ animationDirection, animateBackwards }}>
             <CalendarGridRow
               {...props}
               {...partialWeekProps}
@@ -198,7 +198,7 @@ export const CalendarDayGrid: React.FunctionComponent<CalendarDayGridProps> = pr
             />
           </DirectionalSlide>
         ))}
-        <DirectionalSlide key={'lastTransitionWeek_' + finalWeek[0].key} {...{ animationDirection, animateBackwards }}>
+        <DirectionalSlide replayKey={finalWeek[0].key} {...{ animationDirection, animateBackwards }}>
           <CalendarGridRow
             {...props}
             {...partialWeekProps}

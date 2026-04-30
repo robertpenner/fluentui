@@ -9,6 +9,7 @@ export const DirectionalSlide: React.FunctionComponent<{
   easing?: string;
   animationDirection?: AnimationDirection;
   animateBackwards?: boolean;
+  replayKey?: string | number;
   children: JSXElement;
 }> = ({
   // Using durationSlower (400ms) as the closest token to the original 367ms
@@ -16,6 +17,7 @@ export const DirectionalSlide: React.FunctionComponent<{
   easing = motionTokens.curveDecelerateMax,
   animationDirection = AnimationDirection.Vertical,
   animateBackwards = false,
+  replayKey,
   children,
 }) => {
   let outX = '0px';
@@ -27,7 +29,7 @@ export const DirectionalSlide: React.FunctionComponent<{
     outY = distance;
   }
   return (
-    <Slide.In duration={duration} easing={easing} outX={outX} outY={outY}>
+    <Slide.In duration={duration} easing={easing} outX={outX} outY={outY} replayKey={replayKey}>
       {children}
     </Slide.In>
   );
