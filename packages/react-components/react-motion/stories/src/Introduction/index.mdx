@@ -1,6 +1,6 @@
-import { Meta } from '@storybook/addon-docs/blocks';
-import { tokens } from '@fluentui/react-components';
-import { MotionIntroDemo } from './MotionIntroDemo';
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import { Card, CardHeader, tokens } from '@fluentui/react-components';
+import * as MotionIntroDemoStories from './MotionIntroDemo.stories';
 import { MotionVsPresenceDemo } from './MotionVsPresenceDemo';
 
 <Meta title="Motion/Introduction" />
@@ -30,31 +30,23 @@ import { MotionVsPresenceDemo } from './MotionVsPresenceDemo';
     gap: 24px;
     margin: 32px 0;
   }
-  .principle-card {
-    padding: 24px;
-    border-radius: 8px;
-    border: 1px solid ${tokens.colorNeutralStroke1};
-    background: ${tokens.colorNeutralBackground1};
-  }
-  .principle-card h3 {
-    margin-top: 0;
+  .principles-grid h3 {
+    margin: 0;
     display: flex;
     align-items: center;
     gap: 8px;
   }
-  .audience-section {
+  .audience-card {
     margin: 32px 0;
     padding: 24px;
-    border-radius: 8px;
-    border: 1px solid ${tokens.colorNeutralStroke1};
   }
-  .audience-section h2 {
+  .audience-card h2 {
     margin-top: 0;
   }
-  .designer-section {
+  .designer-card {
     border-left: 4px solid ${tokens.colorPalettePurpleBorder2};
   }
-  .developer-section {
+  .developer-card {
     border-left: 4px solid ${tokens.colorPaletteBlueBorder2};
   }
   .a11y-callout {
@@ -84,7 +76,7 @@ Fluent Motion is a set of React components that make it easy to animate elements
 
 Under the hood it uses the browser's [Web Animations API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API), so animations are fast and smooth without extra JavaScript overhead.
 
-<MotionIntroDemo />
+<Canvas of={MotionIntroDemoStories.GetStarted} />
 
 ## An Atomic Motion System
 
@@ -103,32 +95,32 @@ Inspired by [atomic design](https://bradfrost.com/blog/post/atomic-web-design/),
 ## Key Principles
 
 <div className="principles-grid">
-  <div className="principle-card">
-    <h3>⚡ Performance</h3>
+  <Card appearance="filled">
+    <CardHeader header={<h3>⚡ Performance</h3>} />
     <div>
-      Animations run on the browser's compositor thread where possible, ensuring smooth 60fps motion even on
-      lower-powered devices.
+      Animations run on the browser's compositor thread where possible, ensuring smooth motion at 60fps, 120fps —
+      whatever your device can handle.
     </div>
-  </div>
-  <div className="principle-card">
-    <h3>📦 Lightweight</h3>
+  </Card>
+  <Card appearance="filled">
+    <CardHeader header={<h3>📦 Lightweight</h3>} />
     <div>
       Small bundle size — the browser does the heavy lifting. No JavaScript animation engine is shipped to your users.
     </div>
-  </div>
-  <div className="principle-card">
-    <h3>🎯 Simple by Default</h3>
+  </Card>
+  <Card appearance="filled">
+    <CardHeader header={<h3>🎯 Simple by Default</h3>} />
     <div>
       Common animations work with minimal code. Pre-built components like <code>Fade</code>, <code>Scale</code>, and{' '}
       <code>Slide</code> work out of the box.
     </div>
-  </div>
-  <div className="principle-card">
-    <h3>🔧 Powerful on Demand</h3>
+  </Card>
+  <Card appearance="filled">
+    <CardHeader header={<h3>🔧 Powerful on Demand</h3>} />
     <div>
       Full customization available when needed — custom keyframes, timing, easing curves, and lifecycle callbacks.
     </div>
-  </div>
+  </Card>
 </div>
 
 <div className="a11y-callout">
@@ -140,9 +132,7 @@ When a user has requested reduced motion, animations are scaled down or disabled
 
 </div>
 
----
-
-<div className="audience-section designer-section">
+<Card appearance="filled" className="audience-card designer-card">
 
 ## For Motion Designers
 
@@ -180,11 +170,9 @@ Six presence components — **Fade**, **Scale**, **Collapse**, **Slide**, **Blur
 
 See all components with interactive demos on the <a href="?path=/docs/motion-components-preview-introduction--docs">Motion Components</a> page.
 
-</div>
+</Card>
 
----
-
-<div className="audience-section developer-section">
+<Card appearance="filled" className="audience-card developer-card">
 
 ## For Developers
 
@@ -207,46 +195,44 @@ For most use cases, you don't need the factories — use the <a href="?path=/doc
 | `@fluentui/react-motion`                    | Stable | Core factories (`createMotionComponent`, `createPresenceComponent`), `PresenceGroup`, `motionTokens`, `presenceMotionSlot` |
 | `@fluentui/react-motion-components-preview` | Beta   | Ready-to-use components: `Fade`, `Scale`, `Collapse`, `Slide`, `Blur`, `Rotate`, `Stagger`, plus Snappy/Relaxed variants   |
 
-</div>
-
----
+</Card>
 
 ## Next Steps
 
 <div className="principles-grid">
-  <div className="principle-card">
-    <h3>📚 Learn the APIs</h3>
+  <Card appearance="filled">
+    <CardHeader header={<h3>📚 Learn the APIs</h3>} />
     <div>
       Dive into <a href="?path=/docs/motion-apis-createpresencecomponent--docs">createPresenceComponent</a> and{' '}
       <a href="?path=/docs/motion-apis-createmotioncomponent--docs">createMotionComponent</a> for full API
       documentation.
     </div>
-  </div>
-  <div className="principle-card">
-    <h3>🧩 Use Pre-built Components</h3>
+  </Card>
+  <Card appearance="filled">
+    <CardHeader header={<h3>🧩 Use Pre-built Components</h3>} />
     <div>
       Explore the <a href="?path=/docs/motion-components-preview-introduction--docs">Motion Components</a> for
       ready-to-use animations.
     </div>
-  </div>
-  <div className="principle-card">
-    <h3>🎨 Explore Tokens</h3>
+  </Card>
+  <Card appearance="filled">
+    <CardHeader header={<h3>🎨 Explore Tokens</h3>} />
     <div>
       See all available <a href="?path=/docs/motion-tokens--docs">Motion Tokens</a> for durations and easing curves.
     </div>
-  </div>
-  <div className="principle-card">
-    <h3>🔄 Migrate from Other Libraries</h3>
+  </Card>
+  <Card appearance="filled">
+    <CardHeader header={<h3>🔄 Migrate from Other Libraries</h3>} />
     <div>
       Coming from Framer Motion or GSAP? Check our <a href="?path=/docs/motion-migration--docs">Migration Guide</a>.
     </div>
-  </div>
-  <div className="principle-card">
-    <h3>⚛️ Motion Atoms</h3>
+  </Card>
+  <Card appearance="filled">
+    <CardHeader header={<h3>⚛️ Motion Atoms</h3>} />
     <div>
       Build custom animations by composing{' '}
       <a href="?path=/docs/motion-components-preview-atoms--docs">low-level atoms</a> like <code>fadeAtom</code> and{' '}
       <code>scaleAtom</code>.
     </div>
-  </div>
+  </Card>
 </div>
