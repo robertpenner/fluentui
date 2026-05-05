@@ -23,9 +23,9 @@ Each component (except Blur and Rotate) comes with **Snappy** (150ms) and **Rela
 ## Installation
 
 ```bash
-npm install @fluentui/react-motion-components-preview @fluentui/react-motion
+npm install @fluentui/react-motion-components-preview
 # or
-yarn add @fluentui/react-motion-components-preview @fluentui/react-motion
+yarn add @fluentui/react-motion-components-preview
 ```
 
 ## Quick Start
