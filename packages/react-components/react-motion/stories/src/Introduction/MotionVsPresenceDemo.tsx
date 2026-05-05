@@ -8,11 +8,11 @@ import { useClasses } from './MotionVsPresenceDemo.styles';
 // One-way motion: plays on mount
 const SlideIn = createMotionComponent({
   keyframes: [
-    { transform: 'translateX(-20px)', opacity: 0 },
+    { transform: 'translateX(-50px)', opacity: 0 },
     { transform: 'translateX(0)', opacity: 1 },
   ],
-  duration: motionTokens.durationUltraSlow * 2,
-  easing: motionTokens.curveDecelerateMid,
+  duration: motionTokens.durationUltraSlow,
+  easing: motionTokens.curveDecelerateMin,
 });
 
 // Two-way presence: controlled by visible prop
@@ -31,10 +31,11 @@ const FadePresence = createPresenceComponent({
 
 const motionCode = `const SlideIn = createMotionComponent({
   keyframes: [
-    { transform: 'translateX(-20px)', opacity: 0 },
+    { transform: 'translateX(-50px)', opacity: 0 },
     { transform: 'translateX(0)', opacity: 1 },
   ],
-  duration: 1000,
+  duration: motionTokens.durationUltraSlow,
+  easing: motionTokens.curveDecelerateMin,
 });`;
 
 const presenceCode = `const Fade = createPresenceComponent({
