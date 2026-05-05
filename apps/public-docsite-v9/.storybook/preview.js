@@ -46,7 +46,7 @@ export const parameters = {
         'Motion',
         [
           'Introduction',
-          'Components (preview)',
+          ['Components (preview)', ['Introduction']],
           'Choreography (preview)',
           'APIs',
           'Tokens',
