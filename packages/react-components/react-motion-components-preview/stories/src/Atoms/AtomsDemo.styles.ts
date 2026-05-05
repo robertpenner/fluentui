@@ -51,22 +51,18 @@ export const useClasses = makeStyles({
   codeArea: {
     flex: '1 1 auto',
     minWidth: 0,
+    margin: 0,
     padding: `${tokens.spacingVerticalL} ${tokens.spacingHorizontalXL}`,
-    backgroundColor: tokens.colorNeutralBackground1,
+    backgroundColor: tokens.colorNeutralBackground3,
     borderLeft: `${tokens.strokeWidthThin} solid ${tokens.colorNeutralStroke1}`,
     overflow: 'auto',
-    '@media (max-width: 600px)': {
-      borderLeft: 'none',
-      borderTop: `${tokens.strokeWidthThin} solid ${tokens.colorNeutralStroke1}`,
-    },
-  },
-  code: {
     fontFamily: tokens.fontFamilyMonospace,
     fontSize: tokens.fontSizeBase100,
     lineHeight: tokens.lineHeightBase200,
     color: tokens.colorNeutralForeground1,
-    whiteSpace: 'pre',
-    margin: 0,
-    display: 'block',
+    '@media (max-width: 600px)': {
+      borderLeft: 'none',
+      borderTop: `${tokens.strokeWidthThin} solid ${tokens.colorNeutralStroke1}`,
+    },
   },
 });

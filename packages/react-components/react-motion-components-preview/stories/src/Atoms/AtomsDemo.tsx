@@ -108,9 +108,7 @@ export const AtomsDemo: React.FC = () => {
             <div className={classes.demoBox}>{atomLabels[atomType]}</div>
           </MotionComponent>
         </div>
-        <div className={classes.codeArea}>
-          <code className={classes.code}>{atomCodeSnippets[atomType]}</code>
-        </div>
+        <pre className={classes.codeArea}>{atomCodeSnippets[atomType]}</pre>
       </div>
     </div>
   );
