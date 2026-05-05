@@ -69,18 +69,20 @@ export const MotionVsPresenceDemo: React.FC = () => {
           <p className={classes.subtitle}>Plays once on mount</p>
         </div>
         <div className={classes.demoArea}>
-          <SlideIn key={motionKey}>
-            <Card appearance="filled" className={classes.card}>
-              Slide In
-            </Card>
-          </SlideIn>
+          <div className={classes.motionWrapper}>
+            <SlideIn key={motionKey}>
+              <Card appearance="filled" className={classes.card}>
+                Slide In
+              </Card>
+            </SlideIn>
+          </div>
         </div>
-        <pre className={classes.codeArea}>{motionCode}</pre>
         <div className={classes.buttonRow}>
           <Button appearance="primary" onClick={handleReplay}>
             Replay
           </Button>
         </div>
+        <pre className={classes.codeArea}>{motionCode}</pre>
       </div>
 
       <div className={classes.panel}>
@@ -89,18 +91,20 @@ export const MotionVsPresenceDemo: React.FC = () => {
           <p className={classes.subtitle}>Toggles with enter/exit</p>
         </div>
         <div className={classes.demoArea}>
-          <FadePresence visible={presenceVisible}>
-            <Card appearance="filled" className={classes.card}>
-              Fade
-            </Card>
-          </FadePresence>
+          <div className={classes.motionWrapper}>
+            <FadePresence visible={presenceVisible}>
+              <Card appearance="filled" className={classes.card}>
+                Fade
+              </Card>
+            </FadePresence>
+          </div>
         </div>
-        <pre className={classes.codeArea}>{presenceCode}</pre>
         <div className={classes.buttonRow}>
           <Button appearance="primary" onClick={handleTogglePresence}>
             {presenceVisible ? 'Hide' : 'Show'}
           </Button>
         </div>
+        <pre className={classes.codeArea}>{presenceCode}</pre>
       </div>
     </div>
   );
