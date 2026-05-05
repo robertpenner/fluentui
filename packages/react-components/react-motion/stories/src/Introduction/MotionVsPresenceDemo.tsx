@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Button } from '@fluentui/react-components';
+import { Button, Card } from '@fluentui/react-components';
 import { createMotionComponent, createPresenceComponent, motionTokens } from '@fluentui/react-motion';
 import { useClasses } from './MotionVsPresenceDemo.styles';
 
@@ -11,7 +11,7 @@ const SlideIn = createMotionComponent({
     { transform: 'translateX(-20px)', opacity: 0 },
     { transform: 'translateX(0)', opacity: 1 },
   ],
-  duration: motionTokens.durationUltraSlow,
+  duration: motionTokens.durationUltraSlow * 2,
   easing: motionTokens.curveDecelerateMid,
 });
 
@@ -34,7 +34,7 @@ const motionCode = `const SlideIn = createMotionComponent({
     { transform: 'translateX(-20px)', opacity: 0 },
     { transform: 'translateX(0)', opacity: 1 },
   ],
-  duration: 500,
+  duration: 1000,
 });`;
 
 const presenceCode = `const Fade = createPresenceComponent({
@@ -70,12 +70,12 @@ export const MotionVsPresenceDemo: React.FC = () => {
         </div>
         <div className={classes.demoArea}>
           <SlideIn key={motionKey}>
-            <div className={classes.card}>Slide In</div>
+            <Card appearance="filled" className={classes.card}>
+              Slide In
+            </Card>
           </SlideIn>
         </div>
-        <div className={classes.codeArea}>
-          <code className={classes.code}>{motionCode}</code>
-        </div>
+        <pre className={classes.codeArea}>{motionCode}</pre>
         <div className={classes.buttonRow}>
           <Button appearance="primary" onClick={handleReplay}>
             Replay
@@ -90,12 +90,12 @@ export const MotionVsPresenceDemo: React.FC = () => {
         </div>
         <div className={classes.demoArea}>
           <FadePresence visible={presenceVisible}>
-            <div className={classes.card}>Fade</div>
+            <Card appearance="filled" className={classes.card}>
+              Fade
+            </Card>
           </FadePresence>
         </div>
-        <div className={classes.codeArea}>
-          <code className={classes.code}>{presenceCode}</code>
-        </div>
+        <pre className={classes.codeArea}>{presenceCode}</pre>
         <div className={classes.buttonRow}>
           <Button appearance="primary" onClick={handleTogglePresence}>
             {presenceVisible ? 'Hide' : 'Show'}
