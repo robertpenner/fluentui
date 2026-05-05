@@ -41,13 +41,15 @@ export const useClasses = makeStyles({
     textAlign: 'center',
   },
   demoArea: {
-    display: 'flex',
+    display: 'grid',
     alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
+    justifyItems: 'center',
     height: '80px',
     padding: tokens.spacingVerticalL,
     backgroundColor: tokens.colorNeutralBackground1,
+  },
+  motionWrapper: {
+    width: 'fit-content',
   },
   card: {
     alignItems: 'center',
