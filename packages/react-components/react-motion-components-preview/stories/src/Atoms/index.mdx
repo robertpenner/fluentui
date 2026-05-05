@@ -1,7 +1,6 @@
 import { Meta } from '@storybook/addon-docs/blocks';
 import { tokens } from '@fluentui/react-components';
 import { AtomsDemo } from './AtomsDemo';
-import { ComposingAtomsDemo } from './ComposingAtomsDemo';
 
 <Meta title="Motion/Components (preview)/Atoms" />
 
@@ -146,9 +145,9 @@ blurAtom({ direction: 'enter', duration: 500, outRadius: '10px', inRadius: '0px'
 
 ## Creating Custom Presence Components
 
-The real power of atoms is **composing** them. Pass an array of atoms to `createPresenceComponent` and they run in parallel — creating richer effects from simple building blocks:
+The real power of atoms is **composing** them. Pass an array of atoms to `createPresenceComponent` and they run in parallel — creating richer effects from simple building blocks.
 
-<ComposingAtomsDemo />
+See the [SpinBlur example](?path=/docs/motion-components-preview-atoms-spinblur--docs) for a custom presence component built from `rotateAtom` + `blurAtom` + `scaleAtom`.
 
 Multiple atoms in an array animate simultaneously. Use the same duration for a cohesive feel, or intentionally vary them for more complex choreography.
 
