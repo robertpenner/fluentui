@@ -1986,7 +1986,7 @@
     stylis "^4.2.0"
     tslib "^2.1.0"
 
-"@griffel/core@^1.16.0", "@griffel/core@^1.19.2", "@griffel/core@^1.21.0":
+"@griffel/core@^1.16.0", "@griffel/core@^1.21.0":
   version "1.21.0"
   resolved "https://registry.yarnpkg.com/@griffel/core/-/core-1.21.0.tgz#2d2fa4ddd1d7ddfe853d2598527b956cb4506142"
   integrity sha512-QqMoewiNTT0DmLM7OY607c7yhg18SuKfzovTO3hPXGQvtdu/StnjvuBAs+1B1kYSVGReAo6s/dJVeLnPuHjE7Q==
@@ -2015,7 +2015,7 @@
     "@griffel/core" "^1.16.0"
     tslib "^2.1.0"
 
-"@griffel/react@^1.0.0", "@griffel/react@^1.5.32", "@griffel/react@^1.6.1":
+"@griffel/react@^1.5.32", "@griffel/react@^1.6.1":
   version "1.7.2"
   resolved "https://registry.yarnpkg.com/@griffel/react/-/react-1.7.2.tgz#5c3589b128fd3a0654f589bb25055487fb06e677"
   integrity sha512-/+N+81e9ibNsh2wNlhGf2PcimEFrx8VbtWiLCmI6lsrTV5eBcQrIIDVQq737KPIJFtD4v6Txu9n0PXbN3hedNg==
@@ -2031,7 +2031,7 @@
     "@griffel/core" "^1.16.0"
     tslib "^2.1.0"
 
-"@griffel/style-types@^1.3.0", "@griffel/style-types@^1.4.0":
+"@griffel/style-types@^1.4.0":
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/@griffel/style-types/-/style-types-1.4.0.tgz#58eb5538506e8602188a8b17ba9f0b48d703cf4b"
   integrity sha512-vNDfOGV7RN/XkA7vxgf7Z5HgW8eiBm5cHT9wQPhsKB4pxWom5u6eQ9CkYE5mCCTSPl9H6Nd1NBai04d4P6BD7Q==
