@@ -200,15 +200,22 @@ This appendix catalogs work completed _before_ the UXE starts. Items here should
   - `ComposingAtomsDemo` — composing multiple atoms (includes SpinBlur example)
 - Updated `react-motion-components-preview` README — installation, usage, API reference
 
-### Migrations completed (Phase 1 + most of Phase 2 of the migration plan)
+### Migrations from the migration plan — current status
 
-By UXE start, the following migrations from the [migration epic #36125](https://github.com/microsoft/fluentui/issues/36125) are merged or near-complete:
+Status of items in the [migration epic #36125](https://github.com/microsoft/fluentui/issues/36125):
 
-- ✅ **#36126 ProgressBar** — Phase 1, indeterminate animation, complete
-- ✅ **#36127 Calendar** — Phase 1, weekday label fade-in, ~95% complete (will be merged before UXE start)
-- ✅ **#36128 Spinner root** — Phase 2, root rotation, ~90% complete (will be merged before UXE start)
+- ✅ **#36126 ProgressBar** — Phase 1, indeterminate animation. Shipped via [#35883](https://github.com/microsoft/fluentui/pull/35883).
+- ⏳ **#36127 Calendar** — Phase 1. Migration still needs to land; PR [#35666](https://github.com/microsoft/fluentui/pull/35666) is open.
+- ⏳ **#36128 Spinner root** — Phase 2. Migration still needs to land; PR [#35882](https://github.com/microsoft/fluentui/pull/35882) is open.
 
-The migration plan's earliest available issues for UXE pickup are therefore Phase 2 (#36129 Drawer, if still open at UXE start) or Phase 3 (#36130 Skeleton, locked as MIG-05 / ONB-06 first paired migration).
+Calendar (#36127) and Spinner root (#36128) are not committed UXE backlog items; they need to land regardless of UXE start (Robert-owned, or absorbed into the UXE backlog if still outstanding when the UXE is onboarded — decide at the time). The earliest "available" UXE pickup items in the migration plan are #36129 (Drawer, Phase 2) or #36130 (Skeleton, Phase 3 — locked as MIG-05 / ONB-06 first paired migration).
+
+### FMS work currently in flight (not yet shipped)
+
+The doc references the items below as if they are available; in fact they are open PRs and may or may not be merged by UXE start. Treat them as upcoming dependencies, not as shipped:
+
+- ⏳ **`Sequence` choreography component** — PR [#35775](https://github.com/microsoft/fluentui/pull/35775), open since 2026-02-23. Group 4 (CHOR-02, CHOR-03, CHOR-04) assumes Sequence is available; if it has not landed by UXE start, those items either wait on it or absorb the remaining Sequence work.
+- ⏳ **`replayKey` prop on motion components** — PR [#36108](https://github.com/microsoft/fluentui/pull/36108), open since 2026-05-06. Prerequisite for the Calendar migration PR [#35666](https://github.com/microsoft/fluentui/pull/35666); also relevant to Group 5 (interruption / replay semantics).
 
 ### Backlog items cut during planning (do not re-propose)
 
@@ -539,7 +546,7 @@ These can pick up in parallel based on UXE bandwidth, without queueing on other 
 
 **Locked decisions:**
 
-- Phase 1 (#36126 ProgressBar, #36127 Calendar) and Phase 2 #36128 (Spinner root) are done by UXE start; not in backlog
+- Phase 1 #36126 (ProgressBar) shipped; Phase 1 #36127 (Calendar) and Phase 2 #36128 (Spinner root) still need to land but are not committed UXE backlog items (Robert-owned, or absorbed if outstanding at UXE start)
 - First paired migration is Skeleton (#36130, Phase 3) — chosen over Phase 1/2 because UXE is C+D+E and shouldn't be under-leveraged
 - Marquee item is #36132 (focus border ×7) per JD L8 ("translate system concepts into reusable patterns")
 
