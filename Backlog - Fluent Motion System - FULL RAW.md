@@ -406,6 +406,34 @@ These can pick up in parallel based on UXE bandwidth, without queueing on other 
 - **Dependencies:** ONB-02 recommended
 - **Sequencing:** M1 W2
 
+---
+
+## ONB-05 — Read & annotate the v9 Stable release checklist
+
+**Description:** Read through the v9 Stable release checklist ([`docs/react-v9/contributing/stable-release-checklist.md`](docs/react-v9/contributing/stable-release-checklist.md)) plus related v9 promotion guidance. Produce annotations focused on motion-specific implications: which checklist gates will be straightforward for motion components, which need adapted patterns (VR tests, `isConformant`, bundle-size, perf), and which surface implicit motion-specific concerns. Annotations seed **PROM-INFRA-09** (motion-specific addendum) and inform **CHOR-01** Beta exit criteria.
+
+**Why it matters:** The UXE drives Group 6 (Stable promotion readiness) in M3. They need baseline fluency in what "Stable" actually means for a v9 package before that work begins. Reading the checklist also surfaces the early questions PROM-INFRA-09 codifies.
+
+- **Difficulty:** Easy
+- **Dependencies:** ONB-01
+- **Sequencing:** M1 W2
+- **Pairing:** Async; questions raised in the W2 debrief
+- **Output:** Annotations grouped by _straightforward / needs adaptation / motion-specific gap_
+
+---
+
+## ONB-07 — Onboarding retrospective: prioritized docs improvement list
+
+**Description:** Closing artifact for Group 1. After ONB-01 through ONB-05 — and the kickoff of ONB-06 (= MIG-05 paired migration) — the UXE produces a written retrospective consolidating annotations from ONB-01, ONB-04, ONB-05; reflections from ONB-03 and the early portion of ONB-06; and any early CHOR-01 framing input. Output is a **prioritized list** of: docs gaps (immediate fixes), ramp friction (structural concerns), tactical Q&A candidates (for DOC-08), and surprises worth durably capturing. UXE proposes priority order; Robert reviews and confirms the top 3–5 for DOC-01.
+
+**Why it matters:** Without a retrospective, ramp friction is lost — every future contributor pays the same friction tax. The retro is also the strongest argument for DOC-01: it has a literal consumer (the UXE) who experienced the gap. Closes the onboarding-as-deliverable loop the JD calls out.
+
+- **Difficulty:** Easy-Medium (synthesis, not new investigation)
+- **Dependencies:** ONB-01 through ONB-05; early signal from ONB-06; ideally one cycle through DOC-08 questions
+- **Sequencing:** End of M1 W2 / start of M2 W3
+- **Pairing:** 1× synchronous review with Robert (~1 hr) to confirm priority order
+- **Output:** Retrospective doc with prioritized list — feeds DOC-01 and DOC-10
+
 # 📦 Group 2 — Documentation, Storybook, and Examples Improvements
 
 **Label:** `area: docs`
