@@ -184,7 +184,7 @@ This appendix catalogs work completed _before_ the UXE starts. Items here should
   - `MotionIntroDemo` — live interactive demo
   - `MotionVsPresenceDemo` — `useMotion` vs. `createPresenceComponent` side-by-side with code
   - Design principles section (purposeful, accessible, performant, consistent)
-- `Motion/Migration` — 656-line guide for migrating _consumer apps_ from Framer Motion / React Spring / CSS transitions to FMS. Comparison tables, pros/cons, before/after code.
+- `Motion/Migration` — 643-line guide for migrating _consumer apps_ from Framer Motion / React Spring / CSS transitions to FMS. Comparison tables, pros/cons, before/after code.
 - `Motion/MotionSlotAPI` — `MotionSlotDefault`, `MotionSlotCustomize`, `MotionSlotDisable` story sets with `.md` descriptions and `.tsx` implementations
 - `Motion/PresenceMotionSlotAPI` — `PresenceMotionSlotDefault`, `PresenceMotionSlotCustomize`, `PresenceMotionSlotDisable` story sets
 - Updated `react-motion` README — usage patterns, API overview, links to Storybook docs
@@ -304,25 +304,25 @@ STR-01–05 ──→ STR-06 (synthesis doc, closing artifact)
 
 ### Notable cross-group dependencies
 
-| Item                                | Depends on                          | Reason                                                      |
-| ----------------------------------- | ----------------------------------- | ----------------------------------------------------------- |
-| MIG-05 (Skeleton)                   | ONB-02, ONB-03, ONB-04              | First paired migration; needs ramp                          |
-| MIG-07 (Focus border ×7)            | MIG-05, MIG-06                      | Multi-atom + family discipline before scaling to 7          |
-| MIG-10 (Spinner tail)               | #36128 (already merged)             | Phase 5 depends on Phase 2 merged work                      |
-| CHOR-01                             | ONB-05, ONB-07                      | UXE needs Stable checklist context to propose Beta criteria |
-| CHOR-02                             | CHOR-01 approved                    | Scenarios need exit criteria first                          |
-| CHOR-04                             | CHOR-02 (3+ scenarios)              | Ergonomics review needs lived signal                        |
-| CHOR-05 (reduced motion)            | CHOR-01, CHOR-02                    | Strategy applies to scenarios                               |
-| CHOR-06                             | Group 5 items merged                | Apply Group 5 fixes to choreography                         |
-| CHOR-07                             | CHOR-01 through CHOR-06             | Beta declaration is closing                                 |
-| PROM-INFRA-06                       | Group 5 substantially complete      | API freeze needs proposed direction                         |
-| PROM-FADE                           | Most PROM-INFRA-\* + PROM-INFRA-06  | Per-component audit needs scaffolding + API freeze          |
-| PROM-{others}                       | PROM-FADE                           | Pattern established by Fade audit                           |
-| PROM-REPORT                         | All PROM-\* per-component done      | Consolidates findings                                       |
-| DOC-04 (maintainer migration guide) | ONB-04, ONB-06, 1–2 UXE migrations  | Needs lived migration experience                            |
-| DOC-08 (recurring Q&A)              | ONB-01–07                           | UXE needs baseline fluency to answer publicly               |
-| STR-04 (review skill)               | UXE has reviewed several motion PRs | Review skill needs pattern data                             |
-| REL-07                              | All REL-\*                          | Aggregates deferred items                                   |
+| Item                                | Depends on                          | Reason                                                                                                                                                                      |
+| ----------------------------------- | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MIG-05 (Skeleton)                   | ONB-02, ONB-03, ONB-04              | First paired migration; needs ramp                                                                                                                                          |
+| MIG-07 (Focus border ×7)            | MIG-05, MIG-06                      | Multi-atom + family discipline before scaling to 7                                                                                                                          |
+| MIG-10 (Spinner tail)               | #36128 (Spinner root) merged        | Phase 5 builds on Phase 2 root migration. #36128 is still open at writing (PR [#35882](https://github.com/microsoft/fluentui/pull/35882)) — must land before MIG-10 starts. |
+| CHOR-01                             | ONB-05, ONB-07                      | UXE needs Stable checklist context to propose Beta criteria                                                                                                                 |
+| CHOR-02                             | CHOR-01 approved                    | Scenarios need exit criteria first                                                                                                                                          |
+| CHOR-04                             | CHOR-02 (3+ scenarios)              | Ergonomics review needs lived signal                                                                                                                                        |
+| CHOR-05 (reduced motion)            | CHOR-01, CHOR-02                    | Strategy applies to scenarios                                                                                                                                               |
+| CHOR-06                             | Group 5 items merged                | Apply Group 5 fixes to choreography                                                                                                                                         |
+| CHOR-07                             | CHOR-01 through CHOR-06             | Beta declaration is closing                                                                                                                                                 |
+| PROM-INFRA-06                       | Group 5 substantially complete      | API freeze needs proposed direction                                                                                                                                         |
+| PROM-FADE                           | Most PROM-INFRA-\* + PROM-INFRA-06  | Per-component audit needs scaffolding + API freeze                                                                                                                          |
+| PROM-{others}                       | PROM-FADE                           | Pattern established by Fade audit                                                                                                                                           |
+| PROM-REPORT                         | All PROM-\* per-component done      | Consolidates findings                                                                                                                                                       |
+| DOC-04 (maintainer migration guide) | ONB-04, ONB-06, 1–2 UXE migrations  | Needs lived migration experience                                                                                                                                            |
+| DOC-08 (recurring Q&A)              | ONB-01–07                           | UXE needs baseline fluency to answer publicly                                                                                                                               |
+| STR-04 (review skill)               | UXE has reviewed several motion PRs | Review skill needs pattern data                                                                                                                                             |
+| REL-07                              | All REL-\*                          | Aggregates deferred items                                                                                                                                                   |
 
 ### Items that _don't_ have hard cross-group dependencies
 
@@ -350,7 +350,7 @@ These can pick up in parallel based on UXE bandwidth, without queueing on other 
 
 - 2-week ramp (compressed from 4 because UXE profile is C+D+E)
 - Output artifacts feed downstream items (ONB-01 → DOC-01, ONB-04 reflection → DOC-04, ONB-07 retro → Group 2 priorities)
-- ONB-06 first paired migration target = Skeleton (#36130) — same item as MIG-05; not a Phase 1 warmup since Phase 1 will already be done at UXE start
+- ONB-06 first paired migration target = Skeleton (#36130) — same item as MIG-05; not a Phase 1 warmup because the available Phase 1/2 items (#36127 Calendar, #36128 Spinner root) are Robert-owned in-flight migrations rather than budgeted UXE work
 
 ---
 
@@ -398,7 +398,7 @@ These can pick up in parallel based on UXE bandwidth, without queueing on other 
 
 ## ONB-04 — Code archaeology: read a recently-merged migration PR
 
-**Description:** Pick a recently-merged migration PR from Phase 1 or Phase 2 of the migration plan (likely #36126 ProgressBar or #36127 Calendar). Read the diff line-by-line, ask questions, write a short post-merge reflection covering: the migration pattern used, what changed structurally, what was non-obvious. Robert narrates decisions during a walkthrough.
+**Description:** Pick a recently-merged migration PR. Strong candidates: [#35883](https://github.com/microsoft/fluentui/pull/35883) (ProgressBar, Phase 1 of the migration plan), [#35763](https://github.com/microsoft/fluentui/pull/35763) (Popover/Menu slide), [#35168](https://github.com/microsoft/fluentui/pull/35168) (MessageBar slide & fade), [#35433](https://github.com/microsoft/fluentui/pull/35433) (Nav icon Rotate), or [#35141](https://github.com/microsoft/fluentui/pull/35141) (Dialog Scale). Calendar (#36127, PR [#35666](https://github.com/microsoft/fluentui/pull/35666)) and Spinner root (#36128, PR [#35882](https://github.com/microsoft/fluentui/pull/35882)) are also candidates _if they have landed by then_. Read the diff line-by-line, ask questions, write a short post-merge reflection covering: the migration pattern used, what changed structurally, what was non-obvious. Robert narrates decisions during a walkthrough.
 
 **Why it matters:** Migrations are the UXE's most repeated activity in M2–M3. Reading a merged PR with a senior engineer narrating compresses ramp dramatically. Output seeds DOC-04 (the maintainer migration guide).
 
@@ -625,12 +625,12 @@ These can pick up in parallel based on UXE bandwidth, without queueing on other 
 
 ## MIG-10 — Spinner tail arc migration (#36135)
 
-**Description:** `spinnerTail::before/::after` with coordinated conic-gradient arc animations using `animation:inherit`. Real `<span>` elements, arc motion components, coordinate with the already-merged root rotation (#36128).
+**Description:** `spinnerTail::before/::after` with coordinated conic-gradient arc animations using `animation:inherit`. Real `<span>` elements, arc motion components, coordinate with the root rotation migration (#36128).
 
 **Why it matters:** Closes the Spinner migration loop. Highest-complexity item due to coordinated multi-element animation with shared timing inheritance. Likely paired throughout.
 
 - **Difficulty:** Hard
-- **Dependencies:** MIG-09 ideally complete first; #36128 (Spinner root) already merged
+- **Dependencies:** MIG-09 ideally complete first; #36128 (Spinner root) must be landed (PR [#35882](https://github.com/microsoft/fluentui/pull/35882) is open at writing — Robert-owned)
 - **Sequencing:** M3 W11–12
 - **Pairing:** Likely paired throughout
 - **Tags:** `partner-pickup` _(provisional)_, `paired`
