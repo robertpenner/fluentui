@@ -1,9 +1,4 @@
-import type {
-  MotionComponent,
-  MotionComponentProps,
-  PresenceComponent,
-  PresenceComponentProps,
-} from '@fluentui/react-motion';
+import type { MotionComponentProps, PresenceComponent, PresenceComponentProps } from '@fluentui/react-motion';
 import type { JSXElement } from '@fluentui/react-utilities';
 import type { BasePresenceParams, MotionTiming, PoseEndpoints } from '../../types';
 import type { FadePose } from '../../atoms/fade-atom';
@@ -42,8 +37,6 @@ export type FadeMotionProps = MotionComponentProps &
 export type FadeProps = FadePresenceProps | FadeMotionProps;
 
 /** Fade's callable props and directional motions, with its presence definition retained for variants. */
-export type FadeComponent = PresenceComponent<FadeParams> & {
+export type FadeComponent = PresenceComponent<FadeParams, FadeMotionParams, FadeDirectionalParams> & {
   (props: FadeProps): JSXElement | null;
-  In: MotionComponent<FadeDirectionalParams>;
-  Out: MotionComponent<FadeDirectionalParams>;
 };

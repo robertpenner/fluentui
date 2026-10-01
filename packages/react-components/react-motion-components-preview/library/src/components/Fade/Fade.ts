@@ -1,16 +1,7 @@
-import * as React from 'react';
-import type { PresenceMotionFn } from '@fluentui/react-motion';
-import { motionTokens, createPresenceComponent, createMotionComponent } from '@fluentui/react-motion';
-import type { JSXElement } from '@fluentui/react-utilities';
+import type { PresenceMotionFn, MotionComponentProps } from '@fluentui/react-motion';
+import { motionTokens, createPresenceComponent, createPresenceComponentVariant } from '@fluentui/react-motion';
 import { fade } from '../../atoms/fade-atom';
-import type {
-  FadeParams,
-  FadeMotionParams,
-  FadeDirectionalParams,
-  FadeMotionProps,
-  FadeProps,
-  FadeComponent,
-} from './fade-types';
+import type { FadeParams, FadeMotionParams, FadeDirectionalParams, FadeComponent } from './fade-types';
 
 /**
  * Define a presence motion for fade in/out
@@ -46,54 +37,51 @@ export const fadePresenceFn: PresenceMotionFn<FadeParams> = ({
   };
 };
 
-const createFade = (defaults: FadeParams = {}): FadeComponent => {
-  const presence = createPresenceComponent<FadeParams>(params => fadePresenceFn({ ...defaults, ...params }));
-  const motion = createMotionComponent<FadeMotionParams>(
-    ({
-      duration = defaults.duration ?? motionTokens.durationNormal,
-      easing = defaults.easing ?? motionTokens.curveEasyEase,
-      ...params
-    }) => fade({ ...params, duration, easing }),
-  );
-  const In = createMotionComponent<FadeDirectionalParams>(params => {
-    const options = { ...defaults, ...params };
-    return fade({
-      from: options.from ?? options.outOpacity ?? 0,
-      to: options.to ?? options.inOpacity ?? 1,
-      duration: options.duration ?? motionTokens.durationNormal,
-      easing: options.easing ?? motionTokens.curveEasyEase,
-      delay: options.delay,
-    });
-  });
-  const Out = createMotionComponent<FadeDirectionalParams>(params => {
-    const options = { ...defaults, ...params };
-    return fade({
-      from: options.from ?? options.inOpacity ?? 1,
-      to: options.to ?? options.outOpacity ?? 0,
-      duration:
-        params.exitDuration ??
-        params.duration ??
-        defaults.exitDuration ??
-        defaults.duration ??
-        motionTokens.durationNormal,
-      easing:
-        params.exitEasing ?? params.easing ?? defaults.exitEasing ?? defaults.easing ?? motionTokens.curveEasyEase,
-      delay: params.exitDelay ?? params.delay ?? defaults.exitDelay ?? defaults.delay,
-    });
-  });
-
-  function component(props: FadeProps): JSXElement | null {
-    const isMotion = (value: FadeProps): value is FadeMotionProps =>
-      value.visible === undefined && (value.from !== undefined || value.to !== undefined);
-    return isMotion(props) ? React.createElement(motion, props) : React.createElement(presence, props);
-  }
-
-  return Object.assign(component, presence, { In, Out });
-};
-
 /** Applies a one-way opacity motion or visible-controlled presence transitions. */
-export const Fade = createFade();
+export const Fade: FadeComponent = createPresenceComponent<FadeParams, FadeMotionParams, FadeDirectionalParams>(
+  fadePresenceFn,
+  defaults => ({
+    motion: {
+      definition: ({
+        duration = defaults.duration ?? motionTokens.durationNormal,
+        easing = defaults.easing ?? motionTokens.curveEasyEase,
+        ...params
+      }) => fade({ ...params, duration, easing }),
+      isMotion: (props): props is MotionComponentProps & FadeMotionParams =>
+        !('visible' in props && props.visible !== undefined) &&
+        (('from' in props && props.from !== undefined) || ('to' in props && props.to !== undefined)),
+    },
+    enter: params => {
+      const options = { ...defaults, ...params };
+      return fade({
+        from: options.from ?? options.outOpacity ?? 0,
+        to: options.to ?? options.inOpacity ?? 1,
+        duration: options.duration ?? motionTokens.durationNormal,
+        easing: options.easing ?? motionTokens.curveEasyEase,
+        delay: options.delay,
+      });
+    },
+    exit: params => {
+      const options = { ...defaults, ...params };
+      return fade({
+        from: options.from ?? options.inOpacity ?? 1,
+        to: options.to ?? options.outOpacity ?? 0,
+        duration:
+          params.exitDuration ??
+          params.duration ??
+          defaults.exitDuration ??
+          defaults.duration ??
+          motionTokens.durationNormal,
+        easing:
+          params.exitEasing ?? params.easing ?? defaults.exitEasing ?? defaults.easing ?? motionTokens.curveEasyEase,
+        delay: params.exitDelay ?? params.delay ?? defaults.exitDelay ?? defaults.delay,
+      });
+    },
+  }),
+);
 
-export const FadeSnappy = createFade({ duration: motionTokens.durationFast });
+export const FadeSnappy: FadeComponent = createPresenceComponentVariant(Fade, { duration: motionTokens.durationFast });
 
-export const FadeRelaxed = createFade({ duration: motionTokens.durationGentle });
+export const FadeRelaxed: FadeComponent = createPresenceComponentVariant(Fade, {
+  duration: motionTokens.durationGentle,
+});

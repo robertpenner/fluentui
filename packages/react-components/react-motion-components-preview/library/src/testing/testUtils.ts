@@ -1,8 +1,8 @@
 'use client';
 
-import type { PresenceComponent, PresenceMotionFn } from '@fluentui/react-motion';
+import type { PresenceMotionFn } from '@fluentui/react-motion';
 
-function getPresenceMotionFunction(component: PresenceComponent): PresenceMotionFn | null {
+function getPresenceMotionFunction(component: object): PresenceMotionFn | null {
   const symbols = Object.getOwnPropertySymbols(component);
 
   for (const symbol of symbols) {
@@ -15,7 +15,7 @@ function getPresenceMotionFunction(component: PresenceComponent): PresenceMotion
   return null;
 }
 
-export function expectPresenceMotionObject(component: PresenceComponent): void {
+export function expectPresenceMotionObject(component: object): void {
   const presenceMotionFn = getPresenceMotionFunction(component);
 
   expect(
@@ -40,7 +40,7 @@ export function expectPresenceMotionObject(component: PresenceComponent): void {
   });
 }
 
-export function expectPresenceMotionArray(component: PresenceComponent): void {
+export function expectPresenceMotionArray(component: object): void {
   const presenceMotionFn = getPresenceMotionFunction(component);
 
   // eslint-disable-next-line @nx/workspace-no-restricted-globals
@@ -64,7 +64,7 @@ export function expectPresenceMotionArray(component: PresenceComponent): void {
   });
 }
 
-export function expectPresenceMotionFunction(PresenceComponent: PresenceComponent): void {
+export function expectPresenceMotionFunction(PresenceComponent: object): void {
   const presenceMotionFn = getPresenceMotionFunction(PresenceComponent);
 
   expect(presenceMotionFn).toBeInstanceOf(Function);

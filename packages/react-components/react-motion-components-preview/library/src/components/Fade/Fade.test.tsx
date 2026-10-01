@@ -111,6 +111,29 @@ describe('Fade motion component', () => {
     );
   });
 
+  it('retains endpoint and directional modes on custom presence variants', () => {
+    const Variant = createPresenceComponentVariant(Fade, { duration: 123, exitDuration: 75 });
+    const { unmount } = render(
+      <Variant from={0.2} to={0.7}>
+        {testElement}
+      </Variant>,
+    );
+    expect(animateSpy).toHaveBeenLastCalledWith(
+      [{ opacity: 0.2 }, { opacity: 0.7 }],
+      expect.objectContaining({ duration: 123 }),
+    );
+    unmount();
+    render(
+      <Variant.Out from={0.7} to={0.2} duration={150}>
+        {testElement}
+      </Variant.Out>,
+    );
+    expect(animateSpy).toHaveBeenLastCalledWith(
+      [{ opacity: 0.7 }, { opacity: 0.2 }],
+      expect.objectContaining({ duration: 150 }),
+    );
+  });
+
   it('should render Fade with correct opacity keyframes, duration and easing (visible=false -> true -> false)', () => {
     const { rerender } = render(<Fade visible={false}>{testElement}</Fade>);
 

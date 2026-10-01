@@ -3,8 +3,10 @@ import * as React from 'react';
 
 import type { PresenceMotion } from '../types';
 import { createPresenceComponent } from './createPresenceComponent';
+import { createPresenceComponentVariant } from './createPresenceComponentVariant';
 import { PresenceGroupChildContext } from '../contexts/PresenceGroupChildContext';
 import { MotionBehaviourProvider } from '../contexts/MotionBehaviourContext';
+import type { MotionComponentProps } from './createMotionComponent';
 
 const enterKeyframes = [{ opacity: 0 }, { opacity: 1 }];
 const exitKeyframes = [{ opacity: 1 }, { opacity: 0 }];
@@ -67,6 +69,105 @@ describe('createPresenceComponent', () => {
       // @ts-expect-error mock
       delete global.Animation;
     }
+  });
+
+  describe('configured one-way motions', () => {
+    type Endpoints = { from?: number; to?: number };
+
+    it('plays the configured motion on mount while retaining visible-controlled presence', () => {
+      const TestPresence = createPresenceComponent<{}, Endpoints>(motion, () => ({
+        motion: {
+          definition: ({ from = 1, to = 1 }) => ({ keyframes: [{ opacity: from }, { opacity: to }], ...options }),
+          isMotion: (props): props is MotionComponentProps & Endpoints => 'from' in props || 'to' in props,
+        },
+      }));
+      const onMotionStart = jest.fn();
+      const { animateMock, ElementMock, finishMock } = createElementMock();
+      const { unmount } = render(
+        <TestPresence from={0.2} to={0.7} onMotionStart={onMotionStart}>
+          <ElementMock />
+        </TestPresence>,
+      );
+
+      expect(animateMock).toHaveBeenLastCalledWith([{ opacity: 0.2 }, { opacity: 0.7 }], options);
+      expect(onMotionStart).toHaveBeenCalledWith(null);
+      expect(finishMock).not.toHaveBeenCalled();
+      unmount();
+
+      render(
+        <TestPresence visible>
+          <ElementMock />
+        </TestPresence>,
+      );
+      expect(animateMock).toHaveBeenLastCalledWith(enterKeyframes, options);
+      expect(finishMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('uses dedicated In and Out definitions without changing the presence definition', () => {
+      const TestPresence = createPresenceComponent<{}, never, Endpoints>(motion, () => ({
+        enter: ({ from = 0, to = 1 }) => ({ keyframes: [{ opacity: from }, { opacity: to }], ...options }),
+        exit: ({ from = 1, to = 0 }) => ({ keyframes: [{ opacity: from }, { opacity: to }], ...options }),
+      }));
+      const { animateMock, ElementMock } = createElementMock();
+      const { unmount } = render(
+        <TestPresence.In from={0.2} to={0.7}>
+          <ElementMock />
+        </TestPresence.In>,
+      );
+      expect(animateMock).toHaveBeenLastCalledWith([{ opacity: 0.2 }, { opacity: 0.7 }], options);
+      unmount();
+      render(
+        <TestPresence.Out from={0.7} to={0.2}>
+          <ElementMock />
+        </TestPresence.Out>,
+      );
+      expect(animateMock).toHaveBeenLastCalledWith([{ opacity: 0.7 }, { opacity: 0.2 }], options);
+    });
+
+    it('preserves configured modes and runtime overrides through nested variants', () => {
+      type Timing = { duration?: number; exitDuration?: number };
+      type MotionParams = Timing & Endpoints;
+      const TestPresence = createPresenceComponent<Timing, MotionParams, MotionParams>(motion, defaults => ({
+        motion: {
+          definition: ({ from = 1, to = 1, duration = defaults.duration ?? 500 }) => ({
+            keyframes: [{ opacity: from }, { opacity: to }],
+            ...options,
+            duration,
+          }),
+          isMotion: (props): props is MotionComponentProps & MotionParams => 'from' in props || 'to' in props,
+        },
+        exit: params => ({
+          keyframes: [{ opacity: params.from ?? 1 }, { opacity: params.to ?? 0 }],
+          ...options,
+          duration: params.exitDuration ?? params.duration ?? defaults.exitDuration ?? 500,
+        }),
+      }));
+      const Variant = createPresenceComponentVariant(TestPresence, { duration: 250, exitDuration: 150 });
+      const Nested = createPresenceComponentVariant(Variant, { duration: 350 });
+      const { animateMock, ElementMock } = createElementMock();
+      const { unmount } = render(
+        <Nested from={0.2} to={0.7}>
+          <ElementMock />
+        </Nested>,
+      );
+      expect(animateMock).toHaveBeenLastCalledWith([{ opacity: 0.2 }, { opacity: 0.7 }], { ...options, duration: 350 });
+      unmount();
+
+      const { unmount: unmountOut } = render(
+        <Nested.Out from={0.7} to={0.2}>
+          <ElementMock />
+        </Nested.Out>,
+      );
+      expect(animateMock).toHaveBeenLastCalledWith([{ opacity: 0.7 }, { opacity: 0.2 }], { ...options, duration: 150 });
+      unmountOut();
+
+      render(
+        <Nested.Out from={0.7} to={0.2} duration={123}>
+          <ElementMock />
+        </Nested.Out>,
+      );
+      expect(animateMock).toHaveBeenLastCalledWith([{ opacity: 0.7 }, { opacity: 0.2 }], { ...options, duration: 123 });
+    });
   });
 
   describe('appear', () => {

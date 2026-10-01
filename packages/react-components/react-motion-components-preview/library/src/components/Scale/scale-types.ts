@@ -1,9 +1,4 @@
-import type {
-  MotionComponent,
-  MotionComponentProps,
-  PresenceComponent,
-  PresenceComponentProps,
-} from '@fluentui/react-motion';
+import type { MotionComponentProps, PresenceComponent, PresenceComponentProps } from '@fluentui/react-motion';
 import type { JSXElement } from '@fluentui/react-utilities';
 import type { BasePresenceParams, AnimateOpacity, MotionTiming, PoseEndpoints } from '../../types';
 import type { ScalePose } from '../../atoms/scale-atom';
@@ -44,8 +39,6 @@ export type ScaleMotionProps = MotionComponentProps &
 export type ScaleProps = ScalePresenceProps | ScaleMotionProps;
 
 /** Scale's callable props and directional motions, with its presence definition retained for variants. */
-export type ScaleComponent = PresenceComponent<ScaleParams> & {
+export type ScaleComponent = PresenceComponent<ScaleParams, ScaleMotionParams, ScaleDirectionalParams> & {
   (props: ScaleProps): JSXElement | null;
-  In: MotionComponent<ScaleDirectionalParams>;
-  Out: MotionComponent<ScaleDirectionalParams>;
 };

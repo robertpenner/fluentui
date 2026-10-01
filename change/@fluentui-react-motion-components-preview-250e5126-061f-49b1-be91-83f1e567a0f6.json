@@ -1,0 +1,6 @@
+{
+  "type": "patch",
+  "comment": "refactor(react-motion-components-preview): compose Fade and Scale using shared presence modes",
+  "packageName": "@fluentui/react-motion-components-preview",
+  "email": "robert@robertpenner.com"
+}

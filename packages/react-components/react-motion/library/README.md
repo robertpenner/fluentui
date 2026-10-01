@@ -48,6 +48,27 @@ function App() {
 }
 ```
 
+## Custom One-Way Modes
+
+`createPresenceComponent` accepts an optional second argument: a callback that
+receives variant defaults and returns `PresenceComponentOptions`.
+
+- `motion.definition` defines one-way playback on the main component, while
+  `motion.isMotion` selects that mode from its props using a TypeScript type guard.
+- `enter` defines `.In` independently of the presence component's enter motion.
+- `exit` defines `.Out` independently of the presence component's exit motion.
+
+The factory's three type parameters describe presence parameters, main-component
+one-way parameters, and directional parameters. Directional parameters extend the
+presence parameters. Without these options, `.In` and `.Out` continue to select
+the original presence definition's enter and exit motions.
+
+`createPresenceComponentVariant` retains configured modes and supplies accumulated
+variant defaults to the callback, including for variants of variants. Definitions
+can distinguish defaults from explicitly supplied runtime parameters when choosing
+timing precedence. The existing presence lifecycle, visibility controls, and
+presence-group context remain unchanged.
+
 ## Documentation
 
 📚 **[Full documentation](https://react.fluentui.dev/?path=/docs/motion-introduction--docs)**

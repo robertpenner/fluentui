@@ -1,0 +1,6 @@
+{
+  "type": "minor",
+  "comment": "feat(react-motion): support configurable one-way presence modes and preserve them in variants",
+  "packageName": "@fluentui/react-motion",
+  "email": "robert@robertpenner.com"
+}

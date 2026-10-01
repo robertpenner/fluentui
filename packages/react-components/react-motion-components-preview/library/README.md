@@ -105,6 +105,10 @@ Snappy and Relaxed variants support the same modes. Use `replayKey` to replay.
 Without endpoint props, Fade and Scale retain their existing presence behavior,
 including `visible`, entered/exited pose props, exit timing, and presence groups.
 
+Custom variants made with `createPresenceComponentVariant(Fade, defaults)` or
+`createPresenceComponentVariant(Scale, defaults)` retain endpoint playback and
+the directional components, including when creating a variant of another variant.
+
 ## Pose-Based Helpers
 
 `fade`, `fadeIn`, `fadeOut`, `slide`, `slideIn`, `slideOut`, `scale`, `scaleIn`,

@@ -1,6 +1,10 @@
 import type { MotionParam, PresenceMotionFn } from '../types';
 import type { PresenceComponent } from './createPresenceComponent';
-import { PRESENCE_MOTION_DEFINITION, createPresenceComponent } from './createPresenceComponent';
+import {
+  PRESENCE_MOTION_DEFINITION,
+  PRESENCE_COMPONENT_OPTIONS,
+  createPresenceComponent,
+} from './createPresenceComponent';
 
 /**
  * Create a variant function that wraps a presence function to customize it.
@@ -27,12 +31,24 @@ export function createPresenceFnVariant<MotionParams extends Record<string, Moti
  * @returns A new presence component that uses the provided variant parameters as defaults.
  * The new component can still accept runtime parameters that override the defaults.
  */
-export function createPresenceComponentVariant<MotionParams extends Record<string, MotionParam> = {}>(
-  component: PresenceComponent<MotionParams>,
-  variantParams: Partial<MotionParams>,
-): PresenceComponent<MotionParams> {
+export function createPresenceComponentVariant<
+  PresenceParams extends Record<string, MotionParam> = {},
+  MotionParams extends Record<string, MotionParam> = never,
+  DirectionalParams extends PresenceParams = PresenceParams,
+>(
+  component: PresenceComponent<NoInfer<PresenceParams>, MotionParams, DirectionalParams> & {
+    [PRESENCE_MOTION_DEFINITION]: PresenceMotionFn<PresenceParams>;
+  },
+  variantParams: Partial<NoInfer<PresenceParams>>,
+): PresenceComponent<PresenceParams, MotionParams, DirectionalParams> {
   const originalFn = component[PRESENCE_MOTION_DEFINITION];
   // The variant params become new defaults, but they can still be overridden by runtime params.
   const variantFn = createPresenceFnVariant(originalFn, variantParams);
-  return createPresenceComponent(variantFn);
+  const createDefinitions = component[PRESENCE_COMPONENT_OPTIONS];
+  if (!createDefinitions) {
+    return createPresenceComponent<PresenceParams, MotionParams, DirectionalParams>(variantFn);
+  }
+  return createPresenceComponent<PresenceParams, MotionParams, DirectionalParams>(variantFn, defaults =>
+    createDefinitions({ ...variantParams, ...defaults }),
+  );
 }

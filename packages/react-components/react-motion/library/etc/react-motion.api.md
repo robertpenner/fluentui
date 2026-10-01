@@ -26,11 +26,13 @@ export function createMotionComponent<MotionParams extends Record<string, Motion
 // @public
 export function createMotionComponentVariant<MotionParams extends Record<string, MotionParam> = {}>(component: MotionComponent<MotionParams>, variantParams: Partial<MotionParams>): MotionComponent<MotionParams>;
 
-// @public (undocumented)
-export function createPresenceComponent<MotionParams extends Record<string, MotionParam> = {}>(value: PresenceMotion | PresenceMotionFn<MotionParams>): PresenceComponent<MotionParams>;
+// @public
+export function createPresenceComponent<PresenceParams extends Record<string, MotionParam> = {}, MotionParams extends Record<string, MotionParam> = never, DirectionalParams extends PresenceParams = PresenceParams>(value: PresenceMotion | PresenceMotionFn<PresenceParams>, createDefinitions?: (defaults: Partial<PresenceParams>) => PresenceComponentOptions<PresenceParams, MotionParams, DirectionalParams>): PresenceComponent<PresenceParams, MotionParams, DirectionalParams>;
 
 // @public
-export function createPresenceComponentVariant<MotionParams extends Record<string, MotionParam> = {}>(component: PresenceComponent<MotionParams>, variantParams: Partial<MotionParams>): PresenceComponent<MotionParams>;
+export function createPresenceComponentVariant<PresenceParams extends Record<string, MotionParam> = {}, MotionParams extends Record<string, MotionParam> = never, DirectionalParams extends PresenceParams = PresenceParams>(component: PresenceComponent<NoInfer<PresenceParams>, MotionParams, DirectionalParams> & {
+    [PRESENCE_MOTION_DEFINITION]: PresenceMotionFn<PresenceParams>;
+}, variantParams: Partial<NoInfer<PresenceParams>>): PresenceComponent<PresenceParams, MotionParams, DirectionalParams>;
 
 // @public (undocumented)
 export const curves: {
@@ -130,11 +132,22 @@ export const motionTokens: {
 };
 
 // @public (undocumented)
-export type PresenceComponent<MotionParams extends Record<string, MotionParam> = {}> = React_2.FC<PresenceComponentProps & MotionParams> & {
-    (props: PresenceComponentProps & MotionParams): JSXElement | null;
-    [PRESENCE_MOTION_DEFINITION]: PresenceMotionFn<MotionParams>;
-    In: MotionComponent<MotionParams>;
-    Out: MotionComponent<MotionParams>;
+export type PresenceComponent<PresenceParams extends Record<string, MotionParam> = {}, MotionParams extends Record<string, MotionParam> = never, DirectionalParams extends PresenceParams = PresenceParams> = React_2.FC<PresenceComponentProps & PresenceParams> & {
+    (props: (PresenceComponentProps & PresenceParams) | (MotionComponentProps & MotionParams)): JSXElement | null;
+    [PRESENCE_MOTION_DEFINITION]: PresenceMotionFn<PresenceParams>;
+    [PRESENCE_COMPONENT_OPTIONS]?: (defaults: Partial<PresenceParams>) => PresenceComponentOptions<PresenceParams, MotionParams, DirectionalParams>;
+    In: MotionComponent<DirectionalParams>;
+    Out: MotionComponent<DirectionalParams>;
+};
+
+// @public
+export type PresenceComponentOptions<PresenceParams extends Record<string, MotionParam>, MotionParams extends Record<string, MotionParam> = never, DirectionalParams extends PresenceParams = PresenceParams> = {
+    motion?: {
+        definition: AtomMotionFn<MotionParams>;
+        isMotion: (props: (PresenceComponentProps & PresenceParams) | (MotionComponentProps & MotionParams)) => props is MotionComponentProps & MotionParams;
+    };
+    enter?: AtomMotionFn<DirectionalParams>;
+    exit?: AtomMotionFn<DirectionalParams>;
 };
 
 // @public (undocumented)
