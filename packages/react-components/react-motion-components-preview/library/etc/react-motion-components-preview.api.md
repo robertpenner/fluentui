@@ -5,6 +5,9 @@
 ```ts
 
 import type { AtomMotion } from '@fluentui/react-motion';
+import type { JSXElement } from '@fluentui/react-utilities';
+import type { MotionComponent } from '@fluentui/react-motion';
+import type { MotionComponentProps } from '@fluentui/react-motion';
 import { PresenceComponent } from '@fluentui/react-motion';
 import type { PresenceComponentProps } from '@fluentui/react-motion';
 import type { PresenceDirection } from '@fluentui/react-motion';
@@ -51,7 +54,7 @@ export const CollapseRelaxed: PresenceComponent<CollapseParams>;
 export const CollapseSnappy: PresenceComponent<CollapseParams>;
 
 // @public
-export const Fade: PresenceComponent<FadeParams>;
+export const Fade: FadeComponent;
 
 // @public
 export const fade: ({ from, to, duration, easing, delay, }: FadeOptions) => AtomMotion;
@@ -78,10 +81,10 @@ export type FadeParams = BasePresenceParams & {
 export type FadePose = number;
 
 // @public (undocumented)
-export const FadeRelaxed: PresenceComponent<FadeParams>;
+export const FadeRelaxed: FadeComponent;
 
 // @public (undocumented)
-export const FadeSnappy: PresenceComponent<FadeParams>;
+export const FadeSnappy: FadeComponent;
 
 // @public
 export type MotionTiming = Omit<BaseAtomParams, 'direction'>;
@@ -100,7 +103,7 @@ export type RotateParams = BasePresenceParams & AnimateOpacity & {
 };
 
 // @public
-export const Scale: PresenceComponent<ScaleParams>;
+export const Scale: ScaleComponent;
 
 // @public
 export const scale: ({ from, to, duration, easing, delay, }: ScaleOptions) => AtomMotion;
@@ -139,10 +142,10 @@ export type ScaleParams = BasePresenceParams & AnimateOpacity & {
 export type ScalePose = number;
 
 // @public (undocumented)
-export const ScaleRelaxed: PresenceComponent<ScaleParams>;
+export const ScaleRelaxed: ScaleComponent;
 
 // @public (undocumented)
-export const ScaleSnappy: PresenceComponent<ScaleParams>;
+export const ScaleSnappy: ScaleComponent;
 
 // @public
 export const Slide: PresenceComponent<SlideParams>;

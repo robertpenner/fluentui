@@ -74,6 +74,37 @@ Every presence component includes one-way sub-components:
 </Fade.Out>
 ```
 
+### One-Way Fade and Scale
+
+Author `from`, `to`, or both without `visible` to play once on mount. An omitted
+endpoint defaults to 1. General `Scale` animates scale only and has no
+`animateOpacity` prop in this mode.
+
+```tsx
+<Fade from={0.2} to={0.7} duration={300}>
+  <div>Partial opacity transition</div>
+</Fade>
+<Scale from={0.8} to={1.2}>
+  <div>Scale-only transition</div>
+</Scale>
+<Scale.In from={0.8} to={1.2} animateOpacity={false}>
+  <div>Entering scale without a fade</div>
+</Scale.In>
+<Scale.Out from={1.2} to={0.8} duration={150}>
+  <div>Exiting scale with a fade</div>
+</Scale.Out>
+```
+
+Both `.In` and `.Out` accept both endpoints. Their default opacity poses are
+0-to-1 and 1-to-0 respectively; their default scale poses are 0.9-to-1 and
+1-to-0.9. Directional Scale includes a fade unless `animateOpacity={false}`.
+One-way `.Out` accepts `duration`, `easing`, and `delay`; the corresponding
+`exitDuration`, `exitEasing`, and `exitDelay` aliases take precedence when supplied.
+Snappy and Relaxed variants support the same modes. Use `replayKey` to replay.
+
+Without endpoint props, Fade and Scale retain their existing presence behavior,
+including `visible`, entered/exited pose props, exit timing, and presence groups.
+
 ## Pose-Based Helpers
 
 `fade`, `fadeIn`, `fadeOut`, `slide`, `slideIn`, `slideOut`, `scale`, `scaleIn`,

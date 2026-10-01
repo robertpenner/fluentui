@@ -1,8 +1,17 @@
+import * as React from 'react';
 import type { PresenceMotionFn } from '@fluentui/react-motion';
-import { motionTokens, createPresenceComponent, createPresenceComponentVariant } from '@fluentui/react-motion';
+import { motionTokens, createPresenceComponent, createMotionComponent } from '@fluentui/react-motion';
+import type { JSXElement } from '@fluentui/react-utilities';
 import { fadeIn, fadeOut } from '../../atoms/fade-atom';
 import { scale } from '../../atoms/scale-atom';
-import type { ScaleParams } from './scale-types';
+import type {
+  ScaleParams,
+  ScaleMotionParams,
+  ScaleDirectionalParams,
+  ScaleMotionProps,
+  ScaleProps,
+  ScaleComponent,
+} from './scale-types';
 
 /**
  * Define a presence motion for scale in/out
@@ -51,15 +60,64 @@ const scalePresenceFn: PresenceMotionFn<ScaleParams> = ({
   };
 };
 
-/** A React component that applies scale in/out transitions to its children. */
-export const Scale = createPresenceComponent(scalePresenceFn);
+const createScale = (defaults: ScaleParams = {}): ScaleComponent => {
+  const presence = createPresenceComponent<ScaleParams>(params => scalePresenceFn({ ...defaults, ...params }));
+  const motion = createMotionComponent<ScaleMotionParams>(
+    ({
+      duration = defaults.duration ?? motionTokens.durationGentle,
+      easing = defaults.easing ?? motionTokens.curveDecelerateMax,
+      ...params
+    }) => scale({ ...params, duration, easing }),
+  );
+  const In = createMotionComponent<ScaleDirectionalParams>(params => {
+    const options = { ...defaults, ...params };
+    const timing = {
+      duration: options.duration ?? motionTokens.durationGentle,
+      easing: options.easing ?? motionTokens.curveDecelerateMax,
+      delay: options.delay,
+    };
+    const atoms = [
+      scale({ from: options.from ?? options.outScale ?? 0.9, to: options.to ?? options.inScale ?? 1, ...timing }),
+    ];
+    if (options.animateOpacity !== false) {
+      atoms.push(fadeIn(timing));
+    }
+    return atoms;
+  });
+  const Out = createMotionComponent<ScaleDirectionalParams>(params => {
+    const options = { ...defaults, ...params };
+    const timing = {
+      duration: params.exitDuration ?? params.duration ?? defaults.exitDuration ?? motionTokens.durationNormal,
+      easing: params.exitEasing ?? params.easing ?? defaults.exitEasing ?? motionTokens.curveAccelerateMax,
+      delay: params.exitDelay ?? params.delay ?? defaults.exitDelay ?? defaults.delay,
+    };
+    const atoms = [
+      scale({ from: options.from ?? options.inScale ?? 1, to: options.to ?? options.outScale ?? 0.9, ...timing }),
+    ];
+    if (options.animateOpacity !== false) {
+      atoms.push(fadeOut(timing));
+    }
+    return atoms;
+  });
 
-export const ScaleSnappy = createPresenceComponentVariant(Scale, {
+  function component(props: ScaleProps): JSXElement | null {
+    const isMotion = (value: ScaleProps): value is ScaleMotionProps =>
+      value.visible === undefined && (value.from !== undefined || value.to !== undefined);
+    return isMotion(props) ? React.createElement(motion, props) : React.createElement(presence, props);
+  }
+
+  return Object.assign(component, presence, { In, Out });
+};
+
+/** Applies a scale-only one-way motion or visible-controlled presence transitions with optional opacity. */
+export const Scale = createScale();
+
+export const ScaleSnappy = createScale({
   duration: motionTokens.durationNormal,
   exitDuration: motionTokens.durationFast,
 });
 
-export const ScaleRelaxed = createPresenceComponentVariant(Scale, {
+export const ScaleRelaxed = createScale({
   duration: motionTokens.durationSlow,
   exitDuration: motionTokens.durationGentle,
 });

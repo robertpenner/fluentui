@@ -1,0 +1,6 @@
+{
+  "type": "minor",
+  "comment": "feat(react-motion-components-preview): add endpoint-based one-way Fade and Scale modes",
+  "packageName": "@fluentui/react-motion-components-preview",
+  "email": "robert@robertpenner.com"
+}
